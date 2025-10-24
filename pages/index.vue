@@ -22,9 +22,51 @@ const resetColor = (colorName: string) => {
     operator: { offset: 3, lightness: 50 },
   }
 
-  if (defaults[colorName]) {
-    state[`${colorName}Offset` as keyof typeof state] = defaults[colorName].offset as any
-    state[`${colorName}Lightness` as keyof typeof state] = defaults[colorName].lightness as any
+  const d = defaults[colorName]
+  if (!d) return
+
+  // Direct property assignment for each color type
+  switch (colorName) {
+    case 'error':
+      state.errorOffset = d.offset
+      state.errorLightness = d.lightness
+      break
+    case 'warning':
+      state.warningOffset = d.offset
+      state.warningLightness = d.lightness
+      break
+    case 'keyword':
+      state.keywordOffset = d.offset
+      state.keywordLightness = d.lightness
+      break
+    case 'string':
+      state.stringOffset = d.offset
+      state.stringLightness = d.lightness
+      break
+    case 'number':
+      state.numberOffset = d.offset
+      state.numberLightness = d.lightness
+      break
+    case 'function':
+      state.functionOffset = d.offset
+      state.functionLightness = d.lightness
+      break
+    case 'constant':
+      state.constantOffset = d.offset
+      state.constantLightness = d.lightness
+      break
+    case 'type':
+      state.typeOffset = d.offset
+      state.typeLightness = d.lightness
+      break
+    case 'variable':
+      state.variableOffset = d.offset
+      state.variableLightness = d.lightness
+      break
+    case 'operator':
+      state.operatorOffset = d.offset
+      state.operatorLightness = d.lightness
+      break
   }
 }
 
@@ -77,6 +119,24 @@ const loadPreset = (presetName: keyof typeof presets) => {
   const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
   colors.forEach(colorName => resetColor(colorName))
 }
+
+const resetAll = () => {
+  // Reset core settings
+  state.baseHue = 0
+  state.hueOffset = 7
+  state.saturation = 85
+  state.contrast = 50
+  state.monochromeMode = false
+  state.monochromeIntensity = 80
+  state.monochromeLightness = 50
+  state.boldKeywords = false
+  state.italicComments = true
+  state.mode = 'dark'
+
+  // Reset all colors
+  const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
+  colors.forEach(colorName => resetColor(colorName))
+}
 </script>
 
 <template>
@@ -89,7 +149,7 @@ const loadPreset = (presetName: keyof typeof presets) => {
 
       <!-- Presets dropdown -->
       <div class="preset-section">
-        <select @change="(e) => loadPreset((e.target as HTMLSelectElement).value as any)" class="preset-select">
+        <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { loadPreset(el.value as any); el.value = ''; } }" class="preset-select">
           <option value="">load preset...</option>
           <option value="ayu-dark">ayu dark</option>
           <option value="ayu-mirage">ayu mirage</option>
@@ -111,6 +171,7 @@ const loadPreset = (presetName: keyof typeof presets) => {
           <button @click="copyDark" class="btn btn-small">dark</button>
           <button @click="copyLight" class="btn btn-small">light</button>
         </div>
+        <button @click="resetAll" class="btn btn-reset">reset all</button>
       </div>
     </aside>
 
@@ -525,6 +586,18 @@ h1 {
 .btn-small {
   font-size: 8px;
   padding: 4px;
+}
+
+.btn-reset {
+  border-color: rgba(255, 100, 100, 0.4);
+  color: rgba(255, 100, 100, 0.8);
+  margin-top: 4px;
+}
+
+.btn-reset:hover {
+  background: rgba(255, 100, 100, 0.15);
+  border-color: rgba(255, 100, 100, 0.6);
+  color: rgba(255, 100, 100, 1);
 }
 
 .preview {
