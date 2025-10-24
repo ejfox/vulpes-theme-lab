@@ -28,64 +28,64 @@ const resetColor = (colorName: string) => {
   // Direct property assignment for each color type
   switch (colorName) {
     case 'error':
-      state.errorOffset = d.offset
-      state.errorLightness = d.lightness
-      state.errorLinked = d.linked
-      state.errorMultiplier = d.multiplier
+      state.value.errorOffset = d.offset
+      state.value.errorLightness = d.lightness
+      state.value.errorLinked = d.linked
+      state.value.errorMultiplier = d.multiplier
       break
     case 'warning':
-      state.warningOffset = d.offset
-      state.warningLightness = d.lightness
-      state.warningLinked = d.linked
-      state.warningMultiplier = d.multiplier
+      state.value.warningOffset = d.offset
+      state.value.warningLightness = d.lightness
+      state.value.warningLinked = d.linked
+      state.value.warningMultiplier = d.multiplier
       break
     case 'keyword':
-      state.keywordOffset = d.offset
-      state.keywordLightness = d.lightness
-      state.keywordLinked = d.linked
-      state.keywordMultiplier = d.multiplier
+      state.value.keywordOffset = d.offset
+      state.value.keywordLightness = d.lightness
+      state.value.keywordLinked = d.linked
+      state.value.keywordMultiplier = d.multiplier
       break
     case 'string':
-      state.stringOffset = d.offset
-      state.stringLightness = d.lightness
-      state.stringLinked = d.linked
-      state.stringMultiplier = d.multiplier
+      state.value.stringOffset = d.offset
+      state.value.stringLightness = d.lightness
+      state.value.stringLinked = d.linked
+      state.value.stringMultiplier = d.multiplier
       break
     case 'number':
-      state.numberOffset = d.offset
-      state.numberLightness = d.lightness
-      state.numberLinked = d.linked
-      state.numberMultiplier = d.multiplier
+      state.value.numberOffset = d.offset
+      state.value.numberLightness = d.lightness
+      state.value.numberLinked = d.linked
+      state.value.numberMultiplier = d.multiplier
       break
     case 'function':
-      state.functionOffset = d.offset
-      state.functionLightness = d.lightness
-      state.functionLinked = d.linked
-      state.functionMultiplier = d.multiplier
+      state.value.functionOffset = d.offset
+      state.value.functionLightness = d.lightness
+      state.value.functionLinked = d.linked
+      state.value.functionMultiplier = d.multiplier
       break
     case 'constant':
-      state.constantOffset = d.offset
-      state.constantLightness = d.lightness
-      state.constantLinked = d.linked
-      state.constantMultiplier = d.multiplier
+      state.value.constantOffset = d.offset
+      state.value.constantLightness = d.lightness
+      state.value.constantLinked = d.linked
+      state.value.constantMultiplier = d.multiplier
       break
     case 'type':
-      state.typeOffset = d.offset
-      state.typeLightness = d.lightness
-      state.typeLinked = d.linked
-      state.typeMultiplier = d.multiplier
+      state.value.typeOffset = d.offset
+      state.value.typeLightness = d.lightness
+      state.value.typeLinked = d.linked
+      state.value.typeMultiplier = d.multiplier
       break
     case 'variable':
-      state.variableOffset = d.offset
-      state.variableLightness = d.lightness
-      state.variableLinked = d.linked
-      state.variableMultiplier = d.multiplier
+      state.value.variableOffset = d.offset
+      state.value.variableLightness = d.lightness
+      state.value.variableLinked = d.linked
+      state.value.variableMultiplier = d.multiplier
       break
     case 'operator':
-      state.operatorOffset = d.offset
-      state.operatorLightness = d.lightness
-      state.operatorLinked = d.linked
-      state.operatorMultiplier = d.multiplier
+      state.value.operatorOffset = d.offset
+      state.value.operatorLightness = d.lightness
+      state.value.operatorLinked = d.linked
+      state.value.operatorMultiplier = d.multiplier
       break
   }
 }
@@ -131,10 +131,10 @@ const presets = {
 
 const loadPreset = (presetName: keyof typeof presets) => {
   const preset = presets[presetName]
-  state.baseHue = preset.baseHue
-  state.saturation = preset.saturation
-  state.contrast = preset.contrast
-  state.mode = preset.mode
+  state.value.baseHue = preset.baseHue
+  state.value.saturation = preset.saturation
+  state.value.contrast = preset.contrast
+  state.value.mode = preset.mode
   // Reset all color offsets to defaults
   const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
   colors.forEach(colorName => resetColor(colorName))
@@ -142,16 +142,16 @@ const loadPreset = (presetName: keyof typeof presets) => {
 
 const resetAll = () => {
   // Reset core settings
-  state.baseHue = 0
-  state.hueOffset = 7
-  state.saturation = 85
-  state.contrast = 50
-  state.monochromeMode = false
-  state.monochromeIntensity = 80
-  state.monochromeLightness = 50
-  state.boldKeywords = false
-  state.italicComments = true
-  state.mode = 'dark'
+  state.value.baseHue = 0
+  state.value.hueOffset = 7
+  state.value.saturation = 85
+  state.value.contrast = 50
+  state.value.monochromeMode = true
+  state.value.monochromeIntensity = 80
+  state.value.monochromeLightness = 50
+  state.value.boldKeywords = false
+  state.value.italicComments = true
+  state.value.mode = 'dark'
 
   // Reset all colors
   const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
