@@ -739,28 +739,28 @@ h1 {
 
 .swatches {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 2px;
-  margin-bottom: 4px;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
   position: sticky;
   top: 0;
   z-index: 50;
   background: #000;
-  padding-bottom: 4px;
+  padding-bottom: 8px;
 }
 
 .swatch {
-  padding: 8px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   color: #000;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .swatch.editable {
-  gap: 6px;
-  padding: 14px 8px;
+  gap: 8px;
+  padding: 16px 12px;
 }
 
 .swatch-info {
@@ -775,13 +775,13 @@ h1 {
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  font-size: 8px;
-  padding: 2px 4px;
+  font-size: 9px;
+  padding: 3px 6px;
   line-height: 1;
   transition: all 0.15s;
   font-weight: bold;
   border-radius: 2px;
-  min-width: 16px;
+  min-width: 20px;
 }
 
 .link-btn.linked {
@@ -801,12 +801,12 @@ h1 {
   border: none;
   color: rgba(0, 0, 0, 0.5);
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   padding: 0;
   line-height: 1;
   transition: color 0.15s, transform 0.15s;
   margin-left: auto;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 .reset-btn:hover {
@@ -820,7 +820,7 @@ h1 {
 }
 
 .offset-value {
-  font-size: 7px;
+  font-size: 8px;
   opacity: 0.8;
   font-weight: normal;
   font-variant-numeric: tabular-nums;
@@ -828,27 +828,27 @@ h1 {
 
 .offset-slider {
   width: 100%;
-  height: 2px;
+  height: 3px;
   background: rgba(0, 0, 0, 0.2);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  margin: 2px 0;
+  margin: 3px 0;
 }
 
 .offset-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background: rgba(0, 0, 0, 0.8);
   cursor: pointer;
   border-radius: 0;
 }
 
 .offset-slider::-moz-range-thumb {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background: rgba(0, 0, 0, 0.8);
   cursor: pointer;
   border-radius: 0;
@@ -857,61 +857,61 @@ h1 {
 
 .offset-slider.linked {
   background: rgba(100, 100, 255, 0.3);
-  height: 3px;
+  height: 4px;
 }
 
 .offset-slider.linked::-webkit-slider-thumb {
   background: rgba(50, 50, 200, 0.9);
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
 }
 
 .offset-slider.linked::-moz-range-thumb {
   background: rgba(50, 50, 200, 0.9);
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
 }
 
 .offset-slider.add-mode {
   background: rgba(0, 200, 100, 0.2);
-  height: 1.5px;
+  height: 2px;
 }
 
 .offset-slider.add-mode::-webkit-slider-thumb {
   background: rgba(0, 150, 80, 0.8);
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
 }
 
 .offset-slider.add-mode::-moz-range-thumb {
   background: rgba(0, 150, 80, 0.8);
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
 }
 
 .lightness-slider {
   width: 100%;
-  height: 1px;
+  height: 2px;
   background: rgba(0, 0, 0, 0.15);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
-  margin: 1px 0;
+  margin: 3px 0;
 }
 
 .lightness-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
   background: rgba(0, 0, 0, 0.6);
   cursor: pointer;
   border-radius: 0;
 }
 
 .lightness-slider::-moz-range-thumb {
-  width: 6px;
-  height: 6px;
+  width: 9px;
+  height: 9px;
   background: rgba(0, 0, 0, 0.6);
   cursor: pointer;
   border-radius: 0;
@@ -921,7 +921,7 @@ h1 {
 .swatch code {
   font-family: inherit;
   opacity: 0.7;
-  font-size: 8px;
+  font-size: 9px;
 }
 
 .previews {
