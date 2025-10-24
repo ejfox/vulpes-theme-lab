@@ -365,9 +365,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.warning }">
           <div class="swatch-info">
             <span>warning</span>
-            <button @click="state.warningLinked = !state.warningLinked" class="link-btn" :class="{ linked: state.warningLinked }" :title="state.warningLinked ? 'unlink from global' : 'link to global'">{{ state.warningLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('warning')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('warning')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('warning', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.warningLinked = !state.warningLinked" class="link-btn" :class="{ linked: state.warningLinked }" title="link to global offset">{{ state.warningLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('warning')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('warning')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.warningLinked ? ((state.hueOffset * state.warningMultiplier) + state.warningOffset).toFixed(0) : state.warningOffset }}° / {{ state.warningLightness }}</span>
           </div>
           <input
@@ -375,6 +384,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.warningMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.warning}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -385,6 +395,7 @@ const resetAll = () => {
             v-model.number="state.warningOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.warningLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.warning})` }"
             min="-180"
             max="180"
             step="1"
@@ -394,6 +405,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.warningLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.warning}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -408,9 +420,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.keyword }">
           <div class="swatch-info">
             <span>keyword</span>
-            <button @click="state.keywordLinked = !state.keywordLinked" class="link-btn" :class="{ linked: state.keywordLinked }" :title="state.keywordLinked ? 'unlink from global' : 'link to global'">{{ state.keywordLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('keyword')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('keyword')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('keyword', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.keywordLinked = !state.keywordLinked" class="link-btn" :class="{ linked: state.keywordLinked }" title="link to global offset">{{ state.keywordLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('keyword')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('keyword')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.keywordLinked ? ((state.hueOffset * state.keywordMultiplier) + state.keywordOffset).toFixed(0) : state.keywordOffset }}° / {{ state.keywordLightness }}</span>
           </div>
           <input
@@ -418,6 +439,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.keywordMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.keyword}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -428,6 +450,7 @@ const resetAll = () => {
             v-model.number="state.keywordOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.keywordLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.keyword})` }"
             min="-180"
             max="180"
             step="1"
@@ -437,6 +460,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.keywordLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.keyword}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -447,9 +471,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.string }">
           <div class="swatch-info">
             <span>string</span>
-            <button @click="state.stringLinked = !state.stringLinked" class="link-btn" :class="{ linked: state.stringLinked }" :title="state.stringLinked ? 'unlink from global' : 'link to global'">{{ state.stringLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('string')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('string')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('string', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.stringLinked = !state.stringLinked" class="link-btn" :class="{ linked: state.stringLinked }" title="link to global offset">{{ state.stringLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('string')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('string')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.stringLinked ? ((state.hueOffset * state.stringMultiplier) + state.stringOffset).toFixed(0) : state.stringOffset }}° / {{ state.stringLightness }}</span>
           </div>
           <input
@@ -457,6 +490,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.stringMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.string}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -467,6 +501,7 @@ const resetAll = () => {
             v-model.number="state.stringOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.stringLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.string})` }"
             min="-180"
             max="180"
             step="1"
@@ -476,6 +511,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.stringLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.string}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -486,9 +522,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.number }">
           <div class="swatch-info">
             <span>number</span>
-            <button @click="state.numberLinked = !state.numberLinked" class="link-btn" :class="{ linked: state.numberLinked }" :title="state.numberLinked ? 'unlink from global' : 'link to global'">{{ state.numberLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('number')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('number')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('number', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.numberLinked = !state.numberLinked" class="link-btn" :class="{ linked: state.numberLinked }" title="link to global offset">{{ state.numberLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('number')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('number')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.numberLinked ? ((state.hueOffset * state.numberMultiplier) + state.numberOffset).toFixed(0) : state.numberOffset }}° / {{ state.numberLightness }}</span>
           </div>
           <input
@@ -496,6 +541,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.numberMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.number}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -506,6 +552,7 @@ const resetAll = () => {
             v-model.number="state.numberOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.numberLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.number})` }"
             min="-180"
             max="180"
             step="1"
@@ -515,6 +562,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.numberLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.number}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -525,9 +573,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.function }">
           <div class="swatch-info">
             <span>function</span>
-            <button @click="state.functionLinked = !state.functionLinked" class="link-btn" :class="{ linked: state.functionLinked }" :title="state.functionLinked ? 'unlink from global' : 'link to global'">{{ state.functionLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('function')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('function')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('function', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.functionLinked = !state.functionLinked" class="link-btn" :class="{ linked: state.functionLinked }" title="link to global offset">{{ state.functionLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('function')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('function')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.functionLinked ? ((state.hueOffset * state.functionMultiplier) + state.functionOffset).toFixed(0) : state.functionOffset }}° / {{ state.functionLightness }}</span>
           </div>
           <input
@@ -535,6 +592,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.functionMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.function}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -545,6 +603,7 @@ const resetAll = () => {
             v-model.number="state.functionOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.functionLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.function})` }"
             min="-180"
             max="180"
             step="1"
@@ -554,6 +613,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.functionLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.function}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -564,9 +624,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.constant }">
           <div class="swatch-info">
             <span>constant</span>
-            <button @click="state.constantLinked = !state.constantLinked" class="link-btn" :class="{ linked: state.constantLinked }" :title="state.constantLinked ? 'unlink from global' : 'link to global'">{{ state.constantLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('constant')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('constant')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('constant', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.constantLinked = !state.constantLinked" class="link-btn" :class="{ linked: state.constantLinked }" title="link to global offset">{{ state.constantLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('constant')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('constant')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.constantLinked ? ((state.hueOffset * state.constantMultiplier) + state.constantOffset).toFixed(0) : state.constantOffset }}° / {{ state.constantLightness }}</span>
           </div>
           <input
@@ -574,6 +643,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.constantMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.constant}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -584,6 +654,7 @@ const resetAll = () => {
             v-model.number="state.constantOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.constantLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.constant})` }"
             min="-180"
             max="180"
             step="1"
@@ -593,6 +664,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.constantLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.constant}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -603,9 +675,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.type }">
           <div class="swatch-info">
             <span>type</span>
-            <button @click="state.typeLinked = !state.typeLinked" class="link-btn" :class="{ linked: state.typeLinked }" :title="state.typeLinked ? 'unlink from global' : 'link to global'">{{ state.typeLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('type')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('type')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('type', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.typeLinked = !state.typeLinked" class="link-btn" :class="{ linked: state.typeLinked }" title="link to global offset">{{ state.typeLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('type')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('type')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.typeLinked ? ((state.hueOffset * state.typeMultiplier) + state.typeOffset).toFixed(0) : state.typeOffset }}° / {{ state.typeLightness }}</span>
           </div>
           <input
@@ -613,6 +694,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.typeMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.type}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -623,6 +705,7 @@ const resetAll = () => {
             v-model.number="state.typeOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.typeLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.type})` }"
             min="-180"
             max="180"
             step="1"
@@ -632,6 +715,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.typeLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.type}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -642,9 +726,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.variable }">
           <div class="swatch-info">
             <span>variable</span>
-            <button @click="state.variableLinked = !state.variableLinked" class="link-btn" :class="{ linked: state.variableLinked }" :title="state.variableLinked ? 'unlink from global' : 'link to global'">{{ state.variableLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('variable')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('variable')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('variable', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.variableLinked = !state.variableLinked" class="link-btn" :class="{ linked: state.variableLinked }" title="link to global offset">{{ state.variableLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('variable')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('variable')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.variableLinked ? ((state.hueOffset * state.variableMultiplier) + state.variableOffset).toFixed(0) : state.variableOffset }}° / {{ state.variableLightness }}</span>
           </div>
           <input
@@ -652,6 +745,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.variableMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.variable}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -662,6 +756,7 @@ const resetAll = () => {
             v-model.number="state.variableOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.variableLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.variable})` }"
             min="-180"
             max="180"
             step="1"
@@ -671,6 +766,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.variableLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.variable}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -681,9 +777,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.operator }">
           <div class="swatch-info">
             <span>operator</span>
-            <button @click="state.operatorLinked = !state.operatorLinked" class="link-btn" :class="{ linked: state.operatorLinked }" :title="state.operatorLinked ? 'unlink from global' : 'link to global'">{{ state.operatorLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('operator')" class="shuffle-btn" title="randomize">⚄</button>
-            <button @click="resetColor('operator')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('operator', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.operatorLinked = !state.operatorLinked" class="link-btn" :class="{ linked: state.operatorLinked }" title="link to global offset">{{ state.operatorLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('operator')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('operator')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.operatorLinked ? ((state.hueOffset * state.operatorMultiplier) + state.operatorOffset).toFixed(0) : state.operatorOffset }}° / {{ state.operatorLightness }}</span>
           </div>
           <input
@@ -691,6 +796,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.operatorMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.operator}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -701,6 +807,7 @@ const resetAll = () => {
             v-model.number="state.operatorOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.operatorLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.operator})` }"
             min="-180"
             max="180"
             step="1"
@@ -710,6 +817,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.operatorLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.operator}, #fff)` }"
             min="0"
             max="100"
             step="1"
