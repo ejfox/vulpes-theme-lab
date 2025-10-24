@@ -140,6 +140,114 @@ const loadPreset = (presetName: keyof typeof presets) => {
   colors.forEach(colorName => resetColor(colorName))
 }
 
+// Color math presets - apply color theory to multipliers
+const colorMathPresets = {
+  'complementary': {
+    // Complementary: 180° apart for maximum contrast
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: 180 / 7, offset: 0 },  // ~25.7x for 180°
+    keyword: { multiplier: 0, offset: 0 },
+    string: { multiplier: 180 / 7, offset: 0 },
+    number: { multiplier: 0, offset: 0 },
+    function: { multiplier: 180 / 7, offset: 0 },
+    constant: { multiplier: 0, offset: 0 },
+    type: { multiplier: 90 / 7, offset: 0 },  // quarter turn
+    variable: { multiplier: -90 / 7, offset: 0 },
+    operator: { multiplier: 0, offset: 0 },
+  },
+  'triadic': {
+    // Triadic: 120° apart for balanced harmony
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: 120 / 7, offset: 0 },  // ~17.1x
+    keyword: { multiplier: -120 / 7, offset: 0 },
+    string: { multiplier: 0, offset: 0 },
+    number: { multiplier: 120 / 7, offset: 0 },
+    function: { multiplier: -120 / 7, offset: 0 },
+    constant: { multiplier: 0, offset: 0 },
+    type: { multiplier: 120 / 7, offset: 0 },
+    variable: { multiplier: -120 / 7, offset: 0 },
+    operator: { multiplier: 0, offset: 0 },
+  },
+  'split-complementary': {
+    // Split complementary: base + 150° and 210° (flanking complement)
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: 150 / 7, offset: 0 },  // ~21.4x
+    keyword: { multiplier: -150 / 7, offset: 0 },
+    string: { multiplier: 0, offset: 0 },
+    number: { multiplier: 150 / 7, offset: 0 },
+    function: { multiplier: -150 / 7, offset: 0 },
+    constant: { multiplier: 0, offset: 0 },
+    type: { multiplier: 150 / 7, offset: 0 },
+    variable: { multiplier: -150 / 7, offset: 0 },
+    operator: { multiplier: 0, offset: 0 },
+  },
+  'tetradic': {
+    // Tetradic/Square: 90° apart for rich palette
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: 90 / 7, offset: 0 },  // ~12.9x
+    keyword: { multiplier: 180 / 7, offset: 0 },
+    string: { multiplier: -90 / 7, offset: 0 },
+    number: { multiplier: 0, offset: 0 },
+    function: { multiplier: 90 / 7, offset: 0 },
+    constant: { multiplier: 180 / 7, offset: 0 },
+    type: { multiplier: -90 / 7, offset: 0 },
+    variable: { multiplier: 0, offset: 0 },
+    operator: { multiplier: 45 / 7, offset: 0 },  // half-step
+  },
+  'analogous': {
+    // Analogous: close together (30° spacing) for harmony
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: -30 / 7, offset: 0 },  // ~4.3x
+    keyword: { multiplier: 30 / 7, offset: 0 },
+    string: { multiplier: -30 / 7, offset: 0 },
+    number: { multiplier: 60 / 7, offset: 0 },
+    function: { multiplier: -60 / 7, offset: 0 },
+    constant: { multiplier: 30 / 7, offset: 0 },
+    type: { multiplier: -30 / 7, offset: 0 },
+    variable: { multiplier: 60 / 7, offset: 0 },
+    operator: { multiplier: 15 / 7, offset: 0 },
+  },
+  'monochromatic': {
+    // Monochromatic: same hue, vary only lightness
+    error: { multiplier: 0, offset: 0 },
+    warning: { multiplier: 0, offset: 0 },
+    keyword: { multiplier: 0, offset: 0 },
+    string: { multiplier: 0, offset: 0 },
+    number: { multiplier: 0, offset: 0 },
+    function: { multiplier: 0, offset: 0 },
+    constant: { multiplier: 0, offset: 0 },
+    type: { multiplier: 0, offset: 0 },
+    variable: { multiplier: 0, offset: 0 },
+    operator: { multiplier: 0, offset: 0 },
+  },
+}
+
+const applyColorMath = (colorName: string, mathType: keyof typeof colorMathPresets) => {
+  const color = colorName as 'error' | 'warning' | 'keyword' | 'string' | 'number' | 'function' | 'constant' | 'type' | 'variable' | 'operator'
+  const preset = colorMathPresets[mathType]
+  const values = preset[color]
+
+  state.value[`${color}Multiplier` as keyof typeof state.value] = values.multiplier as any
+  state.value[`${color}Offset` as keyof typeof state.value] = values.offset as any
+  state.value[`${color}Linked` as keyof typeof state.value] = true as any
+}
+
+const shuffleColor = (colorName: string) => {
+  const color = colorName as 'error' | 'warning' | 'keyword' | 'string' | 'number' | 'function' | 'constant' | 'type' | 'variable' | 'operator'
+
+  // Random multiplier between -5 and 5
+  const randomMultiplier = (Math.random() * 10 - 5)
+  // Random offset between -180 and 180
+  const randomOffset = Math.floor(Math.random() * 360 - 180)
+  // Random lightness between 30 and 70 (avoiding extremes)
+  const randomLightness = Math.floor(Math.random() * 40 + 30)
+
+  state.value[`${color}Multiplier` as keyof typeof state.value] = randomMultiplier as any
+  state.value[`${color}Offset` as keyof typeof state.value] = randomOffset as any
+  state.value[`${color}Lightness` as keyof typeof state.value] = randomLightness as any
+  state.value[`${color}Linked` as keyof typeof state.value] = Math.random() > 0.5 as any
+}
+
 const resetAll = () => {
   // Reset core settings
   state.value.baseHue = 0
@@ -206,8 +314,18 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.error }">
           <div class="swatch-info">
             <span>error</span>
-            <button @click="state.errorLinked = !state.errorLinked" class="link-btn" :class="{ linked: state.errorLinked }" :title="state.errorLinked ? 'unlink from global' : 'link to global'">{{ state.errorLinked ? 'L' : 'U' }}</button>
-            <button @click="resetColor('error')" class="reset-btn" title="reset">↺</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('error', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="split-complementary">150°</option>
+              <option value="tetradic">90°</option>
+              <option value="analogous">30°</option>
+              <option value="monochromatic">0°</option>
+            </select>
+            <button @click="state.errorLinked = !state.errorLinked" class="link-btn" :class="{ linked: state.errorLinked }" title="link to global offset">{{ state.errorLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('error')" class="shuffle-btn" title="randomize all values">⚄</button>
+            <button @click="resetColor('error')" class="reset-btn" title="reset to defaults">↺</button>
             <span class="offset-value">{{ state.errorLinked ? ((state.hueOffset * state.errorMultiplier) + state.errorOffset).toFixed(0) : state.errorOffset }}° / {{ state.errorLightness }}</span>
           </div>
           <input
@@ -215,6 +333,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.errorMultiplier"
             class="offset-slider linked"
+            :style="{ background: `linear-gradient(to right, ${colors.error}, ${colors.warning})` }"
             min="-5"
             max="5"
             step="0.1"
@@ -225,6 +344,7 @@ const resetAll = () => {
             v-model.number="state.errorOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.errorLinked }"
+            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.error})` }"
             min="-180"
             max="180"
             step="1"
@@ -234,6 +354,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.errorLightness"
             class="lightness-slider"
+            :style="{ background: `linear-gradient(to right, #000, ${colors.error}, #fff)` }"
             min="0"
             max="100"
             step="1"
@@ -245,6 +366,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>warning</span>
             <button @click="state.warningLinked = !state.warningLinked" class="link-btn" :class="{ linked: state.warningLinked }" :title="state.warningLinked ? 'unlink from global' : 'link to global'">{{ state.warningLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('warning')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('warning')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.warningLinked ? ((state.hueOffset * state.warningMultiplier) + state.warningOffset).toFixed(0) : state.warningOffset }}° / {{ state.warningLightness }}</span>
           </div>
@@ -287,6 +409,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>keyword</span>
             <button @click="state.keywordLinked = !state.keywordLinked" class="link-btn" :class="{ linked: state.keywordLinked }" :title="state.keywordLinked ? 'unlink from global' : 'link to global'">{{ state.keywordLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('keyword')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('keyword')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.keywordLinked ? ((state.hueOffset * state.keywordMultiplier) + state.keywordOffset).toFixed(0) : state.keywordOffset }}° / {{ state.keywordLightness }}</span>
           </div>
@@ -325,6 +448,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>string</span>
             <button @click="state.stringLinked = !state.stringLinked" class="link-btn" :class="{ linked: state.stringLinked }" :title="state.stringLinked ? 'unlink from global' : 'link to global'">{{ state.stringLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('string')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('string')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.stringLinked ? ((state.hueOffset * state.stringMultiplier) + state.stringOffset).toFixed(0) : state.stringOffset }}° / {{ state.stringLightness }}</span>
           </div>
@@ -363,6 +487,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>number</span>
             <button @click="state.numberLinked = !state.numberLinked" class="link-btn" :class="{ linked: state.numberLinked }" :title="state.numberLinked ? 'unlink from global' : 'link to global'">{{ state.numberLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('number')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('number')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.numberLinked ? ((state.hueOffset * state.numberMultiplier) + state.numberOffset).toFixed(0) : state.numberOffset }}° / {{ state.numberLightness }}</span>
           </div>
@@ -401,6 +526,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>function</span>
             <button @click="state.functionLinked = !state.functionLinked" class="link-btn" :class="{ linked: state.functionLinked }" :title="state.functionLinked ? 'unlink from global' : 'link to global'">{{ state.functionLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('function')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('function')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.functionLinked ? ((state.hueOffset * state.functionMultiplier) + state.functionOffset).toFixed(0) : state.functionOffset }}° / {{ state.functionLightness }}</span>
           </div>
@@ -439,6 +565,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>constant</span>
             <button @click="state.constantLinked = !state.constantLinked" class="link-btn" :class="{ linked: state.constantLinked }" :title="state.constantLinked ? 'unlink from global' : 'link to global'">{{ state.constantLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('constant')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('constant')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.constantLinked ? ((state.hueOffset * state.constantMultiplier) + state.constantOffset).toFixed(0) : state.constantOffset }}° / {{ state.constantLightness }}</span>
           </div>
@@ -477,6 +604,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>type</span>
             <button @click="state.typeLinked = !state.typeLinked" class="link-btn" :class="{ linked: state.typeLinked }" :title="state.typeLinked ? 'unlink from global' : 'link to global'">{{ state.typeLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('type')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('type')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.typeLinked ? ((state.hueOffset * state.typeMultiplier) + state.typeOffset).toFixed(0) : state.typeOffset }}° / {{ state.typeLightness }}</span>
           </div>
@@ -515,6 +643,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>variable</span>
             <button @click="state.variableLinked = !state.variableLinked" class="link-btn" :class="{ linked: state.variableLinked }" :title="state.variableLinked ? 'unlink from global' : 'link to global'">{{ state.variableLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('variable')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('variable')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.variableLinked ? ((state.hueOffset * state.variableMultiplier) + state.variableOffset).toFixed(0) : state.variableOffset }}° / {{ state.variableLightness }}</span>
           </div>
@@ -553,6 +682,7 @@ const resetAll = () => {
           <div class="swatch-info">
             <span>operator</span>
             <button @click="state.operatorLinked = !state.operatorLinked" class="link-btn" :class="{ linked: state.operatorLinked }" :title="state.operatorLinked ? 'unlink from global' : 'link to global'">{{ state.operatorLinked ? 'L' : 'U' }}</button>
+            <button @click="shuffleColor('operator')" class="shuffle-btn" title="randomize">⚄</button>
             <button @click="resetColor('operator')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.operatorLinked ? ((state.hueOffset * state.operatorMultiplier) + state.operatorOffset).toFixed(0) : state.operatorOffset }}° / {{ state.operatorLightness }}</span>
           </div>
@@ -800,6 +930,24 @@ h1 {
   gap: 6px;
 }
 
+.color-math-select {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.6);
+  font-family: inherit;
+  font-size: 8px;
+  padding: 2px 4px;
+  cursor: pointer;
+  text-transform: lowercase;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.color-math-select:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
 .link-btn {
   background: transparent;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -824,6 +972,25 @@ h1 {
   background: rgba(0, 0, 0, 0.15);
   border-color: rgba(0, 0, 0, 0.5);
   color: rgba(0, 0, 0, 1);
+}
+
+.shuffle-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: all 0.15s;
+  border-radius: 2px;
+}
+
+.shuffle-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
 }
 
 .reset-btn {
