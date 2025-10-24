@@ -19,6 +19,10 @@ interface ThemeState {
   stringOffset: number
   numberOffset: number
   functionOffset: number
+  constantOffset: number
+  typeOffset: number
+  variableOffset: number
+  operatorOffset: number
   // Individual color lightness (0-100)
   errorLightness: number
   warningLightness: number
@@ -26,6 +30,10 @@ interface ThemeState {
   stringLightness: number
   numberLightness: number
   functionLightness: number
+  constantLightness: number
+  typeLightness: number
+  variableLightness: number
+  operatorLightness: number
 }
 
 const defaultState: ThemeState = {
@@ -46,6 +54,10 @@ const defaultState: ThemeState = {
   stringOffset: -10, // was -hueOffset * 1.5
   numberOffset: 14,  // was hueOffset * 2
   functionOffset: -14, // was -hueOffset * 2
+  constantOffset: 21, // hueOffset * 3
+  typeOffset: 17,     // hueOffset * 2.5
+  variableOffset: -17, // -hueOffset * 2.5
+  operatorOffset: 3,   // hueOffset * 0.5
   // Default lightness values (50 = use auto-calculated)
   errorLightness: 50,
   warningLightness: 50,
@@ -53,6 +65,10 @@ const defaultState: ThemeState = {
   stringLightness: 50,
   numberLightness: 50,
   functionLightness: 50,
+  constantLightness: 50,
+  typeLightness: 50,
+  variableLightness: 50,
+  operatorLightness: 50,
 }
 
 export const useTheme = () => {
@@ -83,6 +99,14 @@ export const useTheme = () => {
     stringLightness: Number(params.sl) || defaultState.stringLightness,
     numberLightness: Number(params.nl) || defaultState.numberLightness,
     functionLightness: Number(params.fl) || defaultState.functionLightness,
+    constantOffset: Number(params.co) || defaultState.constantOffset,
+    typeOffset: Number(params.to) || defaultState.typeOffset,
+    variableOffset: Number(params.vo) || defaultState.variableOffset,
+    operatorOffset: Number(params.oo) || defaultState.operatorOffset,
+    constantLightness: Number(params.cl) || defaultState.constantLightness,
+    typeLightness: Number(params.tl) || defaultState.typeLightness,
+    variableLightness: Number(params.vl) || defaultState.variableLightness,
+    operatorLightness: Number(params.ol) || defaultState.operatorLightness,
   }))
 
   // Watch state and sync to URL
@@ -110,6 +134,14 @@ export const useTheme = () => {
       params.sl = String(newState.stringLightness)
       params.nl = String(newState.numberLightness)
       params.fl = String(newState.functionLightness)
+      params.co = String(newState.constantOffset)
+      params.to = String(newState.typeOffset)
+      params.vo = String(newState.variableOffset)
+      params.oo = String(newState.operatorOffset)
+      params.cl = String(newState.constantLightness)
+      params.tl = String(newState.typeLightness)
+      params.vl = String(newState.variableLightness)
+      params.ol = String(newState.operatorLightness)
     }, { deep: true })
   }
 
@@ -174,6 +206,10 @@ export const useTheme = () => {
     const stringL = applyLightnessAdjust(60, 42, state.value.stringLightness)
     const numberL = applyLightnessAdjust(65, 45, state.value.numberLightness)
     const functionL = applyLightnessAdjust(55, 40, state.value.functionLightness)
+    const constantL = applyLightnessAdjust(58, 43, state.value.constantLightness)
+    const typeL = applyLightnessAdjust(62, 41, state.value.typeLightness)
+    const variableL = applyLightnessAdjust(57, 44, state.value.variableLightness)
+    const operatorL = applyLightnessAdjust(60, 40, state.value.operatorLightness)
 
     return {
       bg,
@@ -189,6 +225,10 @@ export const useTheme = () => {
       string: colorAt(state.value.stringOffset, stringL.dark, stringL.light),
       number: colorAt(state.value.numberOffset, numberL.dark, numberL.light),
       function: colorAt(state.value.functionOffset, functionL.dark, functionL.light),
+      constant: colorAt(state.value.constantOffset, constantL.dark, constantL.light),
+      type: colorAt(state.value.typeOffset, typeL.dark, typeL.light),
+      variable: colorAt(state.value.variableOffset, variableL.dark, variableL.light),
+      operator: colorAt(state.value.operatorOffset, operatorL.dark, operatorL.light),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),

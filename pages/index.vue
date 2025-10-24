@@ -203,6 +203,98 @@ const copyLight = async () => {
           />
           <code>{{ colors.function }}</code>
         </div>
+        <div class="swatch editable" :style="{ background: colors.constant }">
+          <div class="swatch-info">
+            <span>constant</span>
+            <span class="offset-value">{{ state.constantOffset }}° / {{ state.constantLightness }}</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.constantOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.constantLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
+          <code>{{ colors.constant }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.type }">
+          <div class="swatch-info">
+            <span>type</span>
+            <span class="offset-value">{{ state.typeOffset }}° / {{ state.typeLightness }}</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.typeOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.typeLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
+          <code>{{ colors.type }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.variable }">
+          <div class="swatch-info">
+            <span>variable</span>
+            <span class="offset-value">{{ state.variableOffset }}° / {{ state.variableLightness }}</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.variableOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.variableLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
+          <code>{{ colors.variable }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.operator }">
+          <div class="swatch-info">
+            <span>operator</span>
+            <span class="offset-value">{{ state.operatorOffset }}° / {{ state.operatorLightness }}</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.operatorOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.operatorLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
+          <code>{{ colors.operator }}</code>
+        </div>
         <div class="swatch" :style="{ background: colors.comment }">
           <span>comment</span>
           <code>{{ colors.comment }}</code>
@@ -359,8 +451,8 @@ h1 {
 }
 
 .swatch.editable {
-  gap: 4px;
-  padding: 10px 8px;
+  gap: 6px;
+  padding: 14px 8px;
 }
 
 .swatch-info {
