@@ -7,6 +7,27 @@ const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLi
 const darkConfig = computed(() => serializeGhosttyTheme(ghosttyThemeDark.value, 'theme-lab-dark'))
 const lightConfig = computed(() => serializeGhosttyTheme(ghosttyThemeLight.value, 'theme-lab-light'))
 
+// Reset functions for each color
+const resetColor = (colorName: string) => {
+  const defaults: Record<string, { offset: number, lightness: number }> = {
+    error: { offset: 7, lightness: 50 },
+    warning: { offset: -7, lightness: 50 },
+    keyword: { offset: 10, lightness: 50 },
+    string: { offset: -10, lightness: 50 },
+    number: { offset: 14, lightness: 50 },
+    function: { offset: -14, lightness: 50 },
+    constant: { offset: 21, lightness: 50 },
+    type: { offset: 17, lightness: 50 },
+    variable: { offset: -17, lightness: 50 },
+    operator: { offset: 3, lightness: 50 },
+  }
+
+  if (defaults[colorName]) {
+    state[`${colorName}Offset` as keyof typeof state] = defaults[colorName].offset as any
+    state[`${colorName}Lightness` as keyof typeof state] = defaults[colorName].lightness as any
+  }
+}
+
 // Download file helper
 const downloadFile = (content: string, filename: string) => {
   const blob = new Blob([content], { type: 'text/plain' })
@@ -64,6 +85,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.error }">
           <div class="swatch-info">
             <span>error</span>
+            <button @click="resetColor('error')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.errorOffset }}° / {{ state.errorLightness }}</span>
           </div>
           <input
@@ -87,6 +109,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.warning }">
           <div class="swatch-info">
             <span>warning</span>
+            <button @click="resetColor('warning')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.warningOffset }}° / {{ state.warningLightness }}</span>
           </div>
           <input
@@ -114,6 +137,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.keyword }">
           <div class="swatch-info">
             <span>keyword</span>
+            <button @click="resetColor('keyword')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.keywordOffset }}° / {{ state.keywordLightness }}</span>
           </div>
           <input
@@ -137,6 +161,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.string }">
           <div class="swatch-info">
             <span>string</span>
+            <button @click="resetColor('string')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.stringOffset }}° / {{ state.stringLightness }}</span>
           </div>
           <input
@@ -160,6 +185,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.number }">
           <div class="swatch-info">
             <span>number</span>
+            <button @click="resetColor('number')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.numberOffset }}° / {{ state.numberLightness }}</span>
           </div>
           <input
@@ -183,6 +209,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.function }">
           <div class="swatch-info">
             <span>function</span>
+            <button @click="resetColor('function')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.functionOffset }}° / {{ state.functionLightness }}</span>
           </div>
           <input
@@ -206,6 +233,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.constant }">
           <div class="swatch-info">
             <span>constant</span>
+            <button @click="resetColor('constant')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.constantOffset }}° / {{ state.constantLightness }}</span>
           </div>
           <input
@@ -229,6 +257,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.type }">
           <div class="swatch-info">
             <span>type</span>
+            <button @click="resetColor('type')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.typeOffset }}° / {{ state.typeLightness }}</span>
           </div>
           <input
@@ -252,6 +281,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.variable }">
           <div class="swatch-info">
             <span>variable</span>
+            <button @click="resetColor('variable')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.variableOffset }}° / {{ state.variableLightness }}</span>
           </div>
           <input
@@ -275,6 +305,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.operator }">
           <div class="swatch-info">
             <span>operator</span>
+            <button @click="resetColor('operator')" class="reset-btn" title="reset">↺</button>
             <span class="offset-value">{{ state.operatorOffset }}° / {{ state.operatorLightness }}</span>
           </div>
           <input
@@ -459,6 +490,25 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 6px;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s, transform 0.15s;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.reset-btn:hover {
+  color: rgba(0, 0, 0, 0.9);
+  transform: rotate(180deg);
 }
 
 .swatch span {
