@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { serializeGhosttyTheme } from '~/utils/ghostty'
+import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight } = useTheme()
 
@@ -265,6 +266,71 @@ const resetAll = () => {
   const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
   colors.forEach(colorName => resetColor(colorName))
 }
+
+// Dynamic gradient helpers - generate data-driven gradients for each slider
+const getMultiplierGradient = (colorName: string) => {
+  // Show the color at different multiplier values from -5 to +5
+  const sat = state.value.saturation / 100
+  const isDark = state.value.mode === 'dark'
+  const baseL = isDark ? 0.55 : 0.40
+
+  // Generate 5 color stops showing the hue at different multiplier positions
+  const stops = [-5, -2.5, 0, 2.5, 5].map(mult => {
+    const offset = state.value.hueOffset * mult
+    const hue = (state.value.baseHue + offset + 360) % 360
+    return chroma.hsl(hue, sat, baseL).hex()
+  })
+
+  return `linear-gradient(to right, ${stops.join(', ')})`
+}
+
+const getOffsetGradient = (colorName: string) => {
+  // Show a hue gradient from -60° to +60° around the current hue position
+  const sat = state.value.saturation / 100
+  const isDark = state.value.mode === 'dark'
+  const baseL = isDark ? 0.55 : 0.40
+
+  // Get the current hue for this color
+  const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number || 0
+  const individualOffset = state.value[`${colorName}Offset` as keyof typeof state.value] as number || 0
+  const isLinked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
+
+  const currentOffset = isLinked ? (state.value.hueOffset * multiplier) + individualOffset : individualOffset
+  const currentHue = (state.value.baseHue + currentOffset + 360) % 360
+
+  // Generate gradient showing hue range
+  const stops = [-60, -30, 0, 30, 60].map(offset => {
+    const hue = (currentHue + offset + 360) % 360
+    return chroma.hsl(hue, sat, baseL).hex()
+  })
+
+  return `linear-gradient(to right, ${stops.join(', ')})`
+}
+
+const getLightnessGradient = (colorName: string) => {
+  // Show the color at different lightness values from dark to light
+  const sat = state.value.saturation / 100
+  const isDark = state.value.mode === 'dark'
+
+  // Get the current hue for this color
+  const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number || 0
+  const individualOffset = state.value[`${colorName}Offset` as keyof typeof state.value] as number || 0
+  const isLinked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
+
+  const currentOffset = isLinked ? (state.value.hueOffset * multiplier) + individualOffset : individualOffset
+  const hue = (state.value.baseHue + currentOffset + 360) % 360
+
+  // Generate gradient from dark to light at this hue
+  const darkL = isDark ? 0.20 : 0.10
+  const lightL = isDark ? 0.85 : 0.75
+
+  const stops = [0, 0.25, 0.5, 0.75, 1].map(t => {
+    const l = darkL + (lightL - darkL) * t
+    return chroma.hsl(hue, sat, l).hex()
+  })
+
+  return `linear-gradient(to right, ${stops.join(', ')})`
+}
 </script>
 
 <template>
@@ -338,7 +404,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.errorMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.error}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('error') }"
             min="-5"
             max="5"
             step="0.1"
@@ -349,7 +415,7 @@ const resetAll = () => {
             v-model.number="state.errorOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.errorLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.error})` }"
+            :style="{ background: getOffsetGradient('error') }"
             min="-180"
             max="180"
             step="1"
@@ -359,7 +425,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.errorLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.error}, #fff)` }"
+            :style="{ background: getLightnessGradient('error') }"
             min="0"
             max="100"
             step="1"
@@ -389,7 +455,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.warningMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.warning}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('warning') }"
             min="-5"
             max="5"
             step="0.1"
@@ -400,7 +466,7 @@ const resetAll = () => {
             v-model.number="state.warningOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.warningLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.warning})` }"
+            :style="{ background: getOffsetGradient('warning') }"
             min="-180"
             max="180"
             step="1"
@@ -410,7 +476,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.warningLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.warning}, #fff)` }"
+            :style="{ background: getLightnessGradient('warning') }"
             min="0"
             max="100"
             step="1"
@@ -444,7 +510,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.keywordMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.keyword}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('keyword') }"
             min="-5"
             max="5"
             step="0.1"
@@ -455,7 +521,7 @@ const resetAll = () => {
             v-model.number="state.keywordOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.keywordLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.keyword})` }"
+            :style="{ background: getOffsetGradient('keyword') }"
             min="-180"
             max="180"
             step="1"
@@ -465,7 +531,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.keywordLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.keyword}, #fff)` }"
+            :style="{ background: getLightnessGradient('keyword') }"
             min="0"
             max="100"
             step="1"
@@ -495,7 +561,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.stringMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.string}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('string') }"
             min="-5"
             max="5"
             step="0.1"
@@ -506,7 +572,7 @@ const resetAll = () => {
             v-model.number="state.stringOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.stringLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.string})` }"
+            :style="{ background: getOffsetGradient('string') }"
             min="-180"
             max="180"
             step="1"
@@ -516,7 +582,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.stringLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.string}, #fff)` }"
+            :style="{ background: getLightnessGradient('string') }"
             min="0"
             max="100"
             step="1"
@@ -546,7 +612,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.numberMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.number}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('number') }"
             min="-5"
             max="5"
             step="0.1"
@@ -557,7 +623,7 @@ const resetAll = () => {
             v-model.number="state.numberOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.numberLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.number})` }"
+            :style="{ background: getOffsetGradient('number') }"
             min="-180"
             max="180"
             step="1"
@@ -567,7 +633,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.numberLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.number}, #fff)` }"
+            :style="{ background: getLightnessGradient('number') }"
             min="0"
             max="100"
             step="1"
@@ -597,7 +663,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.functionMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.function}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('function') }"
             min="-5"
             max="5"
             step="0.1"
@@ -608,7 +674,7 @@ const resetAll = () => {
             v-model.number="state.functionOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.functionLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.function})` }"
+            :style="{ background: getOffsetGradient('function') }"
             min="-180"
             max="180"
             step="1"
@@ -618,7 +684,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.functionLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.function}, #fff)` }"
+            :style="{ background: getLightnessGradient('function') }"
             min="0"
             max="100"
             step="1"
@@ -648,7 +714,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.constantMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.constant}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('constant') }"
             min="-5"
             max="5"
             step="0.1"
@@ -659,7 +725,7 @@ const resetAll = () => {
             v-model.number="state.constantOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.constantLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.constant})` }"
+            :style="{ background: getOffsetGradient('constant') }"
             min="-180"
             max="180"
             step="1"
@@ -669,7 +735,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.constantLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.constant}, #fff)` }"
+            :style="{ background: getLightnessGradient('constant') }"
             min="0"
             max="100"
             step="1"
@@ -699,7 +765,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.typeMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.type}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('type') }"
             min="-5"
             max="5"
             step="0.1"
@@ -710,7 +776,7 @@ const resetAll = () => {
             v-model.number="state.typeOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.typeLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.type})` }"
+            :style="{ background: getOffsetGradient('type') }"
             min="-180"
             max="180"
             step="1"
@@ -720,7 +786,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.typeLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.type}, #fff)` }"
+            :style="{ background: getLightnessGradient('type') }"
             min="0"
             max="100"
             step="1"
@@ -750,7 +816,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.variableMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.variable}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('variable') }"
             min="-5"
             max="5"
             step="0.1"
@@ -761,7 +827,7 @@ const resetAll = () => {
             v-model.number="state.variableOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.variableLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.variable})` }"
+            :style="{ background: getOffsetGradient('variable') }"
             min="-180"
             max="180"
             step="1"
@@ -771,7 +837,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.variableLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.variable}, #fff)` }"
+            :style="{ background: getLightnessGradient('variable') }"
             min="0"
             max="100"
             step="1"
@@ -801,7 +867,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.operatorMultiplier"
             class="offset-slider linked"
-            :style="{ background: `linear-gradient(to right, ${colors.operator}, ${colors.warning})` }"
+            :style="{ background: getMultiplierGradient('operator') }"
             min="-5"
             max="5"
             step="0.1"
@@ -812,7 +878,7 @@ const resetAll = () => {
             v-model.number="state.operatorOffset"
             class="offset-slider"
             :class="{ 'add-mode': state.operatorLinked }"
-            :style="{ background: `linear-gradient(to right, ${colors.bg}, ${colors.operator})` }"
+            :style="{ background: getOffsetGradient('operator') }"
             min="-180"
             max="180"
             step="1"
@@ -822,7 +888,7 @@ const resetAll = () => {
             type="range"
             v-model.number="state.operatorLightness"
             class="lightness-slider"
-            :style="{ background: `linear-gradient(to right, #000, ${colors.operator}, #fff)` }"
+            :style="{ background: getLightnessGradient('operator') }"
             min="0"
             max="100"
             step="1"
