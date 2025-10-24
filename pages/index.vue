@@ -270,7 +270,12 @@ const resetAll = () => {
 <template>
   <div class="lab" :style="{ background: colors.bg || '#000', color: colors.fg || '#fff' }">
     <!-- Floating frosted glass controls -->
-    <aside class="floating-controls">
+    <aside class="floating-controls" :style="{
+      background: state.mode === 'dark' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+      borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
+      boxShadow: state.mode === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
+      color: state.mode === 'dark' ? '#fff' : '#000'
+    }">
       <div class="header">
         <h1>theme-lab</h1>
       </div>
@@ -905,28 +910,31 @@ const resetAll = () => {
 
 .header {
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid currentColor;
+  border-opacity: 0.1;
 }
 
 h1 {
   font-size: 10px;
   font-weight: normal;
   margin: 0;
-  color: #fff;
+  color: inherit;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .preset-section {
   padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid currentColor;
+  border-opacity: 0.1;
 }
 
 .preset-select {
   width: 100%;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  border: 1px solid currentColor;
+  border-opacity: 0.3;
+  color: inherit;
   padding: 6px;
   font-family: inherit;
   font-size: 8px;
@@ -937,13 +945,14 @@ h1 {
 }
 
 .preset-select:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: currentColor;
+  background-opacity: 0.05;
+  border-opacity: 0.5;
 }
 
 .preset-select option {
-  background: #000;
-  color: #fff;
+  background: inherit;
+  color: inherit;
 }
 
 .actions {
@@ -951,7 +960,8 @@ h1 {
   flex-direction: column;
   gap: 4px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid currentColor;
+  border-opacity: 0.1;
 }
 
 .action-row {
@@ -962,8 +972,9 @@ h1 {
 
 .btn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  border: 1px solid currentColor;
+  border-opacity: 0.3;
+  color: inherit;
   padding: 6px;
   font-family: inherit;
   font-size: 9px;
@@ -973,12 +984,13 @@ h1 {
 }
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: currentColor;
+  background-opacity: 0.2;
+  border-opacity: 0.5;
 }
 
 .btn-primary {
-  border-color: rgba(255, 255, 255, 0.5);
+  border-opacity: 0.5;
 }
 
 .btn-small {
