@@ -34,6 +34,28 @@ interface ThemeState {
   typeLightness: number
   variableLightness: number
   operatorLightness: number
+  // Link to global offset (when true, uses hueOffset * multiplier)
+  errorLinked: boolean
+  warningLinked: boolean
+  keywordLinked: boolean
+  stringLinked: boolean
+  numberLinked: boolean
+  functionLinked: boolean
+  constantLinked: boolean
+  typeLinked: boolean
+  variableLinked: boolean
+  operatorLinked: boolean
+  // Multipliers for linked colors
+  errorMultiplier: number
+  warningMultiplier: number
+  keywordMultiplier: number
+  stringMultiplier: number
+  numberMultiplier: number
+  functionMultiplier: number
+  constantMultiplier: number
+  typeMultiplier: number
+  variableMultiplier: number
+  operatorMultiplier: number
 }
 
 const defaultState: ThemeState = {
@@ -41,23 +63,23 @@ const defaultState: ThemeState = {
   hueOffset: 7,
   saturation: 85,
   contrast: 50,
-  monochromeMode: false,
+  monochromeMode: true,
   monochromeIntensity: 80,
   monochromeLightness: 50,
   boldKeywords: false,
   italicComments: true,
   mode: 'dark' as 'dark' | 'light',
-  // Default offsets based on original multipliers
-  errorOffset: 7,    // was hueOffset * 1
-  warningOffset: -7, // was -hueOffset * 1
-  keywordOffset: 10, // was hueOffset * 1.5
-  stringOffset: -10, // was -hueOffset * 1.5
-  numberOffset: 14,  // was hueOffset * 2
-  functionOffset: -14, // was -hueOffset * 2
-  constantOffset: 21, // hueOffset * 3
-  typeOffset: 17,     // hueOffset * 2.5
-  variableOffset: -17, // -hueOffset * 2.5
-  operatorOffset: 3,   // hueOffset * 0.5
+  // Default offsets - now additive to global (0 = use pure multiplier)
+  errorOffset: 0,
+  warningOffset: 0,
+  keywordOffset: 0,
+  stringOffset: 0,
+  numberOffset: 0,
+  functionOffset: 0,
+  constantOffset: 0,
+  typeOffset: 0,
+  variableOffset: 0,
+  operatorOffset: 0,
   // Default lightness values (50 = use auto-calculated)
   errorLightness: 50,
   warningLightness: 50,
@@ -69,6 +91,28 @@ const defaultState: ThemeState = {
   typeLightness: 50,
   variableLightness: 50,
   operatorLightness: 50,
+  // Default linked state (all linked by default)
+  errorLinked: true,
+  warningLinked: true,
+  keywordLinked: true,
+  stringLinked: true,
+  numberLinked: true,
+  functionLinked: true,
+  constantLinked: true,
+  typeLinked: true,
+  variableLinked: true,
+  operatorLinked: true,
+  // Default multipliers
+  errorMultiplier: 1,
+  warningMultiplier: -1,
+  keywordMultiplier: 1.5,
+  stringMultiplier: -1.5,
+  numberMultiplier: 2,
+  functionMultiplier: -2,
+  constantMultiplier: 3,
+  typeMultiplier: 2.5,
+  variableMultiplier: -2.5,
+  operatorMultiplier: 0.5,
 }
 
 export const useTheme = () => {
@@ -107,6 +151,26 @@ export const useTheme = () => {
     typeLightness: Number(params.tl) || defaultState.typeLightness,
     variableLightness: Number(params.vl) || defaultState.variableLightness,
     operatorLightness: Number(params.ol) || defaultState.operatorLightness,
+    errorLinked: params.elink !== '0',
+    warningLinked: params.wlink !== '0',
+    keywordLinked: params.klink !== '0',
+    stringLinked: params.slink !== '0',
+    numberLinked: params.nlink !== '0',
+    functionLinked: params.flink !== '0',
+    constantLinked: params.clink !== '0',
+    typeLinked: params.tlink !== '0',
+    variableLinked: params.vlink !== '0',
+    operatorLinked: params.olink !== '0',
+    errorMultiplier: Number(params.em) || defaultState.errorMultiplier,
+    warningMultiplier: Number(params.wm) || defaultState.warningMultiplier,
+    keywordMultiplier: Number(params.km) || defaultState.keywordMultiplier,
+    stringMultiplier: Number(params.sm) || defaultState.stringMultiplier,
+    numberMultiplier: Number(params.nm) || defaultState.numberMultiplier,
+    functionMultiplier: Number(params.fm) || defaultState.functionMultiplier,
+    constantMultiplier: Number(params.cm) || defaultState.constantMultiplier,
+    typeMultiplier: Number(params.tm) || defaultState.typeMultiplier,
+    variableMultiplier: Number(params.vm) || defaultState.variableMultiplier,
+    operatorMultiplier: Number(params.om) || defaultState.operatorMultiplier,
   }))
 
   // Watch state and sync to URL
@@ -142,6 +206,26 @@ export const useTheme = () => {
       params.tl = String(newState.typeLightness)
       params.vl = String(newState.variableLightness)
       params.ol = String(newState.operatorLightness)
+      params.elink = newState.errorLinked ? '1' : '0'
+      params.wlink = newState.warningLinked ? '1' : '0'
+      params.klink = newState.keywordLinked ? '1' : '0'
+      params.slink = newState.stringLinked ? '1' : '0'
+      params.nlink = newState.numberLinked ? '1' : '0'
+      params.flink = newState.functionLinked ? '1' : '0'
+      params.clink = newState.constantLinked ? '1' : '0'
+      params.tlink = newState.typeLinked ? '1' : '0'
+      params.vlink = newState.variableLinked ? '1' : '0'
+      params.olink = newState.operatorLinked ? '1' : '0'
+      params.em = String(newState.errorMultiplier)
+      params.wm = String(newState.warningMultiplier)
+      params.km = String(newState.keywordMultiplier)
+      params.sm = String(newState.stringMultiplier)
+      params.nm = String(newState.numberMultiplier)
+      params.fm = String(newState.functionMultiplier)
+      params.cm = String(newState.constantMultiplier)
+      params.tm = String(newState.typeMultiplier)
+      params.vm = String(newState.variableMultiplier)
+      params.om = String(newState.operatorMultiplier)
     }, { deep: true })
   }
 
@@ -211,24 +295,35 @@ export const useTheme = () => {
     const variableL = applyLightnessAdjust(57, 44, state.value.variableLightness)
     const operatorL = applyLightnessAdjust(60, 40, state.value.operatorLightness)
 
+    // Helper to get actual offset (linked = hueOffset * multiplier + individual offset, unlinked = fixed offset)
+    const getOffset = (colorName: string): number => {
+      const linked = state.value[`${colorName}Linked` as keyof ThemeState] as boolean
+      const individualOffset = state.value[`${colorName}Offset` as keyof ThemeState] as number
+      if (linked) {
+        const multiplier = state.value[`${colorName}Multiplier` as keyof ThemeState] as number
+        return (state.value.hueOffset * multiplier) + individualOffset
+      }
+      return individualOffset
+    }
+
     return {
       bg,
       fg,
       base: colorAt(0, 50, 45),
-      error: colorAt(state.value.errorOffset, errorL.dark, errorL.light),
-      warning: colorAt(state.value.warningOffset, warningL.dark, warningL.light),
+      error: colorAt(getOffset('error'), errorL.dark, errorL.light),
+      warning: colorAt(getOffset('warning'), warningL.dark, warningL.light),
       hint: colorAt(0, 70, 55),
       comment: state.value.monochromeMode
         ? chroma.hsl(state.value.baseHue, sat * monoIntensity * 0.5, isDark ? 0.45 : 0.55).hex()
         : chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
-      keyword: colorAt(state.value.keywordOffset, keywordL.dark, keywordL.light),
-      string: colorAt(state.value.stringOffset, stringL.dark, stringL.light),
-      number: colorAt(state.value.numberOffset, numberL.dark, numberL.light),
-      function: colorAt(state.value.functionOffset, functionL.dark, functionL.light),
-      constant: colorAt(state.value.constantOffset, constantL.dark, constantL.light),
-      type: colorAt(state.value.typeOffset, typeL.dark, typeL.light),
-      variable: colorAt(state.value.variableOffset, variableL.dark, variableL.light),
-      operator: colorAt(state.value.operatorOffset, operatorL.dark, operatorL.light),
+      keyword: colorAt(getOffset('keyword'), keywordL.dark, keywordL.light),
+      string: colorAt(getOffset('string'), stringL.dark, stringL.light),
+      number: colorAt(getOffset('number'), numberL.dark, numberL.light),
+      function: colorAt(getOffset('function'), functionL.dark, functionL.light),
+      constant: colorAt(getOffset('constant'), constantL.dark, constantL.light),
+      type: colorAt(getOffset('type'), typeL.dark, typeL.light),
+      variable: colorAt(getOffset('variable'), variableL.dark, variableL.light),
+      operator: colorAt(getOffset('operator'), operatorL.dark, operatorL.light),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),

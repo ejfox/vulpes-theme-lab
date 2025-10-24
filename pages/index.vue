@@ -9,17 +9,17 @@ const lightConfig = computed(() => serializeGhosttyTheme(ghosttyThemeLight.value
 
 // Reset functions for each color
 const resetColor = (colorName: string) => {
-  const defaults: Record<string, { offset: number, lightness: number }> = {
-    error: { offset: 7, lightness: 50 },
-    warning: { offset: -7, lightness: 50 },
-    keyword: { offset: 10, lightness: 50 },
-    string: { offset: -10, lightness: 50 },
-    number: { offset: 14, lightness: 50 },
-    function: { offset: -14, lightness: 50 },
-    constant: { offset: 21, lightness: 50 },
-    type: { offset: 17, lightness: 50 },
-    variable: { offset: -17, lightness: 50 },
-    operator: { offset: 3, lightness: 50 },
+  const defaults: Record<string, { multiplier: number, offset: number, lightness: number, linked: boolean }> = {
+    error: { multiplier: 1, offset: 0, lightness: 50, linked: true },
+    warning: { multiplier: -1, offset: 0, lightness: 50, linked: true },
+    keyword: { multiplier: 1.5, offset: 0, lightness: 50, linked: true },
+    string: { multiplier: -1.5, offset: 0, lightness: 50, linked: true },
+    number: { multiplier: 2, offset: 0, lightness: 50, linked: true },
+    function: { multiplier: -2, offset: 0, lightness: 50, linked: true },
+    constant: { multiplier: 3, offset: 0, lightness: 50, linked: true },
+    type: { multiplier: 2.5, offset: 0, lightness: 50, linked: true },
+    variable: { multiplier: -2.5, offset: 0, lightness: 50, linked: true },
+    operator: { multiplier: 0.5, offset: 0, lightness: 50, linked: true },
   }
 
   const d = defaults[colorName]
@@ -30,42 +30,62 @@ const resetColor = (colorName: string) => {
     case 'error':
       state.errorOffset = d.offset
       state.errorLightness = d.lightness
+      state.errorLinked = d.linked
+      state.errorMultiplier = d.multiplier
       break
     case 'warning':
       state.warningOffset = d.offset
       state.warningLightness = d.lightness
+      state.warningLinked = d.linked
+      state.warningMultiplier = d.multiplier
       break
     case 'keyword':
       state.keywordOffset = d.offset
       state.keywordLightness = d.lightness
+      state.keywordLinked = d.linked
+      state.keywordMultiplier = d.multiplier
       break
     case 'string':
       state.stringOffset = d.offset
       state.stringLightness = d.lightness
+      state.stringLinked = d.linked
+      state.stringMultiplier = d.multiplier
       break
     case 'number':
       state.numberOffset = d.offset
       state.numberLightness = d.lightness
+      state.numberLinked = d.linked
+      state.numberMultiplier = d.multiplier
       break
     case 'function':
       state.functionOffset = d.offset
       state.functionLightness = d.lightness
+      state.functionLinked = d.linked
+      state.functionMultiplier = d.multiplier
       break
     case 'constant':
       state.constantOffset = d.offset
       state.constantLightness = d.lightness
+      state.constantLinked = d.linked
+      state.constantMultiplier = d.multiplier
       break
     case 'type':
       state.typeOffset = d.offset
       state.typeLightness = d.lightness
+      state.typeLinked = d.linked
+      state.typeMultiplier = d.multiplier
       break
     case 'variable':
       state.variableOffset = d.offset
       state.variableLightness = d.lightness
+      state.variableLinked = d.linked
+      state.variableMultiplier = d.multiplier
       break
     case 'operator':
       state.operatorOffset = d.offset
       state.operatorLightness = d.lightness
+      state.operatorLinked = d.linked
+      state.operatorMultiplier = d.multiplier
       break
   }
 }
@@ -186,13 +206,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.error }">
           <div class="swatch-info">
             <span>error</span>
+            <button @click="state.errorLinked = !state.errorLinked" class="link-btn" :class="{ linked: state.errorLinked }" :title="state.errorLinked ? 'unlink from global' : 'link to global'">{{ state.errorLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('error')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.errorOffset }}° / {{ state.errorLightness }}</span>
+            <span class="offset-value">{{ state.errorLinked ? ((state.hueOffset * state.errorMultiplier) + state.errorOffset).toFixed(0) : state.errorOffset }}° / {{ state.errorLightness }}</span>
           </div>
+          <input
+            v-if="state.errorLinked"
+            type="range"
+            v-model.number="state.errorMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.errorOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.errorLinked }"
             min="-180"
             max="180"
             step="1"
@@ -210,13 +241,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.warning }">
           <div class="swatch-info">
             <span>warning</span>
+            <button @click="state.warningLinked = !state.warningLinked" class="link-btn" :class="{ linked: state.warningLinked }" :title="state.warningLinked ? 'unlink from global' : 'link to global'">{{ state.warningLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('warning')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.warningOffset }}° / {{ state.warningLightness }}</span>
+            <span class="offset-value">{{ state.warningLinked ? ((state.hueOffset * state.warningMultiplier) + state.warningOffset).toFixed(0) : state.warningOffset }}° / {{ state.warningLightness }}</span>
           </div>
+          <input
+            v-if="state.warningLinked"
+            type="range"
+            v-model.number="state.warningMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.warningOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.warningLinked }"
             min="-180"
             max="180"
             step="1"
@@ -238,13 +280,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.keyword }">
           <div class="swatch-info">
             <span>keyword</span>
+            <button @click="state.keywordLinked = !state.keywordLinked" class="link-btn" :class="{ linked: state.keywordLinked }" :title="state.keywordLinked ? 'unlink from global' : 'link to global'">{{ state.keywordLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('keyword')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.keywordOffset }}° / {{ state.keywordLightness }}</span>
+            <span class="offset-value">{{ state.keywordLinked ? ((state.hueOffset * state.keywordMultiplier) + state.keywordOffset).toFixed(0) : state.keywordOffset }}° / {{ state.keywordLightness }}</span>
           </div>
+          <input
+            v-if="state.keywordLinked"
+            type="range"
+            v-model.number="state.keywordMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.keywordOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.keywordLinked }"
             min="-180"
             max="180"
             step="1"
@@ -262,13 +315,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.string }">
           <div class="swatch-info">
             <span>string</span>
+            <button @click="state.stringLinked = !state.stringLinked" class="link-btn" :class="{ linked: state.stringLinked }" :title="state.stringLinked ? 'unlink from global' : 'link to global'">{{ state.stringLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('string')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.stringOffset }}° / {{ state.stringLightness }}</span>
+            <span class="offset-value">{{ state.stringLinked ? ((state.hueOffset * state.stringMultiplier) + state.stringOffset).toFixed(0) : state.stringOffset }}° / {{ state.stringLightness }}</span>
           </div>
+          <input
+            v-if="state.stringLinked"
+            type="range"
+            v-model.number="state.stringMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.stringOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.stringLinked }"
             min="-180"
             max="180"
             step="1"
@@ -286,13 +350,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.number }">
           <div class="swatch-info">
             <span>number</span>
+            <button @click="state.numberLinked = !state.numberLinked" class="link-btn" :class="{ linked: state.numberLinked }" :title="state.numberLinked ? 'unlink from global' : 'link to global'">{{ state.numberLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('number')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.numberOffset }}° / {{ state.numberLightness }}</span>
+            <span class="offset-value">{{ state.numberLinked ? ((state.hueOffset * state.numberMultiplier) + state.numberOffset).toFixed(0) : state.numberOffset }}° / {{ state.numberLightness }}</span>
           </div>
+          <input
+            v-if="state.numberLinked"
+            type="range"
+            v-model.number="state.numberMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.numberOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.numberLinked }"
             min="-180"
             max="180"
             step="1"
@@ -310,13 +385,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.function }">
           <div class="swatch-info">
             <span>function</span>
+            <button @click="state.functionLinked = !state.functionLinked" class="link-btn" :class="{ linked: state.functionLinked }" :title="state.functionLinked ? 'unlink from global' : 'link to global'">{{ state.functionLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('function')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.functionOffset }}° / {{ state.functionLightness }}</span>
+            <span class="offset-value">{{ state.functionLinked ? ((state.hueOffset * state.functionMultiplier) + state.functionOffset).toFixed(0) : state.functionOffset }}° / {{ state.functionLightness }}</span>
           </div>
+          <input
+            v-if="state.functionLinked"
+            type="range"
+            v-model.number="state.functionMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.functionOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.functionLinked }"
             min="-180"
             max="180"
             step="1"
@@ -334,13 +420,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.constant }">
           <div class="swatch-info">
             <span>constant</span>
+            <button @click="state.constantLinked = !state.constantLinked" class="link-btn" :class="{ linked: state.constantLinked }" :title="state.constantLinked ? 'unlink from global' : 'link to global'">{{ state.constantLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('constant')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.constantOffset }}° / {{ state.constantLightness }}</span>
+            <span class="offset-value">{{ state.constantLinked ? ((state.hueOffset * state.constantMultiplier) + state.constantOffset).toFixed(0) : state.constantOffset }}° / {{ state.constantLightness }}</span>
           </div>
+          <input
+            v-if="state.constantLinked"
+            type="range"
+            v-model.number="state.constantMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.constantOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.constantLinked }"
             min="-180"
             max="180"
             step="1"
@@ -358,13 +455,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.type }">
           <div class="swatch-info">
             <span>type</span>
+            <button @click="state.typeLinked = !state.typeLinked" class="link-btn" :class="{ linked: state.typeLinked }" :title="state.typeLinked ? 'unlink from global' : 'link to global'">{{ state.typeLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('type')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.typeOffset }}° / {{ state.typeLightness }}</span>
+            <span class="offset-value">{{ state.typeLinked ? ((state.hueOffset * state.typeMultiplier) + state.typeOffset).toFixed(0) : state.typeOffset }}° / {{ state.typeLightness }}</span>
           </div>
+          <input
+            v-if="state.typeLinked"
+            type="range"
+            v-model.number="state.typeMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.typeOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.typeLinked }"
             min="-180"
             max="180"
             step="1"
@@ -382,13 +490,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.variable }">
           <div class="swatch-info">
             <span>variable</span>
+            <button @click="state.variableLinked = !state.variableLinked" class="link-btn" :class="{ linked: state.variableLinked }" :title="state.variableLinked ? 'unlink from global' : 'link to global'">{{ state.variableLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('variable')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.variableOffset }}° / {{ state.variableLightness }}</span>
+            <span class="offset-value">{{ state.variableLinked ? ((state.hueOffset * state.variableMultiplier) + state.variableOffset).toFixed(0) : state.variableOffset }}° / {{ state.variableLightness }}</span>
           </div>
+          <input
+            v-if="state.variableLinked"
+            type="range"
+            v-model.number="state.variableMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.variableOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.variableLinked }"
             min="-180"
             max="180"
             step="1"
@@ -406,13 +525,24 @@ const resetAll = () => {
         <div class="swatch editable" :style="{ background: colors.operator }">
           <div class="swatch-info">
             <span>operator</span>
+            <button @click="state.operatorLinked = !state.operatorLinked" class="link-btn" :class="{ linked: state.operatorLinked }" :title="state.operatorLinked ? 'unlink from global' : 'link to global'">{{ state.operatorLinked ? 'L' : 'U' }}</button>
             <button @click="resetColor('operator')" class="reset-btn" title="reset">↺</button>
-            <span class="offset-value">{{ state.operatorOffset }}° / {{ state.operatorLightness }}</span>
+            <span class="offset-value">{{ state.operatorLinked ? ((state.hueOffset * state.operatorMultiplier) + state.operatorOffset).toFixed(0) : state.operatorOffset }}° / {{ state.operatorLightness }}</span>
           </div>
+          <input
+            v-if="state.operatorLinked"
+            type="range"
+            v-model.number="state.operatorMultiplier"
+            class="offset-slider linked"
+            min="-5"
+            max="5"
+            step="0.1"
+          />
           <input
             type="range"
             v-model.number="state.operatorOffset"
             class="offset-slider"
+            :class="{ 'add-mode': state.operatorLinked }"
             min="-180"
             max="180"
             step="1"
@@ -640,6 +770,32 @@ h1 {
   gap: 6px;
 }
 
+.link-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  font-size: 8px;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: all 0.15s;
+  font-weight: bold;
+  border-radius: 2px;
+  min-width: 16px;
+}
+
+.link-btn.linked {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.link-btn:hover {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 0, 0, 0.5);
+  color: rgba(0, 0, 0, 1);
+}
+
 .reset-btn {
   background: transparent;
   border: none;
@@ -697,6 +853,40 @@ h1 {
   cursor: pointer;
   border-radius: 0;
   border: none;
+}
+
+.offset-slider.linked {
+  background: rgba(100, 100, 255, 0.3);
+  height: 3px;
+}
+
+.offset-slider.linked::-webkit-slider-thumb {
+  background: rgba(50, 50, 200, 0.9);
+  width: 10px;
+  height: 10px;
+}
+
+.offset-slider.linked::-moz-range-thumb {
+  background: rgba(50, 50, 200, 0.9);
+  width: 10px;
+  height: 10px;
+}
+
+.offset-slider.add-mode {
+  background: rgba(0, 200, 100, 0.2);
+  height: 1.5px;
+}
+
+.offset-slider.add-mode::-webkit-slider-thumb {
+  background: rgba(0, 150, 80, 0.8);
+  width: 6px;
+  height: 6px;
+}
+
+.offset-slider.add-mode::-moz-range-thumb {
+  background: rgba(0, 150, 80, 0.8);
+  width: 6px;
+  height: 6px;
 }
 
 .lightness-slider {
