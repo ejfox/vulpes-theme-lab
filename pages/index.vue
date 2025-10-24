@@ -61,32 +61,98 @@ const copyLight = async () => {
           <span>base</span>
           <code>{{ colors.base }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.error }">
-          <span>error</span>
+        <div class="swatch editable" :style="{ background: colors.error }">
+          <div class="swatch-info">
+            <span>error</span>
+            <span class="offset-value">{{ state.errorOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.errorOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.error }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.warning }">
-          <span>warning</span>
+        <div class="swatch editable" :style="{ background: colors.warning }">
+          <div class="swatch-info">
+            <span>warning</span>
+            <span class="offset-value">{{ state.warningOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.warningOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.warning }}</code>
         </div>
         <div class="swatch" :style="{ background: colors.hint }">
           <span>hint</span>
           <code>{{ colors.hint }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.keyword }">
-          <span>keyword</span>
+        <div class="swatch editable" :style="{ background: colors.keyword }">
+          <div class="swatch-info">
+            <span>keyword</span>
+            <span class="offset-value">{{ state.keywordOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.keywordOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.keyword }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.string }">
-          <span>string</span>
+        <div class="swatch editable" :style="{ background: colors.string }">
+          <div class="swatch-info">
+            <span>string</span>
+            <span class="offset-value">{{ state.stringOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.stringOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.string }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.number }">
-          <span>number</span>
+        <div class="swatch editable" :style="{ background: colors.number }">
+          <div class="swatch-info">
+            <span>number</span>
+            <span class="offset-value">{{ state.numberOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.numberOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.number }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.function }">
-          <span>function</span>
+        <div class="swatch editable" :style="{ background: colors.function }">
+          <div class="swatch-info">
+            <span>function</span>
+            <span class="offset-value">{{ state.functionOffset }}°</span>
+          </div>
+          <input
+            type="range"
+            v-model.number="state.functionOffset"
+            class="offset-slider"
+            min="-180"
+            max="180"
+            step="1"
+          />
           <code>{{ colors.function }}</code>
         </div>
         <div class="swatch" :style="{ background: colors.comment }">
@@ -244,9 +310,56 @@ h1 {
   font-size: 9px;
 }
 
+.swatch.editable {
+  gap: 4px;
+  padding: 10px 8px;
+}
+
+.swatch-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .swatch span {
   font-weight: bold;
   text-transform: uppercase;
+}
+
+.offset-value {
+  font-size: 7px;
+  opacity: 0.8;
+  font-weight: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.offset-slider {
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 2px 0;
+}
+
+.offset-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.offset-slider::-moz-range-thumb {
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  border-radius: 0;
+  border: none;
 }
 
 .swatch code {
