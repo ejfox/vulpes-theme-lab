@@ -218,6 +218,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -227,6 +228,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.errorLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -235,6 +237,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.error }}</code>
         </div>
@@ -253,6 +256,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -262,6 +266,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.warningLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -270,6 +275,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.warning }}</code>
         </div>
@@ -292,6 +298,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -301,6 +308,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.keywordLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -309,6 +317,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.keyword }}</code>
         </div>
@@ -327,6 +336,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -336,6 +346,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.stringLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -344,6 +355,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.string }}</code>
         </div>
@@ -362,6 +374,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -371,6 +384,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.numberLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -379,6 +393,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.number }}</code>
         </div>
@@ -397,6 +412,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -406,6 +422,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.functionLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -414,6 +431,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.function }}</code>
         </div>
@@ -432,6 +450,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -441,6 +460,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.constantLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -449,6 +469,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.constant }}</code>
         </div>
@@ -467,6 +488,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -476,6 +498,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.typeLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -484,6 +507,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.type }}</code>
         </div>
@@ -502,6 +526,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -511,6 +536,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.variableLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -519,6 +545,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.variable }}</code>
         </div>
@@ -537,6 +564,7 @@ const resetAll = () => {
             min="-5"
             max="5"
             step="0.1"
+            title="multiplier: how this color relates to global offset"
           />
           <input
             type="range"
@@ -546,6 +574,7 @@ const resetAll = () => {
             min="-180"
             max="180"
             step="1"
+            :title="state.operatorLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
           />
           <input
             type="range"
@@ -554,6 +583,7 @@ const resetAll = () => {
             min="0"
             max="100"
             step="1"
+            title="lightness: brightness (50 = default)"
           />
           <code>{{ colors.operator }}</code>
         </div>
