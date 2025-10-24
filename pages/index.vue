@@ -539,6 +539,11 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 2px;
   margin-bottom: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #000;
+  padding-bottom: 4px;
 }
 
 .swatch {
