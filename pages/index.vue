@@ -64,7 +64,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.error }">
           <div class="swatch-info">
             <span>error</span>
-            <span class="offset-value">{{ state.errorOffset }}°</span>
+            <span class="offset-value">{{ state.errorOffset }}° / {{ state.errorLightness }}</span>
           </div>
           <input
             type="range"
@@ -74,12 +74,20 @@ const copyLight = async () => {
             max="180"
             step="1"
           />
+          <input
+            type="range"
+            v-model.number="state.errorLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
           <code>{{ colors.error }}</code>
         </div>
         <div class="swatch editable" :style="{ background: colors.warning }">
           <div class="swatch-info">
             <span>warning</span>
-            <span class="offset-value">{{ state.warningOffset }}°</span>
+            <span class="offset-value">{{ state.warningOffset }}° / {{ state.warningLightness }}</span>
           </div>
           <input
             type="range"
@@ -87,6 +95,14 @@ const copyLight = async () => {
             class="offset-slider"
             min="-180"
             max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.warningLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
             step="1"
           />
           <code>{{ colors.warning }}</code>
@@ -98,7 +114,7 @@ const copyLight = async () => {
         <div class="swatch editable" :style="{ background: colors.keyword }">
           <div class="swatch-info">
             <span>keyword</span>
-            <span class="offset-value">{{ state.keywordOffset }}°</span>
+            <span class="offset-value">{{ state.keywordOffset }}° / {{ state.keywordLightness }}</span>
           </div>
           <input
             type="range"
@@ -108,12 +124,20 @@ const copyLight = async () => {
             max="180"
             step="1"
           />
+          <input
+            type="range"
+            v-model.number="state.keywordLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
           <code>{{ colors.keyword }}</code>
         </div>
         <div class="swatch editable" :style="{ background: colors.string }">
           <div class="swatch-info">
             <span>string</span>
-            <span class="offset-value">{{ state.stringOffset }}°</span>
+            <span class="offset-value">{{ state.stringOffset }}° / {{ state.stringLightness }}</span>
           </div>
           <input
             type="range"
@@ -123,12 +147,20 @@ const copyLight = async () => {
             max="180"
             step="1"
           />
+          <input
+            type="range"
+            v-model.number="state.stringLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
           <code>{{ colors.string }}</code>
         </div>
         <div class="swatch editable" :style="{ background: colors.number }">
           <div class="swatch-info">
             <span>number</span>
-            <span class="offset-value">{{ state.numberOffset }}°</span>
+            <span class="offset-value">{{ state.numberOffset }}° / {{ state.numberLightness }}</span>
           </div>
           <input
             type="range"
@@ -138,12 +170,20 @@ const copyLight = async () => {
             max="180"
             step="1"
           />
+          <input
+            type="range"
+            v-model.number="state.numberLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
+            step="1"
+          />
           <code>{{ colors.number }}</code>
         </div>
         <div class="swatch editable" :style="{ background: colors.function }">
           <div class="swatch-info">
             <span>function</span>
-            <span class="offset-value">{{ state.functionOffset }}°</span>
+            <span class="offset-value">{{ state.functionOffset }}° / {{ state.functionLightness }}</span>
           </div>
           <input
             type="range"
@@ -151,6 +191,14 @@ const copyLight = async () => {
             class="offset-slider"
             min="-180"
             max="180"
+            step="1"
+          />
+          <input
+            type="range"
+            v-model.number="state.functionLightness"
+            class="lightness-slider"
+            min="0"
+            max="100"
             step="1"
           />
           <code>{{ colors.function }}</code>
@@ -357,6 +405,35 @@ h1 {
   width: 8px;
   height: 8px;
   background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  border-radius: 0;
+  border: none;
+}
+
+.lightness-slider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.15);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 1px 0;
+}
+
+.lightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 6px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.lightness-slider::-moz-range-thumb {
+  width: 6px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.6);
   cursor: pointer;
   border-radius: 0;
   border: none;

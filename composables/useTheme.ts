@@ -19,6 +19,13 @@ interface ThemeState {
   stringOffset: number
   numberOffset: number
   functionOffset: number
+  // Individual color lightness (0-100)
+  errorLightness: number
+  warningLightness: number
+  keywordLightness: number
+  stringLightness: number
+  numberLightness: number
+  functionLightness: number
 }
 
 const defaultState: ThemeState = {
@@ -39,6 +46,13 @@ const defaultState: ThemeState = {
   stringOffset: -10, // was -hueOffset * 1.5
   numberOffset: 14,  // was hueOffset * 2
   functionOffset: -14, // was -hueOffset * 2
+  // Default lightness values (50 = use auto-calculated)
+  errorLightness: 50,
+  warningLightness: 50,
+  keywordLightness: 50,
+  stringLightness: 50,
+  numberLightness: 50,
+  functionLightness: 50,
 }
 
 export const useTheme = () => {
@@ -63,6 +77,12 @@ export const useTheme = () => {
     stringOffset: Number(params.so) || defaultState.stringOffset,
     numberOffset: Number(params.no) || defaultState.numberOffset,
     functionOffset: Number(params.fo) || defaultState.functionOffset,
+    errorLightness: Number(params.el) || defaultState.errorLightness,
+    warningLightness: Number(params.wl) || defaultState.warningLightness,
+    keywordLightness: Number(params.kl) || defaultState.keywordLightness,
+    stringLightness: Number(params.sl) || defaultState.stringLightness,
+    numberLightness: Number(params.nl) || defaultState.numberLightness,
+    functionLightness: Number(params.fl) || defaultState.functionLightness,
   }))
 
   // Watch state and sync to URL
@@ -84,6 +104,12 @@ export const useTheme = () => {
       params.so = String(newState.stringOffset)
       params.no = String(newState.numberOffset)
       params.fo = String(newState.functionOffset)
+      params.el = String(newState.errorLightness)
+      params.wl = String(newState.warningLightness)
+      params.kl = String(newState.keywordLightness)
+      params.sl = String(newState.stringLightness)
+      params.nl = String(newState.numberLightness)
+      params.fl = String(newState.functionLightness)
     }, { deep: true })
   }
 
@@ -132,20 +158,37 @@ export const useTheme = () => {
       return chroma.hsl(hue, sat, l / 100).hex()
     }
 
+    // Helper to map lightness slider (0-100) to actual lightness values
+    // 50 = default (use calculated value), <50 = darker, >50 = lighter
+    const applyLightnessAdjust = (baseDark: number, baseLight: number, adjust: number) => {
+      const offset = (adjust - 50) * 0.3 // ±15 range from center
+      return {
+        dark: baseDark + offset,
+        light: baseLight + offset
+      }
+    }
+
+    const errorL = applyLightnessAdjust(55, 40, state.value.errorLightness)
+    const warningL = applyLightnessAdjust(55, 40, state.value.warningLightness)
+    const keywordL = applyLightnessAdjust(60, 38, state.value.keywordLightness)
+    const stringL = applyLightnessAdjust(60, 42, state.value.stringLightness)
+    const numberL = applyLightnessAdjust(65, 45, state.value.numberLightness)
+    const functionL = applyLightnessAdjust(55, 40, state.value.functionLightness)
+
     return {
       bg,
       fg,
       base: colorAt(0, 50, 45),
-      error: colorAt(state.value.errorOffset, 55, 40),
-      warning: colorAt(state.value.warningOffset, 55, 40),
+      error: colorAt(state.value.errorOffset, errorL.dark, errorL.light),
+      warning: colorAt(state.value.warningOffset, warningL.dark, warningL.light),
       hint: colorAt(0, 70, 55),
       comment: state.value.monochromeMode
         ? chroma.hsl(state.value.baseHue, sat * monoIntensity * 0.5, isDark ? 0.45 : 0.55).hex()
         : chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
-      keyword: colorAt(state.value.keywordOffset, 60, 38),
-      string: colorAt(state.value.stringOffset, 60, 42),
-      number: colorAt(state.value.numberOffset, 65, 45),
-      function: colorAt(state.value.functionOffset, 55, 40),
+      keyword: colorAt(state.value.keywordOffset, keywordL.dark, keywordL.light),
+      string: colorAt(state.value.stringOffset, stringL.dark, stringL.light),
+      number: colorAt(state.value.numberOffset, numberL.dark, numberL.light),
+      function: colorAt(state.value.functionOffset, functionL.dark, functionL.light),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),

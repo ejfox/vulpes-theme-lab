@@ -63,6 +63,7 @@ const toggleMode = () => {
         :min="slider.min"
         :max="slider.max"
         :step="slider.step"
+        :class="{ 'base-hue-slider': slider.key === 'baseHue' }"
       />
     </div>
 
@@ -281,5 +282,34 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   border-radius: 0;
   border: none;
+}
+
+/* Base hue slider - RED and prominent like a car shifter */
+.base-hue-slider {
+  height: 3px !important;
+  background: linear-gradient(
+    to right,
+    hsl(0, 80%, 50%),
+    hsl(60, 80%, 50%),
+    hsl(120, 80%, 50%),
+    hsl(180, 80%, 50%),
+    hsl(240, 80%, 50%),
+    hsl(300, 80%, 50%),
+    hsl(360, 80%, 50%)
+  ) !important;
+}
+
+.base-hue-slider::-webkit-slider-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  background: #ff0000 !important;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+}
+
+.base-hue-slider::-moz-range-thumb {
+  width: 12px !important;
+  height: 12px !important;
+  background: #ff0000 !important;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
 }
 </style>
