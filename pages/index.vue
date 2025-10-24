@@ -1224,52 +1224,56 @@ h1 {
   appearance: none;
   width: 12px;
   height: 12px;
-  background: rgba(0, 0, 0, 0.8);
+  background: #fff;
   cursor: pointer;
   border-radius: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .offset-slider::-moz-range-thumb {
   width: 12px;
   height: 12px;
-  background: rgba(0, 0, 0, 0.8);
+  background: #fff;
   cursor: pointer;
   border-radius: 0;
   border: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .offset-slider.linked {
-  background: rgba(100, 100, 255, 0.3);
   height: 4px;
 }
 
 .offset-slider.linked::-webkit-slider-thumb {
-  background: rgba(50, 50, 200, 0.9);
+  background: #fff;
   width: 14px;
   height: 14px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .offset-slider.linked::-moz-range-thumb {
-  background: rgba(50, 50, 200, 0.9);
+  background: #fff;
   width: 14px;
   height: 14px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .offset-slider.add-mode {
-  background: rgba(0, 200, 100, 0.2);
   height: 2px;
 }
 
 .offset-slider.add-mode::-webkit-slider-thumb {
-  background: rgba(0, 150, 80, 0.8);
+  background: #fff;
   width: 9px;
   height: 9px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .offset-slider.add-mode::-moz-range-thumb {
-  background: rgba(0, 150, 80, 0.8);
+  background: #fff;
   width: 9px;
   height: 9px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .lightness-slider {
@@ -1287,18 +1291,20 @@ h1 {
   appearance: none;
   width: 9px;
   height: 9px;
-  background: rgba(0, 0, 0, 0.6);
+  background: #fff;
   cursor: pointer;
   border-radius: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .lightness-slider::-moz-range-thumb {
   width: 9px;
   height: 9px;
-  background: rgba(0, 0, 0, 0.6);
+  background: #fff;
   cursor: pointer;
   border-radius: 0;
   border: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .swatch code {
