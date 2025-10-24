@@ -53,6 +53,30 @@ const copyDark = async () => {
 const copyLight = async () => {
   await navigator.clipboard.writeText(lightConfig.value)
 }
+
+// Theme presets
+const presets = {
+  'ayu-dark': { baseHue: 33, saturation: 60, contrast: 55, mode: 'dark' as const },
+  'ayu-mirage': { baseHue: 33, saturation: 50, contrast: 50, mode: 'dark' as const },
+  'catppuccin-mocha': { baseHue: 267, saturation: 75, contrast: 45, mode: 'dark' as const },
+  'catppuccin-macchiato': { baseHue: 267, saturation: 70, contrast: 50, mode: 'dark' as const },
+  'catppuccin-latte': { baseHue: 267, saturation: 65, contrast: 55, mode: 'light' as const },
+  'tokyo-night': { baseHue: 225, saturation: 70, contrast: 48, mode: 'dark' as const },
+  'nord': { baseHue: 220, saturation: 40, contrast: 45, mode: 'dark' as const },
+  'gruvbox-dark': { baseHue: 35, saturation: 75, contrast: 50, mode: 'dark' as const },
+  'gruvbox-light': { baseHue: 35, saturation: 70, contrast: 55, mode: 'light' as const },
+}
+
+const loadPreset = (presetName: keyof typeof presets) => {
+  const preset = presets[presetName]
+  state.baseHue = preset.baseHue
+  state.saturation = preset.saturation
+  state.contrast = preset.contrast
+  state.mode = preset.mode
+  // Reset all color offsets to defaults
+  const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
+  colors.forEach(colorName => resetColor(colorName))
+}
 </script>
 
 <template>
@@ -61,6 +85,22 @@ const copyLight = async () => {
     <aside class="floating-controls">
       <div class="header">
         <h1>theme-lab</h1>
+      </div>
+
+      <!-- Presets dropdown -->
+      <div class="preset-section">
+        <select @change="(e) => loadPreset((e.target as HTMLSelectElement).value as any)" class="preset-select">
+          <option value="">load preset...</option>
+          <option value="ayu-dark">ayu dark</option>
+          <option value="ayu-mirage">ayu mirage</option>
+          <option value="catppuccin-mocha">catppuccin mocha</option>
+          <option value="catppuccin-macchiato">catppuccin macchiato</option>
+          <option value="catppuccin-latte">catppuccin latte</option>
+          <option value="tokyo-night">tokyo night</option>
+          <option value="nord">nord</option>
+          <option value="gruvbox-dark">gruvbox dark</option>
+          <option value="gruvbox-light">gruvbox light</option>
+        </select>
       </div>
 
       <ColorControls />
@@ -416,6 +456,35 @@ h1 {
   color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.preset-section {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.preset-select {
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.preset-select:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.preset-select option {
+  background: #000;
+  color: #fff;
 }
 
 .actions {
