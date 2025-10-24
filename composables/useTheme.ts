@@ -12,6 +12,13 @@ interface ThemeState {
   boldKeywords: boolean
   italicComments: boolean
   mode: 'dark' | 'light'
+  // Individual color offsets
+  errorOffset: number
+  warningOffset: number
+  keywordOffset: number
+  stringOffset: number
+  numberOffset: number
+  functionOffset: number
 }
 
 const defaultState: ThemeState = {
@@ -25,6 +32,13 @@ const defaultState: ThemeState = {
   boldKeywords: false,
   italicComments: true,
   mode: 'dark' as 'dark' | 'light',
+  // Default offsets based on original multipliers
+  errorOffset: 7,    // was hueOffset * 1
+  warningOffset: -7, // was -hueOffset * 1
+  keywordOffset: 10, // was hueOffset * 1.5
+  stringOffset: -10, // was -hueOffset * 1.5
+  numberOffset: 14,  // was hueOffset * 2
+  functionOffset: -14, // was -hueOffset * 2
 }
 
 export const useTheme = () => {
@@ -43,6 +57,12 @@ export const useTheme = () => {
     boldKeywords: params.b === '1' || defaultState.boldKeywords,
     italicComments: params.i !== '0',
     mode: (params.mode as 'dark' | 'light') || defaultState.mode,
+    errorOffset: Number(params.eo) || defaultState.errorOffset,
+    warningOffset: Number(params.wo) || defaultState.warningOffset,
+    keywordOffset: Number(params.ko) || defaultState.keywordOffset,
+    stringOffset: Number(params.so) || defaultState.stringOffset,
+    numberOffset: Number(params.no) || defaultState.numberOffset,
+    functionOffset: Number(params.fo) || defaultState.functionOffset,
   }))
 
   // Watch state and sync to URL
@@ -58,6 +78,12 @@ export const useTheme = () => {
       params.b = newState.boldKeywords ? '1' : '0'
       params.i = newState.italicComments ? '1' : '0'
       params.mode = newState.mode
+      params.eo = String(newState.errorOffset)
+      params.wo = String(newState.warningOffset)
+      params.ko = String(newState.keywordOffset)
+      params.so = String(newState.stringOffset)
+      params.no = String(newState.numberOffset)
+      params.fo = String(newState.functionOffset)
     }, { deep: true })
   }
 
@@ -82,8 +108,8 @@ export const useTheme = () => {
           state.value.baseHue,
           sat * monoIntensity, // Use intensity control
           isDark
-            ? 0.70 + (monoLightness * 0.25) + (contrastFactor * 0.10)
-            : 0.25 + (monoLightness * 0.20) - (contrastFactor * 0.05)
+            ? 0.65 + (monoLightness * 0.30) + (contrastFactor * 0.08)
+            : 0.20 + (monoLightness * 0.25)
         ).hex()
       : chroma.hsl(
           0,
@@ -110,16 +136,16 @@ export const useTheme = () => {
       bg,
       fg,
       base: colorAt(0, 50, 45),
-      error: colorAt(state.value.hueOffset, 55, 40),
-      warning: colorAt(-state.value.hueOffset, 55, 40),
+      error: colorAt(state.value.errorOffset, 55, 40),
+      warning: colorAt(state.value.warningOffset, 55, 40),
       hint: colorAt(0, 70, 55),
       comment: state.value.monochromeMode
         ? chroma.hsl(state.value.baseHue, sat * monoIntensity * 0.5, isDark ? 0.45 : 0.55).hex()
         : chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
-      keyword: colorAt(state.value.hueOffset * 1.5, 60, 38),
-      string: colorAt(-state.value.hueOffset * 1.5, 60, 42),
-      number: colorAt(state.value.hueOffset * 2, 65, 45),
-      function: colorAt(-state.value.hueOffset * 2, 55, 40),
+      keyword: colorAt(state.value.keywordOffset, 60, 38),
+      string: colorAt(state.value.stringOffset, 60, 42),
+      number: colorAt(state.value.numberOffset, 65, 45),
+      function: colorAt(state.value.functionOffset, 55, 40),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),

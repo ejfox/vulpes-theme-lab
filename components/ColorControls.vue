@@ -13,6 +13,17 @@ const monochromeSliders = [
   { key: 'monochromeLightness', label: 'mono light', min: 0, max: 100, step: 1 },
 ]
 
+const offsetSliders = [
+  { key: 'errorOffset', label: 'error', min: -180, max: 180, step: 1 },
+  { key: 'warningOffset', label: 'warning', min: -180, max: 180, step: 1 },
+  { key: 'keywordOffset', label: 'keyword', min: -180, max: 180, step: 1 },
+  { key: 'stringOffset', label: 'string', min: -180, max: 180, step: 1 },
+  { key: 'numberOffset', label: 'number', min: -180, max: 180, step: 1 },
+  { key: 'functionOffset', label: 'function', min: -180, max: 180, step: 1 },
+]
+
+const showAdvanced = ref(false)
+
 const toggleMode = () => {
   state.mode = state.mode === 'dark' ? 'light' : 'dark'
 }
@@ -69,6 +80,30 @@ const toggleMode = () => {
           :max="slider.max"
           :step="slider.step"
         />
+      </div>
+    </div>
+
+    <!-- Advanced offset controls -->
+    <div class="advanced-section">
+      <button @click="showAdvanced = !showAdvanced" class="advanced-toggle">
+        <span>{{ showAdvanced ? '▼' : '▶' }}</span>
+        <span>offset math</span>
+      </button>
+
+      <div v-if="showAdvanced" class="advanced-controls">
+        <div class="control-group" v-for="slider in offsetSliders" :key="slider.key">
+          <label>
+            <span class="label">{{ slider.label }}</span>
+            <span class="value">{{ state[slider.key as keyof typeof state] }}</span>
+          </label>
+          <input
+            type="range"
+            v-model.number="state[slider.key as keyof typeof state]"
+            :min="slider.min"
+            :max="slider.max"
+            :step="slider.step"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -155,6 +190,46 @@ const toggleMode = () => {
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.advanced-section {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.advanced-toggle {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px 0;
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.15s;
+}
+
+.advanced-toggle:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.advanced-toggle span:first-child {
+  font-size: 6px;
+  width: 8px;
+}
+
+.advanced-controls {
+  padding-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
