@@ -57,6 +57,10 @@ const copyLight = async () => {
     <main class="preview">
       <!-- Color swatches -->
       <div class="swatches">
+        <div class="swatch" :style="{ background: colors.base }">
+          <span>base</span>
+          <code>{{ colors.base }}</code>
+        </div>
         <div class="swatch" :style="{ background: colors.error }">
           <span>error</span>
           <code>{{ colors.error }}</code>
@@ -65,9 +69,9 @@ const copyLight = async () => {
           <span>warning</span>
           <code>{{ colors.warning }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.base }">
-          <span>base</span>
-          <code>{{ colors.base }}</code>
+        <div class="swatch" :style="{ background: colors.hint }">
+          <span>hint</span>
+          <code>{{ colors.hint }}</code>
         </div>
         <div class="swatch" :style="{ background: colors.keyword }">
           <span>keyword</span>
@@ -77,9 +81,25 @@ const copyLight = async () => {
           <span>string</span>
           <code>{{ colors.string }}</code>
         </div>
+        <div class="swatch" :style="{ background: colors.number }">
+          <span>number</span>
+          <code>{{ colors.number }}</code>
+        </div>
         <div class="swatch" :style="{ background: colors.function }">
           <span>function</span>
           <code>{{ colors.function }}</code>
+        </div>
+        <div class="swatch" :style="{ background: colors.comment }">
+          <span>comment</span>
+          <code>{{ colors.comment }}</code>
+        </div>
+        <div class="swatch" :style="{ background: colors.fg }">
+          <span>foreground</span>
+          <code>{{ colors.fg }}</code>
+        </div>
+        <div class="swatch" :style="{ background: colors.bg, border: '1px solid ' + colors.comment }">
+          <span :style="{ color: colors.fg }">background</span>
+          <code :style="{ color: colors.fg }">{{ colors.bg }}</code>
         </div>
       </div>
 
@@ -210,7 +230,7 @@ h1 {
 
 .swatches {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 2px;
   margin-bottom: 4px;
 }

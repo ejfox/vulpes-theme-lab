@@ -8,6 +8,11 @@ const sliders = [
   { key: 'contrast', label: 'contrast', min: 1, max: 100, step: 1 },
 ]
 
+const monochromeSliders = [
+  { key: 'monochromeIntensity', label: 'mono sat', min: 0, max: 100, step: 1 },
+  { key: 'monochromeLightness', label: 'mono light', min: 0, max: 100, step: 1 },
+]
+
 const toggleMode = () => {
   state.mode = state.mode === 'dark' ? 'light' : 'dark'
 }
@@ -48,6 +53,23 @@ const toggleMode = () => {
         :max="slider.max"
         :step="slider.step"
       />
+    </div>
+
+    <!-- Monochrome-specific controls -->
+    <div v-if="state.monochromeMode" class="monochrome-controls">
+      <div class="control-group" v-for="slider in monochromeSliders" :key="slider.key">
+        <label>
+          <span class="label">{{ slider.label }}</span>
+          <span class="value">{{ state[slider.key as keyof typeof state] }}</span>
+        </label>
+        <input
+          type="range"
+          v-model.number="state[slider.key as keyof typeof state]"
+          :min="slider.min"
+          :max="slider.max"
+          :step="slider.step"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -127,6 +149,15 @@ const toggleMode = () => {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.monochrome-controls {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 label {

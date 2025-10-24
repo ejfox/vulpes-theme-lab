@@ -7,6 +7,8 @@ interface ThemeState {
   saturation: number
   contrast: number
   monochromeMode: boolean
+  monochromeIntensity: number
+  monochromeLightness: number
   boldKeywords: boolean
   italicComments: boolean
   mode: 'dark' | 'light'
@@ -18,6 +20,8 @@ const defaultState: ThemeState = {
   saturation: 85,
   contrast: 50,
   monochromeMode: false,
+  monochromeIntensity: 80,
+  monochromeLightness: 50,
   boldKeywords: false,
   italicComments: true,
   mode: 'dark' as 'dark' | 'light',
@@ -34,6 +38,8 @@ export const useTheme = () => {
     saturation: Number(params.s) || defaultState.saturation,
     contrast: Number(params.c) || defaultState.contrast,
     monochromeMode: params.m === '1' || defaultState.monochromeMode,
+    monochromeIntensity: Number(params.mi) || defaultState.monochromeIntensity,
+    monochromeLightness: Number(params.ml) || defaultState.monochromeLightness,
     boldKeywords: params.b === '1' || defaultState.boldKeywords,
     italicComments: params.i !== '0',
     mode: (params.mode as 'dark' | 'light') || defaultState.mode,
@@ -47,6 +53,8 @@ export const useTheme = () => {
       params.s = String(newState.saturation)
       params.c = String(newState.contrast)
       params.m = newState.monochromeMode ? '1' : '0'
+      params.mi = String(newState.monochromeIntensity)
+      params.ml = String(newState.monochromeLightness)
       params.b = newState.boldKeywords ? '1' : '0'
       params.i = newState.italicComments ? '1' : '0'
       params.mode = newState.mode
@@ -66,11 +74,16 @@ export const useTheme = () => {
     // Foreground with better contrast math
     // Dark mode: light text (70-95% lightness range)
     // Light mode: dark text (20-45% lightness range)
+    const monoIntensity = state.value.monochromeIntensity / 100
+    const monoLightness = state.value.monochromeLightness / 100
+
     const fg = state.value.monochromeMode
       ? chroma.hsl(
           state.value.baseHue,
-          sat * 0.8, // Slightly desaturate for readability
-          isDark ? 0.75 + (contrastFactor * 0.20) : 0.30 - (contrastFactor * 0.10)
+          sat * monoIntensity, // Use intensity control
+          isDark
+            ? 0.70 + (monoLightness * 0.25) + (contrastFactor * 0.10)
+            : 0.25 + (monoLightness * 0.20) - (contrastFactor * 0.05)
         ).hex()
       : chroma.hsl(
           0,
