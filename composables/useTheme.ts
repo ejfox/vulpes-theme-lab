@@ -113,7 +113,9 @@ export const useTheme = () => {
       error: colorAt(state.value.hueOffset, 55, 40),
       warning: colorAt(-state.value.hueOffset, 55, 40),
       hint: colorAt(0, 70, 55),
-      comment: chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
+      comment: state.value.monochromeMode
+        ? chroma.hsl(state.value.baseHue, sat * monoIntensity * 0.5, isDark ? 0.45 : 0.55).hex()
+        : chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
       keyword: colorAt(state.value.hueOffset * 1.5, 60, 38),
       string: colorAt(-state.value.hueOffset * 1.5, 60, 42),
       number: colorAt(state.value.hueOffset * 2, 65, 45),
