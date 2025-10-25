@@ -1,29 +1,41 @@
 <script setup lang="ts">
-const { colors } = useTheme()
+const { colors, options } = useTheme()
 
 const codeLines = [
-  { num: 1, text: 'import { defineNuxtConfig } from "nuxt/config"', highlighted: false, error: false, type: 'import' },
-  { num: 2, text: 'import type { Theme, ColorPalette } from "@/types"', highlighted: false, error: false, type: 'import' },
-  { num: 3, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 4, text: 'interface GhosttyTheme {', highlighted: false, error: false, type: 'keyword' },
-  { num: 5, text: '  background: string', highlighted: true, error: false, type: 'property' },
-  { num: 6, text: '  foreground: string', highlighted: true, error: false, type: 'property' },
-  { num: 7, text: '  cursor: string', highlighted: false, error: false, type: 'property' },
-  { num: 8, text: '  palette: Record<number, string>', highlighted: false, error: false, type: 'property' },
-  { num: 9, text: '}', highlighted: false, error: false, type: 'keyword' },
-  { num: 10, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 11, text: 'export const useTheme = () => {', highlighted: false, error: false, type: 'keyword' },
-  { num: 12, text: '  const state = useState<ThemeState>("theme", () => ({', highlighted: false, error: false, type: 'code' },
-  { num: 13, text: '    baseHue: 180,', highlighted: false, error: false, type: 'code' },
-  { num: 14, text: '    saturation: 0.85,', highlighted: false, error: false, type: 'code' },
-  { num: 15, text: '    contrast: 0.50', highlighted: false, error: true, type: 'code' },
-  { num: 16, text: '    lightness: 0.50  // Missing comma above', highlighted: false, error: false, type: 'comment' },
-  { num: 17, text: '  }))', highlighted: false, error: false, type: 'code' },
-  { num: 18, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 19, text: '  const colors = computed(() => generatePalette(state.value))', highlighted: false, error: false, type: 'code' },
-  { num: 20, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 21, text: '  return { state, colors }', highlighted: false, error: false, type: 'code' },
-  { num: 22, text: '}', highlighted: false, error: false, type: 'keyword' },
+  { num: 1, text: 'import { useState, computed } from "vue"', highlighted: false, error: false, type: 'import' },
+  { num: 2, text: 'import type { ThemeColors, ColorPalette } from "@/types"', highlighted: false, error: false, type: 'import' },
+  { num: 3, text: 'import chroma from "chroma-js"', highlighted: false, error: false, type: 'import' },
+  { num: 4, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 5, text: '// HSL-based theme generation with mathematical precision', highlighted: false, error: false, type: 'comment' },
+  { num: 6, text: '// Tuftian design: ±7° hue offset for minimal variation', highlighted: false, error: false, type: 'comment' },
+  { num: 7, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 8, text: 'interface ThemeConfig {', highlighted: false, error: false, type: 'keyword' },
+  { num: 9, text: '  baseHue: number', highlighted: false, error: false, type: 'property' },
+  { num: 10, text: '  offset: number', highlighted: false, error: false, type: 'property' },
+  { num: 11, text: '  saturation: number', highlighted: false, error: false, type: 'property' },
+  { num: 12, text: '  palette: ColorPalette', highlighted: false, error: false, type: 'property' },
+  { num: 13, text: '}', highlighted: false, error: false, type: 'keyword' },
+  { num: 14, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 15, text: 'export const useTheme = () => {', highlighted: false, error: false, type: 'keyword' },
+  { num: 16, text: '  const state = useState<ThemeConfig>("theme", () => ({', highlighted: false, error: false, type: 'code' },
+  { num: 17, text: '    baseHue: 267,  // Catppuccin mauve', highlighted: true, error: false, type: 'comment' },
+  { num: 18, text: '    offset: 7,', highlighted: true, error: false, type: 'code' },
+  { num: 19, text: '    saturation: 0.85', highlighted: false, error: true, type: 'code' },
+  { num: 20, text: '    // Expected \',\' after property value', highlighted: false, error: false, type: 'comment' },
+  { num: 21, text: '  }))', highlighted: false, error: false, type: 'code' },
+  { num: 22, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 23, text: '  const generateColor = async (hue: number, offset: number) => {', highlighted: false, error: false, type: 'function' },
+  { num: 24, text: '    return chroma.hsl(hue + offset, 0.85, 0.60).hex()', highlighted: false, error: false, type: 'function' },
+  { num: 25, text: '  }', highlighted: false, error: false, type: 'keyword' },
+  { num: 26, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 27, text: '  const colors = computed(() => ({', highlighted: false, error: false, type: 'function' },
+  { num: 28, text: '    error: "#f38ba8",    // Catppuccin red', highlighted: false, error: false, type: 'string' },
+  { num: 29, text: '    keyword: "#cba6f7",  // Catppuccin mauve', highlighted: false, error: false, type: 'string' },
+  { num: 30, text: '    string: "#a6e3a1",   // Catppuccin green', highlighted: false, error: false, type: 'string' },
+  { num: 31, text: '  }))', highlighted: false, error: false, type: 'code' },
+  { num: 32, text: '', highlighted: false, error: false, type: 'empty' },
+  { num: 33, text: '  return { state, colors }', highlighted: false, error: false, type: 'code' },
+  { num: 34, text: '}', highlighted: false, error: false, type: 'keyword' },
 ]
 </script>
 
@@ -73,18 +85,35 @@ const codeLines = [
             color: line.error ? colors.error :
                    line.type === 'import' ? colors.keyword :
                    line.type === 'keyword' ? colors.keyword :
+                   line.type === 'string' ? colors.string :
+                   line.type === 'function' ? colors.function :
                    line.type === 'property' ? colors.fg :
                    line.type === 'comment' ? colors.comment :
                    line.type === 'empty' ? colors.fg :
-                   colors.fg
+                   colors.fg,
+            fontWeight:
+              ((line.type === 'import' || line.type === 'keyword') && options.boldKeywords) ||
+              (line.type === 'function' && options.boldFunctions)
+                ? 'bold' : 'normal',
+            fontStyle:
+              (line.type === 'comment' && options.italicComments) ||
+              (line.type === 'string' && options.italicStrings)
+                ? 'italic' : 'normal',
+            textDecoration: line.error && options.underlineErrors ? 'underline wavy' : 'none',
+            textDecorationColor: line.error ? colors.error : 'transparent'
           }">
             <template v-if="line.type === 'import'">
-              <span :style="{ color: colors.keyword }">{{ line.text.split(' ')[0] }}</span>
-              <span :style="{ color: colors.fg }"> {{ line.text.split(' ').slice(1).join(' ').replace(/["'].*?["']/g, (m) => m) }}</span>
+              <span :style="{
+                color: colors.keyword,
+                fontWeight: options.boldKeywords ? 'bold' : 'normal'
+              }">{{ line.text.split(' ')[0] }}</span>
+              <span :style="{
+                color: colors.string,
+                fontStyle: options.italicStrings ? 'italic' : 'normal'
+              }"> {{ line.text.split(' ').slice(1).join(' ') }}</span>
             </template>
             <template v-else>{{ line.text }}</template>
           </span>
-          <span v-if="line.error" class="error-underline" :style="{ background: colors.error }"></span>
         </div>
       </div>
     </div>
@@ -131,7 +160,6 @@ const codeLines = [
       <div class="telescope-prompt" :style="{ borderBottom: `1px solid ${colors.comment}30` }">
         <span :style="{ color: colors.base }">❯</span>
         <span :style="{ color: colors.fg }">useTheme</span>
-        <span class="cursor" :style="{ background: colors.base }"></span>
       </div>
       <div class="telescope-results">
         <div class="result-item selected" :style="{ background: colors.base + '20', color: colors.base }">

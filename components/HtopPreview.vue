@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors } = useTheme()
+const { colors, options } = useTheme()
 
 const cpuBars = [
   { id: 1, usage: 45, color: 'base' },

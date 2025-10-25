@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors } = useTheme()
+const { colors, options } = useTheme()
 
 // Your actual dense window setup
 const windows = [

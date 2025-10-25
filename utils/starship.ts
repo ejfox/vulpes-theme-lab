@@ -1,0 +1,47 @@
+import type { ThemeColors } from '~/composables/useTheme'
+
+export function serializeStarshipTheme(theme: ThemeColors, name = 'theme_lab'): string {
+  const lines = [
+    `# ${name} - Starship prompt theme`,
+    `# Generated with theme-lab`,
+    `# Add this to your ~/.config/starship.toml`,
+    ``,
+    `palette = "${name}"`,
+    ``,
+    `[palettes.${name}]`,
+    `foreground = '${theme.fg}'`,
+    `background = '${theme.bg}'`,
+    `keyword = '${theme.keyword}'`,
+    `error = '${theme.error}'`,
+    `warning = '${theme.warning}'`,
+    `string = '${theme.string}'`,
+    `number = '${theme.number}'`,
+    `function = '${theme.function}'`,
+    `comment = '${theme.palette[8]}'`,
+    ``,
+    `# Apply theme to prompt elements`,
+    `[character]`,
+    `success_symbol = '[➜](bold string)'`,
+    `error_symbol = '[➜](bold error)'`,
+    ``,
+    `[directory]`,
+    `style = 'bold keyword'`,
+    ``,
+    `[git_branch]`,
+    `style = 'bold warning'`,
+    ``,
+    `[git_status]`,
+    `style = 'bold number'`,
+    `ahead = '⇡\${count}'`,
+    `behind = '⇣\${count}'`,
+    `diverged = '⇕⇡\${ahead_count}⇣\${behind_count}'`,
+    ``,
+    `[cmd_duration]`,
+    `style = 'comment'`,
+    ``,
+    `[package]`,
+    `style = 'function'`,
+  ]
+
+  return lines.join('\n') + '\n'
+}

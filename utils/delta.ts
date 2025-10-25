@@ -1,0 +1,46 @@
+import type { ThemeColors } from '~/composables/useTheme'
+
+export function serializeDeltaTheme(theme: ThemeColors, name = 'theme-lab'): string {
+  const lines = [
+    `# ${name} - Delta (git diff) theme`,
+    `# Generated with theme-lab`,
+    `# Add this to your ~/.gitconfig`,
+    ``,
+    `[delta]`,
+    `    features = ${name}`,
+    `    side-by-side = true`,
+    ``,
+    `[delta "${name}"]`,
+    `    # Syntax highlighting`,
+    `    syntax-theme = none`,
+    `    `,
+    `    # Line numbers`,
+    `    line-numbers = true`,
+    `    line-numbers-left-format = "{nm:>4}┊"`,
+    `    line-numbers-right-format = "{np:>4}│"`,
+    `    line-numbers-left-style = ${theme.comment}`,
+    `    line-numbers-right-style = ${theme.comment}`,
+    `    line-numbers-minus-style = ${theme.error}`,
+    `    line-numbers-plus-style = ${theme.string}`,
+    `    `,
+    `    # File headers`,
+    `    file-style = ${theme.keyword} bold`,
+    `    file-decoration-style = ${theme.keyword} ul`,
+    `    `,
+    `    # Hunk headers`,
+    `    hunk-header-style = ${theme.keyword} bold`,
+    `    hunk-header-decoration-style = ${theme.palette[8]}`,
+    `    `,
+    `    # Diff colors`,
+    `    minus-style = syntax ${theme.error}`,
+    `    minus-emph-style = syntax ${theme.error} bold`,
+    `    plus-style = syntax ${theme.string}`,
+    `    plus-emph-style = syntax ${theme.string} bold`,
+    `    `,
+    `    # Commit style`,
+    `    commit-style = ${theme.warning} bold`,
+    `    commit-decoration-style = ${theme.warning}`,
+  ]
+
+  return lines.join('\n') + '\n'
+}

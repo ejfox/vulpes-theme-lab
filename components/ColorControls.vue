@@ -25,37 +25,52 @@ const offsetSliders = [
 const showAdvanced = ref(false)
 
 const toggleMode = () => {
-  state.mode = state.mode === 'dark' ? 'light' : 'dark'
+  state.value.mode = state.value.mode === 'dark' ? 'light' : 'dark'
 }
 </script>
 
 <template>
   <div class="controls">
-    <div class="mode-toggle">
-      <button @click="toggleMode" class="mode-btn">
-        preview: {{ state.mode }}
+    <div class="mode-toggle" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <button @click="toggleMode" class="mode-btn" :class="'mode-' + state.mode" :style="{
+        borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+        color: state.mode === 'dark' ? '#fff' : '#000'
+      }">
+        {{ state.mode === 'dark' ? 'DARK' : 'LIGHT' }}
       </button>
     </div>
 
-    <div class="checkbox-group">
-      <label class="checkbox-label">
-        <input type="checkbox" v-model="state.monochromeMode" />
+    <div class="checkbox-group" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.monochromeMode" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
         <span>monochrome fg</span>
       </label>
-      <label class="checkbox-label">
-        <input type="checkbox" v-model="state.boldKeywords" />
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.boldKeywords" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
         <span>bold keywords</span>
       </label>
-      <label class="checkbox-label">
-        <input type="checkbox" v-model="state.italicComments" />
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.italicComments" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
         <span>italic comments</span>
+      </label>
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.boldFunctions" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+        <span>bold functions</span>
+      </label>
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.italicStrings" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+        <span>italic strings</span>
+      </label>
+      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        <input type="checkbox" v-model="state.underlineErrors" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+        <span>underline errors</span>
       </label>
     </div>
 
     <div class="control-group" v-for="slider in sliders" :key="slider.key">
       <label>
-        <span class="label">{{ slider.label }}</span>
-        <span class="value">{{ state[slider.key as keyof typeof state] }}</span>
+        <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
+        <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
       </label>
       <input
         type="range"
@@ -64,15 +79,16 @@ const toggleMode = () => {
         :max="slider.max"
         :step="slider.step"
         :class="{ 'base-hue-slider': slider.key === 'baseHue' }"
+        :style="{ background: slider.key === 'baseHue' ? undefined : (state.mode === 'dark' ? '#666' : '#ccc') }"
       />
     </div>
 
     <!-- Monochrome-specific controls -->
-    <div v-if="state.monochromeMode" class="monochrome-controls">
+    <div v-if="state.monochromeMode" class="monochrome-controls" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
       <div class="control-group" v-for="slider in monochromeSliders" :key="slider.key">
         <label>
-          <span class="label">{{ slider.label }}</span>
-          <span class="value">{{ state[slider.key as keyof typeof state] }}</span>
+          <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
+          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
         </label>
         <input
           type="range"
@@ -80,13 +96,16 @@ const toggleMode = () => {
           :min="slider.min"
           :max="slider.max"
           :step="slider.step"
+          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
         />
       </div>
     </div>
 
     <!-- Advanced offset controls -->
-    <div class="advanced-section">
-      <button @click="showAdvanced = !showAdvanced" class="advanced-toggle">
+    <div class="advanced-section" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <button @click="showAdvanced = !showAdvanced" class="advanced-toggle" :style="{
+        color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
+      }">
         <span>{{ showAdvanced ? '▼' : '▶' }}</span>
         <span>offset math</span>
       </button>
@@ -94,8 +113,8 @@ const toggleMode = () => {
       <div v-if="showAdvanced" class="advanced-controls">
         <div class="control-group" v-for="slider in offsetSliders" :key="slider.key">
           <label>
-            <span class="label">{{ slider.label }}</span>
-            <span class="value">{{ state[slider.key as keyof typeof state] }}</span>
+            <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
+            <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
           </label>
           <input
             type="range"
@@ -103,6 +122,7 @@ const toggleMode = () => {
             :min="slider.min"
             :max="slider.max"
             :step="slider.step"
+            :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
           />
         </div>
       </div>
@@ -141,6 +161,26 @@ const toggleMode = () => {
 .mode-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+.mode-btn.mode-light {
+  border-color: rgba(255, 200, 0, 0.5);
+  color: rgba(255, 200, 0, 1);
+}
+
+.mode-btn.mode-light:hover {
+  background: rgba(255, 200, 0, 0.1);
+  border-color: rgba(255, 200, 0, 0.7);
+}
+
+.mode-btn.mode-dark {
+  border-color: rgba(100, 150, 255, 0.5);
+  color: rgba(150, 180, 255, 1);
+}
+
+.mode-btn.mode-dark:hover {
+  background: rgba(100, 150, 255, 0.1);
+  border-color: rgba(100, 150, 255, 0.7);
 }
 
 .checkbox-group {
@@ -252,7 +292,9 @@ label {
   font-variant-numeric: tabular-nums;
   color: #fff;
   font-weight: bold;
-  min-width: 24px;
+  min-width: 36px;
+  width: 36px;
+  display: inline-block;
   text-align: right;
 }
 

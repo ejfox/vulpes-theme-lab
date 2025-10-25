@@ -1,6 +1,35 @@
 import chroma from 'chroma-js'
 import { useUrlSearchParams } from '@vueuse/core'
 
+// Unified theme colors interface - used by ALL export utilities
+export interface ThemeColors {
+  bg: string
+  fg: string
+  base: string
+  error: string
+  warning: string
+  hint: string
+  comment: string
+  keyword: string
+  string: string
+  number: string
+  function: string
+  constant: string
+  type: string
+  variable: string
+  operator: string
+  palette: Record<number, string>
+}
+
+// Theme options interface - font styles and other configurable settings
+export interface ThemeOptions {
+  boldKeywords: boolean
+  italicComments: boolean
+  boldFunctions: boolean
+  italicStrings: boolean
+  underlineErrors: boolean
+}
+
 interface ThemeState {
   baseHue: number
   hueOffset: number
@@ -9,8 +38,13 @@ interface ThemeState {
   monochromeMode: boolean
   monochromeIntensity: number
   monochromeLightness: number
+  bgLightness: number  // 0-100, 50 = auto
+  fgLightness: number  // 0-100, 50 = auto
   boldKeywords: boolean
   italicComments: boolean
+  boldFunctions: boolean
+  italicStrings: boolean
+  underlineErrors: boolean
   mode: 'dark' | 'light'
   // Individual color offsets
   errorOffset: number
@@ -59,15 +93,20 @@ interface ThemeState {
 }
 
 const defaultState: ThemeState = {
-  baseHue: 0,
-  hueOffset: 7,
-  saturation: 85,
-  contrast: 50,
+  baseHue: 309,
+  hueOffset: 1,
+  saturation: 100,
+  contrast: 86,
   monochromeMode: true,
-  monochromeIntensity: 80,
-  monochromeLightness: 50,
+  monochromeIntensity: 100,
+  monochromeLightness: 0,
+  bgLightness: 50,  // 50 = auto-calculated
+  fgLightness: 50,  // 50 = auto-calculated
   boldKeywords: false,
   italicComments: true,
+  boldFunctions: false,
+  italicStrings: true,
+  underlineErrors: true,
   mode: 'dark' as 'dark' | 'light',
   // Default offsets - now additive to global (0 = use pure multiplier)
   errorOffset: 0,
@@ -130,6 +169,9 @@ export const useTheme = () => {
     monochromeLightness: Number(params.ml) || defaultState.monochromeLightness,
     boldKeywords: params.b === '1' || defaultState.boldKeywords,
     italicComments: params.i !== '0',
+    boldFunctions: params.bf === '1' || defaultState.boldFunctions,
+    italicStrings: params.is === '1' || defaultState.italicStrings,
+    underlineErrors: params.ue !== '0',
     mode: (params.mode as 'dark' | 'light') || defaultState.mode,
     errorOffset: Number(params.eo) || defaultState.errorOffset,
     warningOffset: Number(params.wo) || defaultState.warningOffset,
@@ -185,6 +227,9 @@ export const useTheme = () => {
       params.ml = String(newState.monochromeLightness)
       params.b = newState.boldKeywords ? '1' : '0'
       params.i = newState.italicComments ? '1' : '0'
+      params.bf = newState.boldFunctions ? '1' : '0'
+      params.is = newState.italicStrings ? '1' : '0'
+      params.ue = newState.underlineErrors ? '1' : '0'
       params.mode = newState.mode
       params.eo = String(newState.errorOffset)
       params.wo = String(newState.warningOffset)
@@ -379,6 +424,15 @@ export const useTheme = () => {
     palette: lightColors.value.palette,
   }))
 
+  // Theme options (font styles, etc)
+  const options = computed((): ThemeOptions => ({
+    boldKeywords: state.value.boldKeywords,
+    italicComments: state.value.italicComments,
+    boldFunctions: state.value.boldFunctions,
+    italicStrings: state.value.italicStrings,
+    underlineErrors: state.value.underlineErrors,
+  }))
+
   return {
     state,
     colors,
@@ -387,5 +441,6 @@ export const useTheme = () => {
     ghosttyTheme,
     ghosttyThemeDark,
     ghosttyThemeLight,
+    options,
   }
 }

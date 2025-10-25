@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors } = useTheme()
+const { colors, options } = useTheme()
 
 const commits = [
   { hash: 'a3f2d1e', msg: 'fix: resolve merge conflicts in auth flow', author: 'ejfox', time: '2m ago', selected: false },

@@ -1,12 +1,65 @@
 <script setup lang="ts">
 import { serializeGhosttyTheme } from '~/utils/ghostty'
+import { serializeItermTheme } from '~/utils/iterm'
+import { serializeTmuxTheme } from '~/utils/tmux'
+import { serializeNeovimTheme } from '~/utils/neovim'
+import { serializeLazygitTheme } from '~/utils/lazygit'
 import chroma from 'chroma-js'
 
-const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight } = useTheme()
+const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } = useTheme()
 
-// Generate both configs
-const darkConfig = computed(() => serializeGhosttyTheme(ghosttyThemeDark.value, 'theme-lab-dark'))
-const lightConfig = computed(() => serializeGhosttyTheme(ghosttyThemeLight.value, 'theme-lab-light'))
+// Export format selection - multi-select
+const exportFormats = ref<string[]>(['ghostty'])
+
+// Helper to generate config for a single format
+const generateConfig = (format: string, isDark: boolean) => {
+  const themeColors = isDark ? darkColors.value : lightColors.value
+  const themeName = isDark ? 'theme-lab-dark' : 'theme-lab-light'
+  const themeNameUnderscore = isDark ? 'theme_lab_dark' : 'theme_lab_light'
+
+  switch (format) {
+    case 'ghostty':
+      return serializeGhosttyTheme(isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value, themeName)
+    case 'iterm':
+      return serializeItermTheme(themeColors, themeName)
+    case 'tmux':
+      return serializeTmuxTheme(themeColors, themeName)
+    case 'neovim':
+      return serializeNeovimTheme(themeColors, themeNameUnderscore, isDark, options.value)
+    case 'lazygit':
+      return serializeLazygitTheme(themeColors, !isDark)
+    default:
+      return serializeGhosttyTheme(isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value, themeName)
+  }
+}
+
+// Generate preview config for first selected format
+const darkConfig = computed(() => {
+  const format = exportFormats.value[0] || 'ghostty'
+  return generateConfig(format, true)
+})
+
+const lightConfig = computed(() => {
+  const format = exportFormats.value[0] || 'ghostty'
+  return generateConfig(format, false)
+})
+
+// Get file extension based on format
+const getFileExtension = (format: string): string => {
+  switch (format) {
+    case 'ghostty': return '.conf'
+    case 'iterm': return '.itermcolors'
+    case 'tmux': return '.tmux.conf'
+    case 'neovim': return '.lua'
+    case 'lazygit': return '.yml'
+    default: return '.txt'
+  }
+}
+
+// Select all formats helper
+const selectAllFormats = () => {
+  exportFormats.value = ['ghostty', 'iterm', 'tmux', 'neovim', 'lazygit']
+}
 
 // Reset functions for each color
 const resetColor = (colorName: string) => {
@@ -104,41 +157,213 @@ const downloadFile = (content: string, filename: string) => {
   URL.revokeObjectURL(url)
 }
 
+// Export both dark and light for all selected formats
 const exportBoth = () => {
-  downloadFile(darkConfig.value, 'theme-lab-dark')
-  setTimeout(() => downloadFile(lightConfig.value, 'theme-lab-light'), 100)
+  if (exportFormats.value.length === 0) {
+    alert('Please select at least one format to export')
+    return
+  }
+
+  exportFormats.value.forEach((format, index) => {
+    setTimeout(() => {
+      const ext = getFileExtension(format)
+      const darkContent = generateConfig(format, true)
+      const lightContent = generateConfig(format, false)
+
+      downloadFile(darkContent, `theme-lab-dark-${format}${ext}`)
+      setTimeout(() => downloadFile(lightContent, `theme-lab-light-${format}${ext}`), 50)
+    }, index * 150)
+  })
 }
 
+// Export only dark for all selected formats
+const exportDark = () => {
+  if (exportFormats.value.length === 0) {
+    alert('Please select at least one format to export')
+    return
+  }
+
+  exportFormats.value.forEach((format, index) => {
+    setTimeout(() => {
+      const ext = getFileExtension(format)
+      const darkContent = generateConfig(format, true)
+      downloadFile(darkContent, `theme-lab-dark-${format}${ext}`)
+    }, index * 100)
+  })
+}
+
+// Export only light for all selected formats
+const exportLight = () => {
+  if (exportFormats.value.length === 0) {
+    alert('Please select at least one format to export')
+    return
+  }
+
+  exportFormats.value.forEach((format, index) => {
+    setTimeout(() => {
+      const ext = getFileExtension(format)
+      const lightContent = generateConfig(format, false)
+      downloadFile(lightContent, `theme-lab-light-${format}${ext}`)
+    }, index * 100)
+  })
+}
+
+// Copy configs to clipboard (first selected format only)
 const copyDark = async () => {
-  await navigator.clipboard.writeText(darkConfig.value)
+  const format = exportFormats.value[0] || 'ghostty'
+  const content = generateConfig(format, true)
+  await navigator.clipboard.writeText(content)
 }
 
 const copyLight = async () => {
-  await navigator.clipboard.writeText(lightConfig.value)
+  const format = exportFormats.value[0] || 'ghostty'
+  const content = generateConfig(format, false)
+  await navigator.clipboard.writeText(content)
 }
 
-// Theme presets
-const presets = {
-  'ayu-dark': { baseHue: 33, saturation: 60, contrast: 55, mode: 'dark' as const },
-  'ayu-mirage': { baseHue: 33, saturation: 50, contrast: 50, mode: 'dark' as const },
-  'catppuccin-mocha': { baseHue: 267, saturation: 75, contrast: 45, mode: 'dark' as const },
-  'catppuccin-macchiato': { baseHue: 267, saturation: 70, contrast: 50, mode: 'dark' as const },
-  'catppuccin-latte': { baseHue: 267, saturation: 65, contrast: 55, mode: 'light' as const },
-  'tokyo-night': { baseHue: 225, saturation: 70, contrast: 48, mode: 'dark' as const },
-  'nord': { baseHue: 220, saturation: 40, contrast: 45, mode: 'dark' as const },
-  'gruvbox-dark': { baseHue: 35, saturation: 75, contrast: 50, mode: 'dark' as const },
-  'gruvbox-light': { baseHue: 35, saturation: 70, contrast: 55, mode: 'light' as const },
+// Theme presets - based on real theme color analysis
+interface ThemePreset {
+  baseHue: number
+  hueOffset: number
+  saturation: number
+  contrast: number
+  mode: 'dark' | 'light'
+  monochromeMode?: boolean
+  monochromeIntensity?: number
+  monochromeLightness?: number
+  // Color-specific overrides
+  colors?: {
+    [key: string]: { offset?: number, lightness?: number, linked?: boolean, multiplier?: number }
+  }
+}
+
+const presets: Record<string, ThemePreset> = {
+  'catppuccin-mocha': {
+    baseHue: 267,  // Mauve base (signature color)
+    hueOffset: 0,
+    saturation: 84,  // Match mauve saturation
+    contrast: 42,
+    mode: 'dark',
+    monochromeMode: true,
+    monochromeIntensity: 35,
+    monochromeLightness: 60,
+    colors: {
+      error: { offset: 343, linked: false, lightness: 75 },      // Red #f38ba8
+      warning: { offset: 23, linked: false, lightness: 75 },     // Peach #fab387
+      keyword: { offset: 267, linked: false, lightness: 81 },    // Mauve #cba6f7
+      string: { offset: 115, linked: false, lightness: 76 },     // Green #a6e3a1
+      number: { offset: 23, linked: false, lightness: 75 },      // Peach #fab387
+      function: { offset: 217, linked: false, lightness: 76 },   // Blue #89b4fa
+      constant: { offset: 350, linked: false, lightness: 77 },   // Maroon #eba0ac
+      type: { offset: 41, linked: false, lightness: 83 },        // Yellow #f9e2af
+      variable: { offset: 170, linked: false, lightness: 73 },   // Teal #94e2d5
+      operator: { offset: 189, linked: false, lightness: 73 },   // Sky #89dceb
+    }
+  },
+  'catppuccin-latte': {
+    baseHue: 266,  // Mauve base (signature color)
+    hueOffset: 0,
+    saturation: 85,  // Match mauve saturation
+    contrast: 42,
+    mode: 'light',
+    monochromeMode: true,
+    monochromeIntensity: 35,
+    monochromeLightness: 40,
+    colors: {
+      error: { offset: 347, linked: false, lightness: 44 },      // Red #d20f39
+      warning: { offset: 22, linked: false, lightness: 52 },     // Peach #fe640b
+      keyword: { offset: 266, linked: false, lightness: 58 },    // Mauve #8839ef
+      string: { offset: 109, linked: false, lightness: 40 },     // Green #40a02b
+      number: { offset: 22, linked: false, lightness: 52 },      // Peach #fe640b
+      function: { offset: 220, linked: false, lightness: 54 },   // Blue #1e66f5
+      constant: { offset: 355, linked: false, lightness: 59 },   // Maroon #e64553
+      type: { offset: 35, linked: false, lightness: 49 },        // Yellow #df8e1d
+      variable: { offset: 183, linked: false, lightness: 35 },   // Teal #179299
+      operator: { offset: 197, linked: false, lightness: 46 },   // Sky #04a5e5
+    }
+  },
+  'ayu-dark': {
+    baseHue: 40,  // Based on actual yellow/orange accent
+    hueOffset: 0,
+    saturation: 75,
+    contrast: 52,
+    mode: 'dark',
+    monochromeMode: true,
+    monochromeIntensity: 28,
+    monochromeLightness: 55,
+    colors: {
+      error: { offset: 0, linked: false, lightness: 60 },       // #ff3333
+      warning: { offset: 357, linked: false, lightness: 69 },   // #f07178
+      keyword: { offset: 357, linked: false, lightness: 69 },   // #f07178
+      string: { offset: 70, linked: false, lightness: 56 },     // #b8cc52
+      number: { offset: 40, linked: false, lightness: 61 },     // #e6b450
+      function: { offset: 200, linked: false, lightness: 53 },  // #36a3d9
+      constant: { offset: 357, linked: false, lightness: 69 },  // #f07178
+      type: { offset: 40, linked: false, lightness: 61 },       // #e6b450
+      variable: { offset: 160, linked: false, lightness: 74 },  // #95e6cb
+      operator: { offset: 40, linked: false, lightness: 61 },   // #e6b450
+    }
+  },
+  'ayu-light': {
+    baseHue: 36,  // Based on actual yellow/orange accent
+    hueOffset: 0,
+    saturation: 87,
+    contrast: 52,
+    mode: 'light',
+    monochromeMode: true,
+    monochromeIntensity: 28,
+    monochromeLightness: 40,
+    colors: {
+      error: { offset: 357, linked: false, lightness: 69 },     // #f07178
+      warning: { offset: 25, linked: false, lightness: 61 },    // #fa8d3e
+      keyword: { offset: 25, linked: false, lightness: 61 },    // #fa8d3e
+      string: { offset: 75, linked: false, lightness: 35 },     // #86b300
+      number: { offset: 36, linked: false, lightness: 62 },     // #f2ae49
+      function: { offset: 195, linked: false, lightness: 58 },  // #55b4d4
+      constant: { offset: 25, linked: false, lightness: 61 },   // #fa8d3e
+      type: { offset: 36, linked: false, lightness: 62 },       // #f2ae49
+      variable: { offset: 184, linked: false, lightness: 43 },  // #3e999f
+      operator: { offset: 36, linked: false, lightness: 62 },   // #f2ae49
+    }
+  },
 }
 
 const loadPreset = (presetName: keyof typeof presets) => {
   const preset = presets[presetName]
+
+  // Apply base settings
   state.value.baseHue = preset.baseHue
+  state.value.hueOffset = preset.hueOffset
   state.value.saturation = preset.saturation
   state.value.contrast = preset.contrast
-  state.value.mode = preset.mode
-  // Reset all color offsets to defaults
-  const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
-  colors.forEach(colorName => resetColor(colorName))
+  state.mode = preset.mode
+
+  // Apply monochrome settings
+  if (preset.monochromeMode !== undefined) state.value.monochromeMode = preset.monochromeMode
+  if (preset.monochromeIntensity !== undefined) state.value.monochromeIntensity = preset.monochromeIntensity
+  if (preset.monochromeLightness !== undefined) state.value.monochromeLightness = preset.monochromeLightness
+
+  // Apply color-specific settings
+  if (preset.colors) {
+    Object.entries(preset.colors).forEach(([colorName, settings]) => {
+      if (settings.offset !== undefined) {
+        state.value[`${colorName}Offset` as keyof typeof state.value] = settings.offset as any
+      }
+      if (settings.lightness !== undefined) {
+        state.value[`${colorName}Lightness` as keyof typeof state.value] = settings.lightness as any
+      }
+      if (settings.linked !== undefined) {
+        state.value[`${colorName}Linked` as keyof typeof state.value] = settings.linked as any
+      }
+      if (settings.multiplier !== undefined) {
+        state.value[`${colorName}Multiplier` as keyof typeof state.value] = settings.multiplier as any
+      }
+    })
+  } else {
+    // If no color overrides, reset to defaults
+    const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
+    colors.forEach(colorName => resetColor(colorName))
+  }
 }
 
 // Color math presets - apply color theory to multipliers
@@ -250,19 +475,24 @@ const shuffleColor = (colorName: string) => {
 }
 
 const resetAll = () => {
-  // Reset core settings
-  state.value.baseHue = 0
-  state.value.hueOffset = 7
-  state.value.saturation = 85
-  state.value.contrast = 50
+  // Reset ALL core settings - ensures complete reset
+  state.value.baseHue = 309
+  state.value.hueOffset = 1
+  state.value.saturation = 100
+  state.value.contrast = 86
   state.value.monochromeMode = true
-  state.value.monochromeIntensity = 80
-  state.value.monochromeLightness = 50
+  state.value.monochromeIntensity = 100
+  state.value.monochromeLightness = 0
+  state.value.bgLightness = 50  // Reset background lightness
+  state.value.fgLightness = 50  // Reset foreground lightness
   state.value.boldKeywords = false
   state.value.italicComments = true
-  state.value.mode = 'dark'
+  state.value.boldFunctions = false
+  state.value.italicStrings = true
+  state.value.underlineErrors = true
+  state.mode = 'dark'
 
-  // Reset all colors
+  // Reset ALL individual color settings (offset, lightness, linked, multiplier)
   const colors = ['error', 'warning', 'keyword', 'string', 'number', 'function', 'constant', 'type', 'variable', 'operator']
   colors.forEach(colorName => resetColor(colorName))
 }
@@ -271,7 +501,7 @@ const resetAll = () => {
 const getMultiplierGradient = (colorName: string) => {
   // Show the color at different multiplier values from -5 to +5
   const sat = state.value.saturation / 100
-  const isDark = state.value.mode === 'dark'
+  const isDark = state.mode === 'dark'
   const baseL = isDark ? 0.55 : 0.40
 
   // Generate 5 color stops showing the hue at different multiplier positions
@@ -287,7 +517,7 @@ const getMultiplierGradient = (colorName: string) => {
 const getOffsetGradient = (colorName: string) => {
   // Show a hue gradient from -60° to +60° around the current hue position
   const sat = state.value.saturation / 100
-  const isDark = state.value.mode === 'dark'
+  const isDark = state.mode === 'dark'
   const baseL = isDark ? 0.55 : 0.40
 
   // Get the current hue for this color
@@ -310,7 +540,7 @@ const getOffsetGradient = (colorName: string) => {
 const getLightnessGradient = (colorName: string) => {
   // Show the color at different lightness values from dark to light
   const sat = state.value.saturation / 100
-  const isDark = state.value.mode === 'dark'
+  const isDark = state.mode === 'dark'
 
   // Get the current hue for this color
   const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number || 0
@@ -331,6 +561,81 @@ const getLightnessGradient = (colorName: string) => {
 
   return `linear-gradient(to right, ${stops.join(', ')})`
 }
+
+// Helper to get contrasting text color for any background
+const getTextColor = (bgColor: string) => {
+  try {
+    const luminance = chroma(bgColor).luminance()
+    return luminance > 0.5 ? '#000' : '#fff'
+  } catch {
+    return '#000'
+  }
+}
+
+// WCAG contrast ratio helpers
+const getContrastRatio = (color1: string, color2: string): number => {
+  try {
+    return chroma.contrast(color1, color2)
+  } catch {
+    return 0
+  }
+}
+
+const getContrastLevel = (ratio: number): 'AAA' | 'AA' | 'fail' => {
+  if (ratio >= 7) return 'AAA'
+  if (ratio >= 4.5) return 'AA'
+  return 'fail'
+}
+
+const getContrastIcon = (ratio: number): string => {
+  if (ratio >= 7) return 'AAA'
+  if (ratio >= 4.5) return 'AA'
+  return 'FAIL'
+}
+
+// Lock color to WCAG level by adjusting lightness
+const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
+  const targetRatio = level === 'AAA' ? 7 : 4.5
+  const bgColor = colors.value.bg
+
+  // Get current hue and saturation
+  const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number || 0
+  const individualOffset = state.value[`${colorName}Offset` as keyof typeof state.value] as number || 0
+  const isLinked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
+  const sat = state.value.saturation / 100
+
+  const currentOffset = isLinked ? (state.value.hueOffset * multiplier) + individualOffset : individualOffset
+  const hue = (state.value.baseHue + currentOffset + 360) % 360
+
+  // Binary search for the right lightness
+  let low = 0
+  let high = 100
+  let bestLightness = 50
+
+  for (let i = 0; i < 20; i++) {
+    const mid = (low + high) / 2
+    const testColor = chroma.hsl(hue, sat, mid / 100).hex()
+    const ratio = getContrastRatio(testColor, bgColor)
+
+    if (ratio >= targetRatio) {
+      bestLightness = mid
+      // Try to get closer to target
+      if (state.mode === 'dark') {
+        low = mid
+      } else {
+        high = mid
+      }
+    } else {
+      if (state.mode === 'dark') {
+        high = mid
+      } else {
+        low = mid
+      }
+    }
+  }
+
+  state.value[`${colorName}Lightness` as keyof typeof state.value] = Math.round(bestLightness) as any
+}
 </script>
 
 <template>
@@ -342,35 +647,110 @@ const getLightnessGradient = (colorName: string) => {
       boxShadow: state.mode === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
       color: state.mode === 'dark' ? '#fff' : '#000'
     }">
-      <div class="header">
+      <div class="header" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
         <h1>theme-lab</h1>
       </div>
 
       <!-- Presets dropdown -->
-      <div class="preset-section">
-        <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { loadPreset(el.value as any); el.value = ''; } }" class="preset-select">
+      <div class="preset-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+        <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { loadPreset(el.value as any); el.value = ''; } }" class="preset-select" :style="{
+          borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+          color: state.mode === 'dark' ? '#fff' : '#000',
+          background: 'transparent'
+        }">
           <option value="">load preset...</option>
+          <option value="catppuccin-mocha">catppuccin mocha (dark)</option>
+          <option value="catppuccin-latte">catppuccin latte (light)</option>
           <option value="ayu-dark">ayu dark</option>
-          <option value="ayu-mirage">ayu mirage</option>
-          <option value="catppuccin-mocha">catppuccin mocha</option>
-          <option value="catppuccin-macchiato">catppuccin macchiato</option>
-          <option value="catppuccin-latte">catppuccin latte</option>
-          <option value="tokyo-night">tokyo night</option>
-          <option value="nord">nord</option>
-          <option value="gruvbox-dark">gruvbox dark</option>
-          <option value="gruvbox-light">gruvbox light</option>
+          <option value="ayu-light">ayu light</option>
         </select>
       </div>
 
       <ColorControls />
 
-      <div class="actions">
-        <button @click="exportBoth" class="btn btn-primary">export</button>
-        <div class="action-row">
-          <button @click="copyDark" class="btn btn-small">dark</button>
-          <button @click="copyLight" class="btn btn-small">light</button>
+      <div class="actions" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+        <!-- Format selector -->
+        <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">export formats</div>
+          <div class="format-checkboxes">
+            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+              <input type="checkbox" v-model="exportFormats" value="ghostty" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+              <span>ghostty</span>
+            </label>
+            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+              <input type="checkbox" v-model="exportFormats" value="iterm" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+              <span>iterm2</span>
+            </label>
+            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+              <input type="checkbox" v-model="exportFormats" value="tmux" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+              <span>tmux</span>
+            </label>
+            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+              <input type="checkbox" v-model="exportFormats" value="neovim" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+              <span>neovim</span>
+            </label>
+            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+              <input type="checkbox" v-model="exportFormats" value="lazygit" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
+              <span>lazygit</span>
+            </label>
+          </div>
+          <button @click="selectAllFormats" class="btn-select-all" :style="{
+            borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)'
+          }">select all</button>
         </div>
-        <button @click="resetAll" class="btn btn-reset">reset all</button>
+
+        <!-- Download section -->
+        <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">download files</div>
+          <button @click="exportBoth" class="btn btn-primary" :style="{
+            background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+            color: state.mode === 'dark' ? '#fff' : '#000'
+          }" title="Download both dark and light theme files">
+            BOTH THEMES
+          </button>
+          <div class="button-grid">
+            <button @click="exportDark" class="btn btn-secondary" :style="{
+              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              color: state.mode === 'dark' ? '#fff' : '#000'
+            }" title="Download dark theme file">
+              DARK
+            </button>
+            <button @click="exportLight" class="btn btn-secondary" :style="{
+              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              color: state.mode === 'dark' ? '#fff' : '#000'
+            }" title="Download light theme file">
+              LIGHT
+            </button>
+          </div>
+        </div>
+
+        <!-- Copy section -->
+        <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">copy to clipboard</div>
+          <div class="button-grid">
+            <button @click="copyDark" class="btn btn-secondary" :style="{
+              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              color: state.mode === 'dark' ? '#fff' : '#000'
+            }" title="Copy dark theme config to clipboard">
+              COPY DARK
+            </button>
+            <button @click="copyLight" class="btn btn-secondary" :style="{
+              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              color: state.mode === 'dark' ? '#fff' : '#000'
+            }" title="Copy light theme config to clipboard">
+              COPY LIGHT
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset -->
+        <div class="export-section">
+          <button @click="resetAll" class="btn btn-reset" title="Reset all values to defaults">
+            RESET ALL
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -378,26 +758,43 @@ const getLightnessGradient = (colorName: string) => {
     <main class="preview">
       <!-- Color swatches -->
       <div class="swatches">
-        <div class="swatch" :style="{ background: colors.base }">
+        <div class="swatch" :style="{ background: colors.base, color: getTextColor(colors.base) }">
           <span>base</span>
           <code>{{ colors.base }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.error }">
-          <div class="swatch-info">
-            <span>error</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('error', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.error, color: getTextColor(colors.error) }">
+          <div class="swatch-header">
+            <span class="color-name">error</span>
+            <code class="color-hex">{{ colors.error }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.error, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.error, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.error, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.error, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.error, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('error', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('error', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.errorLinked = !state.errorLinked" class="tool-btn" :class="{ active: state.errorLinked }" :title="state.errorLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.errorLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('error')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('error')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('error', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.errorLinked = !state.errorLinked" class="link-btn" :class="{ linked: state.errorLinked }" title="link to global offset">{{ state.errorLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('error')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('error')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.errorLinked ? ((state.hueOffset * state.errorMultiplier) + state.errorOffset).toFixed(0) : state.errorOffset }}° / {{ state.errorLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.errorLinked ? ((state.hueOffset * state.errorMultiplier) + state.errorOffset).toFixed(0) : state.errorOffset }}° · L{{ state.errorLightness }}
           </div>
           <input
             v-if="state.errorLinked"
@@ -433,22 +830,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.error }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.warning }">
-          <div class="swatch-info">
-            <span>warning</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('warning', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.warning, color: getTextColor(colors.warning) }">
+          <div class="swatch-header">
+            <span class="color-name">warning</span>
+            <code class="color-hex">{{ colors.warning }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.warning, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.warning, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.warning, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.warning, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.warning, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('warning', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('warning', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.warningLinked = !state.warningLinked" class="tool-btn" :class="{ active: state.warningLinked }" :title="state.warningLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.warningLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('warning')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('warning')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('warning', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.warningLinked = !state.warningLinked" class="link-btn" :class="{ linked: state.warningLinked }" title="link to global offset">{{ state.warningLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('warning')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('warning')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.warningLinked ? ((state.hueOffset * state.warningMultiplier) + state.warningOffset).toFixed(0) : state.warningOffset }}° / {{ state.warningLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.warningLinked ? ((state.hueOffset * state.warningMultiplier) + state.warningOffset).toFixed(0) : state.warningOffset }}° · L{{ state.warningLightness }}
           </div>
           <input
             v-if="state.warningLinked"
@@ -484,26 +898,43 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.warning }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.hint }">
+        <div class="swatch" :style="{ background: colors.hint, color: getTextColor(colors.hint) }">
           <span>hint</span>
           <code>{{ colors.hint }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.keyword }">
-          <div class="swatch-info">
-            <span>keyword</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('keyword', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.keyword, color: getTextColor(colors.keyword) }">
+          <div class="swatch-header">
+            <span class="color-name">keyword</span>
+            <code class="color-hex">{{ colors.keyword }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.keyword, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.keyword, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.keyword, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.keyword, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.keyword, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('keyword', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('keyword', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.keywordLinked = !state.keywordLinked" class="tool-btn" :class="{ active: state.keywordLinked }" :title="state.keywordLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.keywordLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('keyword')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('keyword')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('keyword', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.keywordLinked = !state.keywordLinked" class="link-btn" :class="{ linked: state.keywordLinked }" title="link to global offset">{{ state.keywordLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('keyword')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('keyword')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.keywordLinked ? ((state.hueOffset * state.keywordMultiplier) + state.keywordOffset).toFixed(0) : state.keywordOffset }}° / {{ state.keywordLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.keywordLinked ? ((state.hueOffset * state.keywordMultiplier) + state.keywordOffset).toFixed(0) : state.keywordOffset }}° · L{{ state.keywordLightness }}
           </div>
           <input
             v-if="state.keywordLinked"
@@ -539,22 +970,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.keyword }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.string }">
-          <div class="swatch-info">
-            <span>string</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('string', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.string, color: getTextColor(colors.string) }">
+          <div class="swatch-header">
+            <span class="color-name">string</span>
+            <code class="color-hex">{{ colors.string }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.string, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.string, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.string, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.string, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.string, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('string', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('string', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.stringLinked = !state.stringLinked" class="tool-btn" :class="{ active: state.stringLinked }" :title="state.stringLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.stringLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('string')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('string')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('string', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.stringLinked = !state.stringLinked" class="link-btn" :class="{ linked: state.stringLinked }" title="link to global offset">{{ state.stringLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('string')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('string')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.stringLinked ? ((state.hueOffset * state.stringMultiplier) + state.stringOffset).toFixed(0) : state.stringOffset }}° / {{ state.stringLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.stringLinked ? ((state.hueOffset * state.stringMultiplier) + state.stringOffset).toFixed(0) : state.stringOffset }}° · L{{ state.stringLightness }}
           </div>
           <input
             v-if="state.stringLinked"
@@ -590,22 +1038,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.string }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.number }">
-          <div class="swatch-info">
-            <span>number</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('number', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.number, color: getTextColor(colors.number) }">
+          <div class="swatch-header">
+            <span class="color-name">number</span>
+            <code class="color-hex">{{ colors.number }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.number, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.number, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.number, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.number, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.number, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('number', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('number', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.numberLinked = !state.numberLinked" class="tool-btn" :class="{ active: state.numberLinked }" :title="state.numberLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.numberLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('number')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('number')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('number', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.numberLinked = !state.numberLinked" class="link-btn" :class="{ linked: state.numberLinked }" title="link to global offset">{{ state.numberLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('number')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('number')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.numberLinked ? ((state.hueOffset * state.numberMultiplier) + state.numberOffset).toFixed(0) : state.numberOffset }}° / {{ state.numberLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.numberLinked ? ((state.hueOffset * state.numberMultiplier) + state.numberOffset).toFixed(0) : state.numberOffset }}° · L{{ state.numberLightness }}
           </div>
           <input
             v-if="state.numberLinked"
@@ -641,22 +1106,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.number }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.function }">
-          <div class="swatch-info">
-            <span>function</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('function', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.function, color: getTextColor(colors.function) }">
+          <div class="swatch-header">
+            <span class="color-name">function</span>
+            <code class="color-hex">{{ colors.function }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.function, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.function, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.function, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.function, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.function, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('function', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('function', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.functionLinked = !state.functionLinked" class="tool-btn" :class="{ active: state.functionLinked }" :title="state.functionLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.functionLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('function')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('function')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('function', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.functionLinked = !state.functionLinked" class="link-btn" :class="{ linked: state.functionLinked }" title="link to global offset">{{ state.functionLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('function')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('function')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.functionLinked ? ((state.hueOffset * state.functionMultiplier) + state.functionOffset).toFixed(0) : state.functionOffset }}° / {{ state.functionLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.functionLinked ? ((state.hueOffset * state.functionMultiplier) + state.functionOffset).toFixed(0) : state.functionOffset }}° · L{{ state.functionLightness }}
           </div>
           <input
             v-if="state.functionLinked"
@@ -692,22 +1174,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.function }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.constant }">
-          <div class="swatch-info">
-            <span>constant</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('constant', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.constant, color: getTextColor(colors.constant) }">
+          <div class="swatch-header">
+            <span class="color-name">constant</span>
+            <code class="color-hex">{{ colors.constant }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.constant, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.constant, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.constant, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.constant, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.constant, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('constant', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('constant', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.constantLinked = !state.constantLinked" class="tool-btn" :class="{ active: state.constantLinked }" :title="state.constantLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.constantLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('constant')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('constant')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('constant', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.constantLinked = !state.constantLinked" class="link-btn" :class="{ linked: state.constantLinked }" title="link to global offset">{{ state.constantLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('constant')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('constant')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.constantLinked ? ((state.hueOffset * state.constantMultiplier) + state.constantOffset).toFixed(0) : state.constantOffset }}° / {{ state.constantLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.constantLinked ? ((state.hueOffset * state.constantMultiplier) + state.constantOffset).toFixed(0) : state.constantOffset }}° · L{{ state.constantLightness }}
           </div>
           <input
             v-if="state.constantLinked"
@@ -743,22 +1242,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.constant }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.type }">
-          <div class="swatch-info">
-            <span>type</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('type', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.type, color: getTextColor(colors.type) }">
+          <div class="swatch-header">
+            <span class="color-name">type</span>
+            <code class="color-hex">{{ colors.type }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.type, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.type, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.type, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.type, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.type, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('type', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('type', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.typeLinked = !state.typeLinked" class="tool-btn" :class="{ active: state.typeLinked }" :title="state.typeLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.typeLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('type')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('type')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('type', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.typeLinked = !state.typeLinked" class="link-btn" :class="{ linked: state.typeLinked }" title="link to global offset">{{ state.typeLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('type')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('type')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.typeLinked ? ((state.hueOffset * state.typeMultiplier) + state.typeOffset).toFixed(0) : state.typeOffset }}° / {{ state.typeLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.typeLinked ? ((state.hueOffset * state.typeMultiplier) + state.typeOffset).toFixed(0) : state.typeOffset }}° · L{{ state.typeLightness }}
           </div>
           <input
             v-if="state.typeLinked"
@@ -794,22 +1310,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.type }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.variable }">
-          <div class="swatch-info">
-            <span>variable</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('variable', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.variable, color: getTextColor(colors.variable) }">
+          <div class="swatch-header">
+            <span class="color-name">variable</span>
+            <code class="color-hex">{{ colors.variable }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.variable, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.variable, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.variable, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.variable, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.variable, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('variable', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('variable', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.variableLinked = !state.variableLinked" class="tool-btn" :class="{ active: state.variableLinked }" :title="state.variableLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.variableLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('variable')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('variable')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('variable', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.variableLinked = !state.variableLinked" class="link-btn" :class="{ linked: state.variableLinked }" title="link to global offset">{{ state.variableLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('variable')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('variable')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.variableLinked ? ((state.hueOffset * state.variableMultiplier) + state.variableOffset).toFixed(0) : state.variableOffset }}° / {{ state.variableLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.variableLinked ? ((state.hueOffset * state.variableMultiplier) + state.variableOffset).toFixed(0) : state.variableOffset }}° · L{{ state.variableLightness }}
           </div>
           <input
             v-if="state.variableLinked"
@@ -845,22 +1378,39 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.variable }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.operator }">
-          <div class="swatch-info">
-            <span>operator</span>
-            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('operator', el.value as any); el.value = ''; } }" class="color-math-select" title="apply color theory">
+        <div class="swatch editable" :style="{ background: colors.operator, color: getTextColor(colors.operator) }">
+          <div class="swatch-header">
+            <span class="color-name">operator</span>
+            <code class="color-hex">{{ colors.operator }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.operator, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.operator, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.operator, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.operator, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.operator, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('operator', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('operator', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.operatorLinked = !state.operatorLinked" class="tool-btn" :class="{ active: state.operatorLinked }" :title="state.operatorLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.operatorLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('operator')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('operator')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('operator', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
               <option value="">math</option>
               <option value="complementary">180°</option>
               <option value="triadic">120°</option>
-              <option value="split-complementary">150°</option>
-              <option value="tetradic">90°</option>
               <option value="analogous">30°</option>
-              <option value="monochromatic">0°</option>
             </select>
-            <button @click="state.operatorLinked = !state.operatorLinked" class="link-btn" :class="{ linked: state.operatorLinked }" title="link to global offset">{{ state.operatorLinked ? 'L' : 'U' }}</button>
-            <button @click="shuffleColor('operator')" class="shuffle-btn" title="randomize all values">⚄</button>
-            <button @click="resetColor('operator')" class="reset-btn" title="reset to defaults">↺</button>
-            <span class="offset-value">{{ state.operatorLinked ? ((state.hueOffset * state.operatorMultiplier) + state.operatorOffset).toFixed(0) : state.operatorOffset }}° / {{ state.operatorLightness }}</span>
+          </div>
+          <div class="value-display">
+            {{ state.operatorLinked ? ((state.hueOffset * state.operatorMultiplier) + state.operatorOffset).toFixed(0) : state.operatorOffset }}° · L{{ state.operatorLightness }}
           </div>
           <input
             v-if="state.operatorLinked"
@@ -896,11 +1446,11 @@ const getLightnessGradient = (colorName: string) => {
           />
           <code>{{ colors.operator }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.comment }">
+        <div class="swatch" :style="{ background: colors.comment, color: getTextColor(colors.comment) }">
           <span>comment</span>
           <code>{{ colors.comment }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.fg }">
+        <div class="swatch" :style="{ background: colors.fg, color: getTextColor(colors.fg) }">
           <span>foreground</span>
           <code>{{ colors.fg }}</code>
         </div>
@@ -913,35 +1463,45 @@ const getLightnessGradient = (colorName: string) => {
       <!-- Live previews -->
       <div class="previews">
         <CodePreview />
+        <ShellPreview />
+      </div>
+
+      <div class="previews">
         <TmuxPreview />
+        <HtopPreview />
       </div>
 
       <!-- Live config previews - both variants -->
       <div class="configs">
-        <div class="config-preview">
-          <div class="config-header">theme-lab-dark</div>
-          <pre class="config-content" :style="{ color: colors.string }">{{ darkConfig }}</pre>
+        <div class="config-preview" :style="{ background: darkColors.bg, borderColor: darkColors.comment }">
+          <div class="config-header" :style="{ color: darkColors.comment, borderBottomColor: darkColors.comment }">
+            {{ exportFormats[0] || 'ghostty' }} - theme-lab-dark{{ getFileExtension(exportFormats[0] || 'ghostty') }}
+            <span v-if="exportFormats.length > 1" :style="{ fontSize: '7px', opacity: 0.6, marginLeft: '4px' }">
+              (+{{ exportFormats.length - 1 }} more)
+            </span>
+          </div>
+          <pre class="config-content" :style="{ color: darkColors.string }">{{ darkConfig }}</pre>
         </div>
-        <div class="config-preview">
-          <div class="config-header">theme-lab-light</div>
-          <pre class="config-content" :style="{ color: colors.string }">{{ lightConfig }}</pre>
+        <div class="config-preview" :style="{ background: lightColors.bg, borderColor: lightColors.comment }">
+          <div class="config-header" :style="{ color: lightColors.comment, borderBottomColor: lightColors.comment }">
+            {{ exportFormats[0] || 'ghostty' }} - theme-lab-light{{ getFileExtension(exportFormats[0] || 'ghostty') }}
+            <span v-if="exportFormats.length > 1" :style="{ fontSize: '7px', opacity: 0.6, marginLeft: '4px' }">
+              (+{{ exportFormats.length - 1 }} more)
+            </span>
+          </div>
+          <pre class="config-content" :style="{ color: lightColors.string }">{{ lightConfig }}</pre>
         </div>
       </div>
 
       <!-- Additional example scenarios -->
       <div class="scenario-section">
-        <div class="scenario-label">lazygit - git interface</div>
-        <GitPreview />
-      </div>
-
-      <div class="scenario-section">
-        <div class="scenario-label">nvim - editing session</div>
+        <div class="scenario-label">nvim - editing session with LSP diagnostics</div>
         <NvimPreview />
       </div>
 
       <div class="scenario-section">
-        <div class="scenario-label">htop - system monitor</div>
-        <HtopPreview />
+        <div class="scenario-label">lazygit - git interface</div>
+        <GitPreview />
       </div>
     </main>
   </div>
@@ -1024,10 +1584,89 @@ h1 {
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
   padding-top: 8px;
   border-top: 1px solid currentColor;
   border-opacity: 0.1;
+}
+
+.export-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.export-section:last-child {
+  border-bottom: none;
+}
+
+.section-label {
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.format-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.format-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: opacity 0.1s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.format-checkbox:hover {
+  opacity: 0.8;
+}
+
+.format-checkbox input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-select-all {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-select-all:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
 }
 
 .action-row {
@@ -1038,42 +1677,59 @@ h1 {
 
 .btn {
   background: transparent;
-  border: 1px solid currentColor;
-  border-opacity: 0.3;
-  color: inherit;
-  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 8px 12px;
   font-family: inherit;
-  font-size: 9px;
+  font-size: 8px;
   cursor: pointer;
-  transition: all 0.1s;
+  transition: all 0.15s;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: normal;
+  width: 100%;
 }
 
 .btn:hover {
-  background: currentColor;
-  background-opacity: 0.2;
-  border-opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
-  border-opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+  font-size: 9px;
+  padding: 10px 12px;
 }
 
-.btn-small {
+.btn-primary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-secondary {
   font-size: 8px;
-  padding: 4px;
+  padding: 6px 8px;
 }
 
 .btn-reset {
+  background: transparent;
   border-color: rgba(255, 100, 100, 0.4);
-  color: rgba(255, 100, 100, 0.8);
-  margin-top: 4px;
+  color: rgba(255, 150, 150, 0.9);
+  font-size: 8px;
+  padding: 8px 12px;
 }
 
 .btn-reset:hover {
-  background: rgba(255, 100, 100, 0.15);
+  background: rgba(255, 100, 100, 0.1);
   border-color: rgba(255, 100, 100, 0.6);
-  color: rgba(255, 100, 100, 1);
+  color: rgba(255, 150, 150, 1);
 }
 
 .preview {
@@ -1100,26 +1756,149 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  color: #000;
   font-size: 10px;
 }
 
 .swatch.editable {
-  gap: 8px;
-  padding: 16px 12px;
+  gap: 6px;
+  padding: 12px;
+  min-height: 180px;
 }
 
-.swatch-info {
+.swatch-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.color-name {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.color-hex {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.contrast-info {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  font-size: 9px;
+  margin-bottom: 8px;
+  cursor: help;
+}
+
+.contrast-icon {
+  font-size: 11px;
+}
+
+.contrast-ratio {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.contrast-level {
+  margin-left: auto;
+  font-size: 7px;
+  opacity: 0.8;
+  font-weight: bold;
+}
+
+.wcag-locks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.lock-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid currentColor;
+  color: inherit;
+  padding: 6px 8px;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.lock-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.lock-btn:active {
+  transform: translateY(0);
+}
+
+.swatch-tools {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.tool-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tool-btn.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.tool-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: inherit;
+  padding: 4px 6px;
+  font-size: 8px;
+  cursor: pointer;
+  flex: 1;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.tool-select:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.value-display {
+  font-size: 8px;
+  opacity: 0.7;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
 }
 
 .color-math-select {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid currentColor;
+  color: inherit;
+  opacity: 0.7;
   font-family: inherit;
   font-size: 8px;
   padding: 2px 4px;
@@ -1130,14 +1909,27 @@ h1 {
 }
 
 .color-math-select:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 1;
+}
+
+.contrast-badge {
+  font-size: 7px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid currentColor;
+  opacity: 0.8;
+  font-weight: bold;
+  cursor: help;
+  font-variant-numeric: tabular-nums;
 }
 
 .link-btn {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid currentColor;
+  color: inherit;
+  opacity: 0.6;
   cursor: pointer;
   font-size: 9px;
   padding: 3px 6px;
@@ -1149,21 +1941,41 @@ h1 {
 }
 
 .link-btn.linked {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.4);
-  color: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 0.9;
 }
 
 .link-btn:hover {
-  background: rgba(0, 0, 0, 0.15);
-  border-color: rgba(0, 0, 0, 0.5);
-  color: rgba(0, 0, 0, 1);
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+}
+
+.wcag-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid currentColor;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 7px;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: all 0.15s;
+  font-weight: bold;
+  border-radius: 2px;
+  min-width: 18px;
+}
+
+.wcag-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 .shuffle-btn {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid currentColor;
+  color: inherit;
+  opacity: 0.6;
   cursor: pointer;
   font-size: 10px;
   padding: 2px 4px;
@@ -1173,27 +1985,27 @@ h1 {
 }
 
 .shuffle-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.4);
-  color: rgba(0, 0, 0, 0.9);
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
   transform: scale(1.1);
 }
 
 .reset-btn {
   background: transparent;
   border: none;
-  color: rgba(0, 0, 0, 0.5);
+  color: inherit;
+  opacity: 0.5;
   cursor: pointer;
   font-size: 12px;
   padding: 0;
   line-height: 1;
-  transition: color 0.15s, transform 0.15s;
+  transition: opacity 0.15s, transform 0.15s;
   margin-left: auto;
   margin-right: 6px;
 }
 
 .reset-btn:hover {
-  color: rgba(0, 0, 0, 0.9);
+  opacity: 1;
   transform: rotate(180deg);
 }
 
@@ -1204,9 +2016,14 @@ h1 {
 
 .offset-value {
   font-size: 8px;
-  opacity: 0.8;
+  opacity: 0.7;
   font-weight: normal;
   font-variant-numeric: tabular-nums;
+  color: inherit;
+  min-width: 32px;
+  width: 32px;
+  display: inline-block;
+  text-align: right;
 }
 
 .offset-slider {
