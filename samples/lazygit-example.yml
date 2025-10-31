@@ -1,0 +1,83 @@
+# Example Lazygit theme export from vulpes-theme-lab
+# Install to: ~/.config/lazygit/config.yml
+#
+# This demonstrates the YAML structure for Lazygit color themes.
+# Lazygit uses named color slots (ANSI colors), not arbitrary hex values.
+
+gui:
+  theme:
+    # Overall UI colors
+    activeBorderColor:
+      - magenta
+      - bold
+    inactiveBorderColor:
+      - blue
+    optionsTextColor:
+      - blue
+    selectedLineBgColor:
+      - magenta
+    selectedRangeBgColor:
+      - magenta
+    cherryPickedCommitBgColor:
+      - magenta
+    cherryPickedCommitFgColor:
+      - cyan
+    unstagedChangesColor:
+      - red
+    defaultFgColor:
+      - white
+    defaultBgColor:
+      - black
+
+  # Diff view colors
+  diffContextColor:
+    - white
+  diffUnstagedColor:
+    - red
+  diffStagedColor:
+    - green
+  diffAddedColor:
+    - green
+  diffDeletedColor:
+    - red
+  diffTerminal: true  # Use terminal colors for diff
+
+# Extended color customization (if supported by your lazygit version)
+colors:
+  # Branch list colors
+  selectedLineBg:
+    - magenta
+  selectedLineFg:
+    - black
+  selectedLineFile:
+    - white
+
+  # File status colors (modified, staged, untracked)
+  unstagedChanges:
+    - red
+  stagedChanges:
+    - green
+  unmergedChanges:
+    - magenta
+
+  # Commit message colors
+  commitHash:
+    - blue
+  commitAuthor:
+    - cyan
+  commitDate:
+    - white
+
+  # Help and informational text
+  helpText:
+    - white
+  selectedOptionalColor:
+    - magenta
+  failedColor:
+    - red
+  successColor:
+    - green
+  warningColor:
+    - yellow
+  infoColor:
+    - cyan

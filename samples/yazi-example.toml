@@ -1,0 +1,118 @@
+# Example Yazi theme export from vulpes-theme-lab (Dark variant)
+# Install to: ~/.config/yazi/theme.toml
+# For light variant, adjust colors and save as: ~/.config/yazi/theme-light.toml
+#
+# This demonstrates the TOML structure for Yazi color themes.
+
+[colors]
+# ANSI 16 base colors (used by terminal + yazi)
+black   = "#282a36"   # Background
+red     = "#ff5555"   # Errors, delete operations
+green   = "#50fa7b"   # Success, add operations
+yellow  = "#f1fa8c"   # Warnings, directories
+blue    = "#8be9fd"   # Info, files
+magenta = "#ff79c6"   # Accents, selected items
+cyan    = "#8be9fd"   # Alternate info
+white   = "#f8f8f2"   # Foreground text
+
+[manager]
+# Main file browser panel
+foreground = { fg = "#f8f8f2" }
+background = { bg = "#282a36" }
+border     = { fg = "#6272a4" }
+
+# Current file selection
+selection_fg = "#282a36"
+selection_bg = "#50fa7b"
+selection_main = { fg = "#282a36", bg = "#50fa7b", bold = true }
+selection_side = { fg = "#f8f8f2", bg = "#44475a" }
+
+# Preview panel
+preview_fg = "#f8f8f2"
+preview_bg = "#282a36"
+
+# Status bar at bottom
+status_fg = "#f8f8f2"
+status_bg = "#44475a"
+
+# Command input
+input_fg = "#f8f8f2"
+input_bg = "#282a36"
+input_border = "#6272a4"
+
+[status]
+# Status bar colors (overall)
+foreground = { fg = "#f8f8f2" }
+background = { bg = "#44475a" }
+mode_normal = { fg = "#50fa7b", bg = "#44475a", bold = true }
+mode_select = { fg = "#ff79c6", bg = "#44475a", bold = true }
+mode_unset  = { fg = "#f1fa8c", bg = "#44475a", bold = true }
+
+[finder]
+# Fuzzy finder / search bar
+foreground = { fg = "#f8f8f2" }
+background = { bg = "#282a36" }
+border     = { fg = "#6272a4" }
+preview_fg = "#f8f8f2"
+preview_bg = "#282a36"
+
+[completion]
+# Completion menu (when typing commands)
+foreground = { fg = "#f8f8f2" }
+background = { bg = "#44475a" }
+border     = { fg = "#6272a4" }
+
+# Selected completion item
+selection_fg = "#282a36"
+selection_bg = "#50fa7b"
+
+[task]
+# Task panel (background operations)
+foreground = { fg = "#f8f8f2" }
+background = { bg = "#282a36" }
+border     = { fg = "#6272a4" }
+
+# Running task indicator
+running = { fg = "#f1fa8c", bold = true }
+# Completed task
+completed = { fg = "#50fa7b" }
+# Failed task
+failed = { fg = "#ff5555", bold = true }
+
+[tab]
+# Tab bar at top
+foreground = { fg = "#6272a4" }
+background = { bg = "#282a36" }
+border     = { fg = "#6272a4" }
+
+# Active/current tab
+active_fg = "#ff79c6"
+active_bg = "#44475a"
+
+[code]
+# Syntax highlighting in preview pane
+comment   = { fg = "#6272a4", italic = true }
+string    = { fg = "#f1fa8c" }
+keyword   = { fg = "#ff79c6", bold = true }
+number    = { fg = "#bd93f9" }
+function  = { fg = "#50fa7b" }
+type      = { fg = "#8be9fd" }
+variable  = { fg = "#f8f8f2" }
+constant  = { fg = "#bd93f9" }
+
+[icons]
+# Icon colors for different file types
+# These are used when displaying files in the browser
+
+# Directory icon
+dir = { fg = "#8be9fd", bold = true }
+
+# Regular file icons (type-based)
+file = { fg = "#f8f8f2" }
+image = { fg = "#ff79c6" }
+audio = { fg = "#bd93f9" }
+video = { fg = "#ff79c6" }
+exec = { fg = "#50fa7b", bold = true }
+archive = { fg = "#f1fa8c" }
+link = { fg = "#8be9fd", italic = true }
+broken_link = { fg = "#ff5555", italic = true }

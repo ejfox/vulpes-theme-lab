@@ -49,6 +49,30 @@ exported themes install to `~/.config/ghostty/themes/`
 theme = theme-lab-dark
 ```
 
+## sample exports
+
+example theme outputs for all supported TUI targets:
+
+- **[nvim-example.lua](./samples/nvim-example.lua)** — Neovim colorscheme with 50+ highlight groups (LSP, syntax, UI)
+- **[bat-example.tmTheme](./samples/bat-example.tmTheme)** — Bat syntax highlighter (TextMate theme format)
+- **[yazi-example.toml](./samples/yazi-example.toml)** — Yazi file manager colors (light + dark variants)
+- **[lazygit-example.yml](./samples/lazygit-example.yml)** — Lazygit Git UI color configuration
+- **[zsh-example.sh](./samples/zsh-example.sh)** — ZSH syntax highlighting + FZF colors with theme switching functions
+
+these samples show the exact structure and color mappings for each tool format.
+
+## planned: multi-format export
+
+next phase: generate all TUI target formats in a single export.
+
+see **[THEME_EXPORT_FORMATS.md](./THEME_EXPORT_FORMATS.md)** for:
+- comprehensive specification for adding multi-format export
+- color mapping specifications for each tool
+- implementation roadmap (8-12 hours, medium difficulty)
+- challenge solutions and design decisions
+
+current status: planning phase. ready for implementation.
+
 ## stack
 
 - nuxt 4
