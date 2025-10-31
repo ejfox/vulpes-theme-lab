@@ -15,6 +15,13 @@ const monochromeSliders = [
   { key: 'monochromeLightness', label: 'mono light', min: 0, max: 100, step: 1 },
 ]
 
+const visualEffectsSliders = [
+  { key: 'backgroundOpacity', label: 'bg opacity', min: 0, max: 100, step: 1 },
+  { key: 'backgroundBlur', label: 'bg blur (mac)', min: 0, max: 100, step: 1 },
+  { key: 'windowBlend', label: 'nvim blend', min: 0, max: 100, step: 1 },
+  { key: 'popupBlend', label: 'popup blend', min: 0, max: 100, step: 1 },
+]
+
 // Programmatically generate all 23 color offset sliders for maximum granular control
 // Ordered by semantic importance for code legibility (matches multiplier importance)
 const colorTypes = [
@@ -126,6 +133,27 @@ const toggleMode = () => {
     <!-- Monochrome-specific controls -->
     <div v-if="state.monochromeMode" class="monochrome-controls" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
       <div class="control-group" v-for="slider in monochromeSliders" :key="slider.key">
+        <label>
+          <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
+          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
+        </label>
+        <input
+          type="range"
+          v-model.number="state[slider.key as keyof typeof state]"
+          :min="slider.min"
+          :max="slider.max"
+          :step="slider.step"
+          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
+        />
+      </div>
+    </div>
+
+    <!-- Visual effects controls -->
+    <div class="visual-effects-section" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <div class="section-header" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">
+        VISUAL EFFECTS
+      </div>
+      <div class="control-group" v-for="slider in visualEffectsSliders" :key="slider.key">
         <label>
           <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
           <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
@@ -273,6 +301,15 @@ const toggleMode = () => {
 }
 
 .color-offsets-section {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.visual-effects-section {
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 8px;

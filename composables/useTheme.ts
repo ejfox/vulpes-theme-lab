@@ -54,6 +54,11 @@ interface ThemeState {
   italicStrings: boolean
   underlineErrors: boolean
   mode: 'dark' | 'light'
+  // Visual effects
+  backgroundOpacity: number  // 0-100 (for Ghostty, Neovim, etc)
+  backgroundBlur: number      // 0-100 (Ghostty only, macOS)
+  windowBlend: number         // 0-100 (Neovim winblend)
+  popupBlend: number          // 0-100 (Neovim pumblend)
   // Individual color offsets
   errorOffset: number
   warningOffset: number
@@ -168,6 +173,11 @@ const defaultState: ThemeState = {
   italicStrings: true,
   underlineErrors: true,
   mode: 'dark' as 'dark' | 'light',
+  // Visual effects defaults
+  backgroundOpacity: 100,     // Fully opaque by default
+  backgroundBlur: 0,          // No blur by default
+  windowBlend: 0,             // No transparency by default
+  popupBlend: 10,             // Slight transparency for popups
   // Default offsets - now additive to global (0 = use pure multiplier)
   errorOffset: 0,
   warningOffset: 0,
@@ -298,6 +308,10 @@ export const useTheme = () => {
     italicStrings: params.is === '1' || defaultState.italicStrings,
     underlineErrors: params.ue !== '0',
     mode: (params.mode as 'dark' | 'light') || defaultState.mode,
+    backgroundOpacity: Number(params.bgop) || defaultState.backgroundOpacity,
+    backgroundBlur: Number(params.bgbl) || defaultState.backgroundBlur,
+    windowBlend: Number(params.wbl) || defaultState.windowBlend,
+    popupBlend: Number(params.pbl) || defaultState.popupBlend,
     errorOffset: Number(params.eo) || defaultState.errorOffset,
     warningOffset: Number(params.wo) || defaultState.warningOffset,
     keywordOffset: Number(params.ko) || defaultState.keywordOffset,
@@ -411,6 +425,10 @@ export const useTheme = () => {
       params.is = newState.italicStrings ? '1' : '0'
       params.ue = newState.underlineErrors ? '1' : '0'
       params.mode = newState.mode
+      params.bgop = String(newState.backgroundOpacity)
+      params.bgbl = String(newState.backgroundBlur)
+      params.wbl = String(newState.windowBlend)
+      params.pbl = String(newState.popupBlend)
       params.eo = String(newState.errorOffset)
       params.wo = String(newState.warningOffset)
       params.ko = String(newState.keywordOffset)

@@ -10,6 +10,10 @@ const editorRef = ref<HTMLElement>()
 const { state, colors, options } = useTheme()
 let view: EditorView | null = null
 
+// Compute opacity as reactive value
+const editorOpacity = computed(() => state.value.backgroundOpacity / 100)
+const editorBlur = computed(() => `blur(${state.value.backgroundBlur}px)`)
+
 // Meta-referential code that actually generates the theme
 const demoCode = `// COMMENT: Theme-lab generates HSL-based color palettes
 // ITALIC comments help explain the mathematical precision
@@ -240,7 +244,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="code-preview">
+  <div class="code-preview" :style="{
+    opacity: editorOpacity,
+    backdropFilter: editorBlur,
+    WebkitBackdropFilter: editorBlur
+  }">
     <div class="preview-label">nvim / code editor preview</div>
     <div ref="editorRef" class="editor-container"></div>
   </div>

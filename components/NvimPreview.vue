@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors, options } = useTheme()
+const { colors, options, state } = useTheme()
 const { setHighlightedColor, clearHighlightedColor } = useHighlightedColor()
 
 const codeLines = [
@@ -41,7 +41,13 @@ const codeLines = [
 </script>
 
 <template>
-  <div class="nvim" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="nvim" :style="{
+    background: colors.bg,
+    color: colors.fg,
+    opacity: state.backgroundOpacity / 100,
+    backdropFilter: `blur(${state.backgroundBlur}px)`,
+    WebkitBackdropFilter: `blur(${state.backgroundBlur}px)`
+  }">
     <!-- Tab line -->
     <div class="tabline" :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30` }">
       <span class="tab active" :style="{ background: colors.base + '20', color: colors.base }">
