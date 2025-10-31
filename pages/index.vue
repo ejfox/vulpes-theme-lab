@@ -7,6 +7,7 @@ import { serializeLazygitTheme } from '~/utils/lazygit'
 import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } = useTheme()
+const { highlightedColor, setHighlightedColor, clearHighlightedColor } = useHighlightedColor()
 
 // Export format selection - multi-select
 const exportFormats = ref<string[]>(['ghostty'])
@@ -799,7 +800,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           <span>base</span>
           <code>{{ colors.base }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.error, color: getTextColor(colors.error) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'error' }" :style="{ background: colors.error, color: getTextColor(colors.error) }">
           <div class="swatch-header">
             <span class="color-name">error</span>
             <code class="color-hex">{{ colors.error }}</code>
@@ -867,7 +868,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.error }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.warning, color: getTextColor(colors.warning) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'warning' }" :style="{ background: colors.warning, color: getTextColor(colors.warning) }">
           <div class="swatch-header">
             <span class="color-name">warning</span>
             <code class="color-hex">{{ colors.warning }}</code>
@@ -939,7 +940,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           <span>hint</span>
           <code>{{ colors.hint }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.keyword, color: getTextColor(colors.keyword) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'keyword' }" :style="{ background: colors.keyword, color: getTextColor(colors.keyword) }">
           <div class="swatch-header">
             <span class="color-name">keyword</span>
             <code class="color-hex">{{ colors.keyword }}</code>
@@ -1007,7 +1008,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.keyword }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.string, color: getTextColor(colors.string) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'string' }" :style="{ background: colors.string, color: getTextColor(colors.string) }">
           <div class="swatch-header">
             <span class="color-name">string</span>
             <code class="color-hex">{{ colors.string }}</code>
@@ -1075,7 +1076,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.string }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.number, color: getTextColor(colors.number) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'number' }" :style="{ background: colors.number, color: getTextColor(colors.number) }">
           <div class="swatch-header">
             <span class="color-name">number</span>
             <code class="color-hex">{{ colors.number }}</code>
@@ -1143,7 +1144,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.number }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.function, color: getTextColor(colors.function) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'function' }" :style="{ background: colors.function, color: getTextColor(colors.function) }">
           <div class="swatch-header">
             <span class="color-name">function</span>
             <code class="color-hex">{{ colors.function }}</code>
@@ -1211,7 +1212,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.function }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.constant, color: getTextColor(colors.constant) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'constant' }" :style="{ background: colors.constant, color: getTextColor(colors.constant) }">
           <div class="swatch-header">
             <span class="color-name">constant</span>
             <code class="color-hex">{{ colors.constant }}</code>
@@ -1279,7 +1280,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.constant }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.type, color: getTextColor(colors.type) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'type' }" :style="{ background: colors.type, color: getTextColor(colors.type) }">
           <div class="swatch-header">
             <span class="color-name">type</span>
             <code class="color-hex">{{ colors.type }}</code>
@@ -1347,7 +1348,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.type }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.variable, color: getTextColor(colors.variable) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'variable' }" :style="{ background: colors.variable, color: getTextColor(colors.variable) }">
           <div class="swatch-header">
             <span class="color-name">variable</span>
             <code class="color-hex">{{ colors.variable }}</code>
@@ -1415,7 +1416,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.variable }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.operator, color: getTextColor(colors.operator) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'operator' }" :style="{ background: colors.operator, color: getTextColor(colors.operator) }">
           <div class="swatch-header">
             <span class="color-name">operator</span>
             <code class="color-hex">{{ colors.operator }}</code>
@@ -1483,7 +1484,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.operator }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.builtin, color: getTextColor(colors.builtin) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'builtin' }" :style="{ background: colors.builtin, color: getTextColor(colors.builtin) }">
           <div class="swatch-header">
             <span class="color-name">builtin</span>
             <code class="color-hex">{{ colors.builtin }}</code>
@@ -1551,7 +1552,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.builtin }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.parameter, color: getTextColor(colors.parameter) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'parameter' }" :style="{ background: colors.parameter, color: getTextColor(colors.parameter) }">
           <div class="swatch-header">
             <span class="color-name">parameter</span>
             <code class="color-hex">{{ colors.parameter }}</code>
@@ -1619,7 +1620,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.parameter }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.property, color: getTextColor(colors.property) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'property' }" :style="{ background: colors.property, color: getTextColor(colors.property) }">
           <div class="swatch-header">
             <span class="color-name">property</span>
             <code class="color-hex">{{ colors.property }}</code>
@@ -1687,7 +1688,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.property }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.namespace, color: getTextColor(colors.namespace) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'namespace' }" :style="{ background: colors.namespace, color: getTextColor(colors.namespace) }">
           <div class="swatch-header">
             <span class="color-name">namespace</span>
             <code class="color-hex">{{ colors.namespace }}</code>
@@ -1755,7 +1756,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.namespace }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.macro, color: getTextColor(colors.macro) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'macro' }" :style="{ background: colors.macro, color: getTextColor(colors.macro) }">
           <div class="swatch-header">
             <span class="color-name">macro</span>
             <code class="color-hex">{{ colors.macro }}</code>
@@ -1823,7 +1824,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.macro }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.tag, color: getTextColor(colors.tag) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'tag' }" :style="{ background: colors.tag, color: getTextColor(colors.tag) }">
           <div class="swatch-header">
             <span class="color-name">tag</span>
             <code class="color-hex">{{ colors.tag }}</code>
@@ -1891,7 +1892,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.tag }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.punctuation, color: getTextColor(colors.punctuation) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'punctuation' }" :style="{ background: colors.punctuation, color: getTextColor(colors.punctuation) }">
           <div class="swatch-header">
             <span class="color-name">punctuation</span>
             <code class="color-hex">{{ colors.punctuation }}</code>
@@ -1959,7 +1960,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.punctuation }}</code>
         </div>
-        <div class="swatch editable" :style="{ background: colors.heading, color: getTextColor(colors.heading) }">
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'heading' }" :style="{ background: colors.heading, color: getTextColor(colors.heading) }">
           <div class="swatch-header">
             <span class="color-name">heading</span>
             <code class="color-hex">{{ colors.heading }}</code>
@@ -2385,6 +2386,26 @@ h1 {
   gap: 6px;
   padding: 12px;
   min-height: 180px;
+  transition: all 0.2s ease;
+}
+
+.swatch.highlighted {
+  animation: highlight-pulse 1.5s ease-in-out infinite;
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    outline-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    outline-color: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+  }
 }
 
 .swatch-header {

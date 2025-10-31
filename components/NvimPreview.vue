@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { colors, options } = useTheme()
+const { setHighlightedColor, clearHighlightedColor } = useHighlightedColor()
 
 const codeLines = [
   { num: 1, text: 'import { useState, computed } from "vue"', highlighted: false, error: false, keyword: 'import', builtin: 'useState, computed', string: '"vue"' },
@@ -89,36 +90,118 @@ const codeLines = [
               }">{{ line.text }}</span>
             </template>
             <template v-else-if="line.keyword">
-              <span :style="{
-                color: colors.keyword,
-                fontWeight: options.boldKeywords ? 'bold' : 'normal'
-              }">{{ line.keyword }}</span><span :style="{ color: colors.fg }"> </span>
-              <span v-if="line.builtin" :style="{ color: colors.builtin }">{{ line.builtin }}</span>
-              <span v-if="line.type" :style="{ color: colors.type }">{{ line.type }}</span>
-              <span v-if="line.func" :style="{
-                color: colors.function,
-                fontWeight: options.boldFunctions ? 'bold' : 'normal'
-              }">{{ line.func }}</span>
-              <span v-if="line.string" :style="{
-                color: colors.string,
-                fontStyle: options.italicStrings ? 'italic' : 'normal'
-              }"> {{ line.string }}</span>
-              <span v-if="line.punctuation" :style="{ color: colors.punctuation }">{{ line.punctuation }}</span>
+              <span
+                :style="{
+                  color: colors.keyword,
+                  fontWeight: options.boldKeywords ? 'bold' : 'normal'
+                }"
+                @mouseenter="setHighlightedColor('keyword')"
+                @mouseleave="clearHighlightedColor()"
+                title="keyword color"
+                class="hoverable-color"
+              >{{ line.keyword }}</span><span :style="{ color: colors.fg }"> </span>
+              <span
+                v-if="line.builtin"
+                :style="{ color: colors.builtin }"
+                @mouseenter="setHighlightedColor('builtin')"
+                @mouseleave="clearHighlightedColor()"
+                title="builtin color"
+                class="hoverable-color"
+              >{{ line.builtin }}</span>
+              <span
+                v-if="line.type"
+                :style="{ color: colors.type }"
+                @mouseenter="setHighlightedColor('type')"
+                @mouseleave="clearHighlightedColor()"
+                title="type color"
+                class="hoverable-color"
+              >{{ line.type }}</span>
+              <span
+                v-if="line.func"
+                :style="{
+                  color: colors.function,
+                  fontWeight: options.boldFunctions ? 'bold' : 'normal'
+                }"
+                @mouseenter="setHighlightedColor('function')"
+                @mouseleave="clearHighlightedColor()"
+                title="function color"
+                class="hoverable-color"
+              >{{ line.func }}</span>
+              <span
+                v-if="line.string"
+                :style="{
+                  color: colors.string,
+                  fontStyle: options.italicStrings ? 'italic' : 'normal'
+                }"
+                @mouseenter="setHighlightedColor('string')"
+                @mouseleave="clearHighlightedColor()"
+                title="string color"
+                class="hoverable-color"
+              > {{ line.string }}</span>
+              <span
+                v-if="line.punctuation"
+                :style="{ color: colors.punctuation }"
+                @mouseenter="setHighlightedColor('punctuation')"
+                @mouseleave="clearHighlightedColor()"
+                title="punctuation color"
+                class="hoverable-color"
+              >{{ line.punctuation }}</span>
             </template>
             <template v-else-if="line.property">
               <span :style="{ color: colors.fg }">  </span>
-              <span :style="{ color: colors.property }">{{ line.property }}</span>
-              <span v-if="line.punctuation" :style="{ color: colors.punctuation }">{{ line.punctuation }}</span>
-              <span v-if="line.type" :style="{ color: colors.type }"> {{ line.type }}</span>
-              <span v-if="line.number" :style="{ color: colors.number }"> {{ line.number }}</span>
-              <span v-if="line.string" :style="{
-                color: colors.string,
-                fontStyle: options.italicStrings ? 'italic' : 'normal'
-              }"> {{ line.string }}</span>
-              <span v-if="line.comment" :style="{
-                color: colors.comment,
-                fontStyle: options.italicComments ? 'italic' : 'normal'
-              }">  {{ line.comment }}</span>
+              <span
+                :style="{ color: colors.property }"
+                @mouseenter="setHighlightedColor('property')"
+                @mouseleave="clearHighlightedColor()"
+                title="property color"
+                class="hoverable-color"
+              >{{ line.property }}</span>
+              <span
+                v-if="line.punctuation"
+                :style="{ color: colors.punctuation }"
+                @mouseenter="setHighlightedColor('punctuation')"
+                @mouseleave="clearHighlightedColor()"
+                title="punctuation color"
+                class="hoverable-color"
+              >{{ line.punctuation }}</span>
+              <span
+                v-if="line.type"
+                :style="{ color: colors.type }"
+                @mouseenter="setHighlightedColor('type')"
+                @mouseleave="clearHighlightedColor()"
+                title="type color"
+                class="hoverable-color"
+              > {{ line.type }}</span>
+              <span
+                v-if="line.number"
+                :style="{ color: colors.number }"
+                @mouseenter="setHighlightedColor('number')"
+                @mouseleave="clearHighlightedColor()"
+                title="number color"
+                class="hoverable-color"
+              > {{ line.number }}</span>
+              <span
+                v-if="line.string"
+                :style="{
+                  color: colors.string,
+                  fontStyle: options.italicStrings ? 'italic' : 'normal'
+                }"
+                @mouseenter="setHighlightedColor('string')"
+                @mouseleave="clearHighlightedColor()"
+                title="string color"
+                class="hoverable-color"
+              > {{ line.string }}</span>
+              <span
+                v-if="line.comment"
+                :style="{
+                  color: colors.comment,
+                  fontStyle: options.italicComments ? 'italic' : 'normal'
+                }"
+                @mouseenter="setHighlightedColor('comment')"
+                @mouseleave="clearHighlightedColor()"
+                title="comment color"
+                class="hoverable-color"
+              >  {{ line.comment }}</span>
             </template>
             <template v-else-if="line.namespace">
               <span :style="{ color: colors.keyword }">{{ line.keyword }}</span>
@@ -356,5 +439,17 @@ const codeLines = [
 @keyframes blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
+}
+
+.hoverable-color {
+  cursor: help;
+  transition: opacity 0.15s ease;
+}
+
+.hoverable-color:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
 }
 </style>

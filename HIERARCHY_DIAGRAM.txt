@@ -1,0 +1,162 @@
+EXPORT CONTROLS - INFORMATION HIERARCHY & THUMB ZONES
+=====================================================
+
+Visual Weight Hierarchy (top to bottom):
+┌──────────────────────────────────────────┐
+│  EXPORT CONFIGURATION         [Level 1]  │ ← Darkest heading
+├──────────────────────────────────────────┤
+│  ┌────────────────────────────────────┐  │
+│  │ ✓ Ghostty                  ✓       │  │ ← 44px tall (thumb-friendly)
+│  ├────────────────────────────────────┤  │
+│  │ □ iTerm2                           │  │
+│  ├────────────────────────────────────┤  │
+│  │ □ Tmux                             │  │
+│  ├────────────────────────────────────┤  │
+│  │ □ Neovim                           │  │
+│  ├────────────────────────────────────┤  │
+│  │ □ Lazygit                          │  │
+│  └────────────────────────────────────┘  │
+│                                           │
+│  [ Select All Formats ]   ← 40px helper  │
+├──────────────────────────────────────────┤
+│                                           │
+│  Export Themes                 [Level 2]  │ ← Subdued heading
+├──────────────────────────────────────────┤
+│  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  │
+│  ┃  ⬇ Download Both Themes         ┃  │ ← 52px PRIMARY ACTION
+│  ┃           (GRADIENT BG)          ┃  │   Largest, most prominent
+│  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  │   Gradient + icon + shadow
+│                                           │
+│  ┌─────────────────┬─────────────────┐   │
+│  │ ● Dark Only     │ ● Light Only    │   │ ← 46px secondary actions
+│  └─────────────────┴─────────────────┘   │   Split grid, medium prominence
+├──────────────────────────────────────────┤
+│                                           │
+│  Copy to Clipboard             [Level 3]  │ ← Subdued heading
+├──────────────────────────────────────────┤
+│  ┌─────────────────┬─────────────────┐   │
+│  │ ● Copy Dark     │ ● Copy Light    │   │ ← 42px tertiary actions
+│  └─────────────────┴─────────────────┘   │   Subtle, less prominent
+├──────────────────────────────────────────┤
+│  ═══════════════════════════════════════ │ ← Danger zone separator
+│  ┌──────────────────────────────────────┐│
+│  │ ↺ Reset All Values                  ││ ← 40px danger action
+│  └──────────────────────────────────────┘│   Red tint, bottom placement
+└──────────────────────────────────────────┘
+
+
+THUMB ZONE ANALYSIS (for mobile/desktop comfort):
+================================================
+
+One-handed interaction pattern:
+                 TOP
+            [Comfortable]
+        ┌──────────────────┐
+        │  Config Section  │ ◄── Requires deliberate reach
+        │  (Checkboxes)    │     but used less frequently
+        ├──────────────────┤
+     ┌──┤  PRIMARY ACTION  │ ◄── SWEET SPOT!
+     │  │  [Download Both] │     Most common action
+     │  ├──────────────────┤     in easy reach zone
+EASY │  │  Dark │ Light    │
+REACH│  ├──────────────────┤
+ZONE │  │  Copy │ Copy     │
+     └──┤  Dark │ Light    │
+        ├──────────────────┤
+        │   Reset (RED)    │ ◄── Bottom = harder to reach
+        └──────────────────┘     = appropriate for
+              BOTTOM              dangerous action
+
+
+VISUAL RHYTHM (spacing consistency):
+====================================
+
+Gap sizes create predictable rhythm:
+- Section gap: 20px (clear separation)
+- Element gap: 8-12px (grouped items)
+- Inner padding: 12-16px (comfortable tap area)
+
+20px ──┐
+       ├─ HEADING
+12px ──┤
+       ├─ Format option  (44px tall + 12-14px padding)
+8px  ──┤
+       ├─ Format option
+8px  ──┤
+       ├─ Format option
+       └─
+
+This creates a scannable visual rhythm that guides the eye
+down the panel naturally.
+
+
+COLOR CODING STRATEGY:
+=====================
+
+Primary action: BLUE gradient
+    → Signals "go ahead, this is safe and recommended"
+    → Draws eye immediately
+
+Secondary actions: Themed borders
+    → Dark mode: Blue tint
+    → Light mode: Yellow tint
+    → Reinforces mode awareness
+
+Tertiary actions: Neutral
+    → White/black borders
+    → Doesn't compete for attention
+
+Danger action: RED tint
+    → Clear warning signal
+    → Separated by border
+    → Requires conscious decision
+
+
+INTERACTION FEEDBACK:
+====================
+
+All buttons provide multi-modal feedback:
+
+1. Visual: Border highlights, background changes
+2. Motion: Subtle transforms (translateY)
+3. Shadow: Depth changes on primary button
+4. Color: Brightness/opacity shifts
+
+Example interaction chain:
+Rest → Hover → Active → Rest
+  ↓      ↓       ↓
+ 0px   -2px     0px  (transform)
+light  bright  press (color)
+small  large   small (shadow)
+
+
+ACCESSIBILITY CONSIDERATIONS:
+=============================
+
+✓ All buttons have title attributes (screen readers)
+✓ Minimum 40px touch targets (motor impairment)
+✓ High contrast text/backgrounds (vision)
+✓ Logical tab order (keyboard navigation)
+✓ Clear visual focus states (keyboard users)
+✓ Semantic HTML structure (assistive tech)
+
+
+COMPARISON: OLD vs NEW
+======================
+
+OLD DESIGN ISSUES:
+- Checkboxes: 12px × 12px (too small!)
+- Visual hierarchy: Flat, everything looks same
+- Scanability: Low (borders everywhere)
+- Touch targets: Many below 40px minimum
+- Grouping: Unclear (4 separate sections)
+- Primary action: Doesn't stand out enough
+
+NEW DESIGN WINS:
+- Format selection: 44px tall (touchable!)
+- Visual hierarchy: Clear 4-level system
+- Scanability: High (card-based, clear sections)
+- Touch targets: All 40px+ minimum
+- Grouping: Logical workflow (configure → export → copy → reset)
+- Primary action: Impossible to miss (gradient, 52px, icon)
+
