@@ -4,5 +4,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   devServer: {
     port: 3322
-  }
+  },
+  // GitHub Pages deployment
+  app: {
+    baseURL: process.env.NODE_ENV === 'production' ? '/vulpes-theme-lab/' : '/',
+  },
+  // Enable static site generation
+  ssr: false,
 })

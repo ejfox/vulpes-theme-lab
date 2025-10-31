@@ -1,5 +1,7 @@
 # vulpes-theme-lab
 
+🎨 **[Live Demo](https://ejfox.github.io/vulpes-theme-lab/)** — Try it now in your browser
+
 a minimal theme builder for ghostty terminal with live previews of nvim, lazygit, htop, and tmux.
 
 ## design principles
