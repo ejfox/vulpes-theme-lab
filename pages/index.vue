@@ -2094,6 +2094,9 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
       @close="showExportModal = false"
       @export="handleModalExport"
     />
+
+    <!-- Color Tooltip -->
+    <ColorTooltip />
   </div>
 </template>
 
