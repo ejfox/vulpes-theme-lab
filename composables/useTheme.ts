@@ -48,8 +48,6 @@ interface ThemeState {
   monochromeMode: boolean
   monochromeIntensity: number
   monochromeLightness: number
-  bgLightness: number  // 0-100, 50 = auto
-  fgLightness: number  // 0-100, 50 = auto
   boldKeywords: boolean
   italicComments: boolean
   boldFunctions: boolean
@@ -75,6 +73,11 @@ interface ThemeState {
   tagOffset: number
   punctuationOffset: number
   headingOffset: number
+  commentOffset: number
+  baseOffset: number
+  hintOffset: number
+  fgOffset: number
+  bgOffset: number
   // Individual color lightness (0-100)
   errorLightness: number
   warningLightness: number
@@ -94,6 +97,11 @@ interface ThemeState {
   tagLightness: number
   punctuationLightness: number
   headingLightness: number
+  commentLightness: number
+  baseLightness: number
+  hintLightness: number
+  fgLightness: number
+  bgLightness: number
   // Link to global offset (when true, uses hueOffset * multiplier)
   errorLinked: boolean
   warningLinked: boolean
@@ -113,6 +121,11 @@ interface ThemeState {
   tagLinked: boolean
   punctuationLinked: boolean
   headingLinked: boolean
+  commentLinked: boolean
+  baseLinked: boolean
+  hintLinked: boolean
+  fgLinked: boolean
+  bgLinked: boolean
   // Multipliers for linked colors
   errorMultiplier: number
   warningMultiplier: number
@@ -132,6 +145,11 @@ interface ThemeState {
   tagMultiplier: number
   punctuationMultiplier: number
   headingMultiplier: number
+  commentMultiplier: number
+  baseMultiplier: number
+  hintMultiplier: number
+  fgMultiplier: number
+  bgMultiplier: number
 }
 
 const defaultState: ThemeState = {
@@ -144,8 +162,6 @@ const defaultState: ThemeState = {
   monochromeMode: true,
   monochromeIntensity: 100,
   monochromeLightness: 0,
-  bgLightness: 50,  // 50 = auto-calculated
-  fgLightness: 50,  // 50 = auto-calculated
   boldKeywords: false,
   italicComments: true,
   boldFunctions: false,
@@ -171,6 +187,11 @@ const defaultState: ThemeState = {
   tagOffset: 0,
   punctuationOffset: 0,
   headingOffset: 0,
+  commentOffset: 0,
+  baseOffset: 0,
+  hintOffset: 0,
+  fgOffset: 0,
+  bgOffset: 0,
   // Default lightness values (50 = use auto-calculated)
   errorLightness: 50,
   warningLightness: 50,
@@ -190,6 +211,11 @@ const defaultState: ThemeState = {
   tagLightness: 50,
   punctuationLightness: 50,
   headingLightness: 50,
+  commentLightness: 50,
+  baseLightness: 50,
+  hintLightness: 50,
+  fgLightness: 50,
+  bgLightness: 50,
   // Default linked state (all linked by default)
   errorLinked: true,
   warningLinked: true,
@@ -209,6 +235,11 @@ const defaultState: ThemeState = {
   tagLinked: true,
   punctuationLinked: true,
   headingLinked: true,
+  commentLinked: false,
+  baseLinked: true,
+  hintLinked: true,
+  fgLinked: false,
+  bgLinked: false,
   // Default multipliers - semantically driven for maximum code legibility
   // High prominence (structural understanding)
   keywordMultiplier: 3,        // Control flow - most important
@@ -235,6 +266,15 @@ const defaultState: ThemeState = {
   // Diagnostics
   errorMultiplier: 5,          // Errors - maximum visibility
   warningMultiplier: -5,       // Warnings - high visibility
+
+  // Comments (typically low saturation/desaturated)
+  commentMultiplier: 0,        // Comments - neutral (often desaturated)
+
+  // Base colors
+  baseMultiplier: 0,           // Base - primary UI color
+  hintMultiplier: 0,           // Hint - subtle UI elements
+  fgMultiplier: 0,             // Foreground - main text color
+  bgMultiplier: 0,             // Background - canvas color
 }
 
 export const useTheme = () => {
@@ -307,6 +347,11 @@ export const useTheme = () => {
     tagOffset: Number(params.tao) || defaultState.tagOffset,
     punctuationOffset: Number(params.puo) || defaultState.punctuationOffset,
     headingOffset: Number(params.heo) || defaultState.headingOffset,
+    commentOffset: Number(params.cmo) || defaultState.commentOffset,
+    baseOffset: Number(params.bao) || defaultState.baseOffset,
+    hintOffset: Number(params.hio) || defaultState.hintOffset,
+    fgOffset: Number(params.fgo) || defaultState.fgOffset,
+    bgOffset: Number(params.bgo) || defaultState.bgOffset,
     builtinLightness: Number(params.bil) || defaultState.builtinLightness,
     parameterLightness: Number(params.pal) || defaultState.parameterLightness,
     propertyLightness: Number(params.prl) || defaultState.propertyLightness,
@@ -315,6 +360,11 @@ export const useTheme = () => {
     tagLightness: Number(params.tal) || defaultState.tagLightness,
     punctuationLightness: Number(params.pul) || defaultState.punctuationLightness,
     headingLightness: Number(params.hel) || defaultState.headingLightness,
+    commentLightness: Number(params.cml) || defaultState.commentLightness,
+    baseLightness: Number(params.bal) || defaultState.baseLightness,
+    hintLightness: Number(params.hil) || defaultState.hintLightness,
+    fgLightness: Number(params.fgl) || defaultState.fgLightness,
+    bgLightness: Number(params.bgl) || defaultState.bgLightness,
     builtinLinked: params.bilink !== '0',
     parameterLinked: params.palink !== '0',
     propertyLinked: params.prlink !== '0',
@@ -323,6 +373,11 @@ export const useTheme = () => {
     tagLinked: params.talink !== '0',
     punctuationLinked: params.pulink !== '0',
     headingLinked: params.helink !== '0',
+    commentLinked: params.cmlink !== '0',
+    baseLinked: params.balink !== '0',
+    hintLinked: params.hilink !== '0',
+    fgLinked: params.fglink !== '0',
+    bgLinked: params.bglink !== '0',
     builtinMultiplier: Number(params.bim) || defaultState.builtinMultiplier,
     parameterMultiplier: Number(params.pam) || defaultState.parameterMultiplier,
     propertyMultiplier: Number(params.prm) || defaultState.propertyMultiplier,
@@ -331,6 +386,11 @@ export const useTheme = () => {
     tagMultiplier: Number(params.tam) || defaultState.tagMultiplier,
     punctuationMultiplier: Number(params.pum) || defaultState.punctuationMultiplier,
     headingMultiplier: Number(params.hem) || defaultState.headingMultiplier,
+    commentMultiplier: Number(params.cmm) || defaultState.commentMultiplier,
+    baseMultiplier: Number(params.bam) || defaultState.baseMultiplier,
+    hintMultiplier: Number(params.him) || defaultState.hintMultiplier,
+    fgMultiplier: Number(params.fgm) || defaultState.fgMultiplier,
+    bgMultiplier: Number(params.bgm) || defaultState.bgMultiplier,
   }))
 
   // Watch state and sync to URL
@@ -400,6 +460,11 @@ export const useTheme = () => {
       params.tao = String(newState.tagOffset)
       params.puo = String(newState.punctuationOffset)
       params.heo = String(newState.headingOffset)
+      params.cmo = String(newState.commentOffset)
+      params.bao = String(newState.baseOffset)
+      params.hio = String(newState.hintOffset)
+      params.fgo = String(newState.fgOffset)
+      params.bgo = String(newState.bgOffset)
       params.bil = String(newState.builtinLightness)
       params.pal = String(newState.parameterLightness)
       params.prl = String(newState.propertyLightness)
@@ -408,6 +473,11 @@ export const useTheme = () => {
       params.tal = String(newState.tagLightness)
       params.pul = String(newState.punctuationLightness)
       params.hel = String(newState.headingLightness)
+      params.cml = String(newState.commentLightness)
+      params.bal = String(newState.baseLightness)
+      params.hil = String(newState.hintLightness)
+      params.fgl = String(newState.fgLightness)
+      params.bgl = String(newState.bgLightness)
       params.bilink = newState.builtinLinked ? '1' : '0'
       params.palink = newState.parameterLinked ? '1' : '0'
       params.prlink = newState.propertyLinked ? '1' : '0'
@@ -416,6 +486,11 @@ export const useTheme = () => {
       params.talink = newState.tagLinked ? '1' : '0'
       params.pulink = newState.punctuationLinked ? '1' : '0'
       params.helink = newState.headingLinked ? '1' : '0'
+      params.cmlink = newState.commentLinked ? '1' : '0'
+      params.balink = newState.baseLinked ? '1' : '0'
+      params.hilink = newState.hintLinked ? '1' : '0'
+      params.fglink = newState.fgLinked ? '1' : '0'
+      params.bglink = newState.bgLinked ? '1' : '0'
       params.bim = String(newState.builtinMultiplier)
       params.pam = String(newState.parameterMultiplier)
       params.prm = String(newState.propertyMultiplier)
@@ -424,6 +499,11 @@ export const useTheme = () => {
       params.tam = String(newState.tagMultiplier)
       params.pum = String(newState.punctuationMultiplier)
       params.hem = String(newState.headingMultiplier)
+      params.cmm = String(newState.commentMultiplier)
+      params.bam = String(newState.baseMultiplier)
+      params.him = String(newState.hintMultiplier)
+      params.fgm = String(newState.fgMultiplier)
+      params.bgm = String(newState.bgMultiplier)
     }, { deep: true })
   }
 
@@ -434,29 +514,9 @@ export const useTheme = () => {
     // Use mode-specific saturation
     const sat = (isDark ? state.value.saturation : state.value.lightModeSaturation) / 100
 
-    // Background is always grayscale - use contrast to adjust
-    const bgLightness = isDark ? 0.05 + (contrastFactor * 0.02) : 0.97 - (contrastFactor * 0.05)
-    const bg = chroma.hsl(0, 0, bgLightness).hex()
-
-    // Foreground with better contrast math
-    // Dark mode: light text (70-95% lightness range)
-    // Light mode: dark text (20-45% lightness range)
+    // Monochrome intensity for foreground
     const monoIntensity = state.value.monochromeIntensity / 100
     const monoLightness = state.value.monochromeLightness / 100
-
-    const fg = state.value.monochromeMode
-      ? chroma.hsl(
-          state.value.baseHue,
-          sat * monoIntensity, // Use intensity control
-          isDark
-            ? 0.65 + (monoLightness * 0.30) + (contrastFactor * 0.08)
-            : 0.20 + (monoLightness * 0.25)
-        ).hex()
-      : chroma.hsl(
-          0,
-          0,
-          isDark ? 0.88 + (contrastFactor * 0.10) : 0.20 - (contrastFactor * 0.08)
-        ).hex()
 
     // Helper to generate color at hue offset with mode-appropriate lightness
     // Uses perceptual lightness adjustments for better consistency
@@ -501,6 +561,11 @@ export const useTheme = () => {
     const tagL = applyLightnessAdjust(60, 39, state.value.tagLightness)
     const punctuationL = applyLightnessAdjust(55, 45, state.value.punctuationLightness)
     const headingL = applyLightnessAdjust(62, 38, state.value.headingLightness)
+    const commentL = applyLightnessAdjust(45, 55, state.value.commentLightness)
+    const baseL = applyLightnessAdjust(50, 45, state.value.baseLightness)
+    const hintL = applyLightnessAdjust(70, 55, state.value.hintLightness)
+    const fgL = applyLightnessAdjust(isDark ? 88 : 20, isDark ? 20 : 88, state.value.fgLightness)
+    const bgL = applyLightnessAdjust(isDark ? 5 : 97, isDark ? 97 : 5, state.value.bgLightness)
 
     // Helper to get actual offset (linked = hueOffset * multiplier + individual offset, unlinked = fixed offset)
     const getOffset = (colorName: string): number => {
@@ -513,16 +578,23 @@ export const useTheme = () => {
       return individualOffset
     }
 
+    // Generate bg and fg with special handling for monochrome mode
+    const bgHue = (state.value.baseHue + getOffset('bg') + 360) % 360
+    const fgHue = (state.value.baseHue + getOffset('fg') + 360) % 360
+
+    const bg = chroma.hsl(bgHue, sat * 0, bgL.dark / 100).hex() // bg is always grayscale (sat=0)
+    const fg = state.value.monochromeMode
+      ? chroma.hsl(fgHue, sat * monoIntensity, fgL.dark / 100).hex()
+      : chroma.hsl(fgHue, 0, fgL.dark / 100).hex()
+
     return {
       bg,
       fg,
-      base: colorAt(0, 50, 45),
+      base: colorAt(getOffset('base'), baseL.dark, baseL.light),
       error: colorAt(getOffset('error'), errorL.dark, errorL.light),
       warning: colorAt(getOffset('warning'), warningL.dark, warningL.light),
-      hint: colorAt(0, 70, 55),
-      comment: state.value.monochromeMode
-        ? chroma.hsl(state.value.baseHue, sat * monoIntensity * 0.5, isDark ? 0.45 : 0.55).hex()
-        : chroma.hsl(0, 0, isDark ? 0.45 : 0.55).hex(),
+      hint: colorAt(getOffset('hint'), hintL.dark, hintL.light),
+      comment: colorAt(getOffset('comment'), commentL.dark, commentL.light),
       keyword: colorAt(getOffset('keyword'), keywordL.dark, keywordL.light),
       string: colorAt(getOffset('string'), stringL.dark, stringL.light),
       number: colorAt(getOffset('number'), numberL.dark, numberL.light),

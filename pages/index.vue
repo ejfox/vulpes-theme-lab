@@ -4,6 +4,8 @@ import { serializeItermTheme } from '~/utils/iterm'
 import { serializeTmuxTheme } from '~/utils/tmux'
 import { serializeNeovimTheme } from '~/utils/neovim'
 import { serializeLazygitTheme } from '~/utils/lazygit'
+import { serializeYaziTheme } from '~/utils/yazi'
+import { serializeZshTheme } from '~/utils/zsh'
 import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } = useTheme()
@@ -34,6 +36,10 @@ const generateConfig = (format: string, isDark: boolean) => {
       return serializeNeovimTheme(themeColors, themeNameUnderscore, isDark, options.value)
     case 'lazygit':
       return serializeLazygitTheme(themeColors, !isDark)
+    case 'yazi':
+      return serializeYaziTheme(themeColors)
+    case 'zsh':
+      return serializeZshTheme(themeColors)
     default:
       return serializeGhosttyTheme(isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value, themeName)
   }
@@ -58,6 +64,8 @@ const getFileExtension = (format: string): string => {
     case 'tmux': return '.tmux.conf'
     case 'neovim': return '.lua'
     case 'lazygit': return '.yml'
+    case 'yazi': return '.toml'
+    case 'zsh': return '.zsh'
     default: return '.txt'
   }
 }
@@ -2028,8 +2036,72 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.heading }}</code>
         </div>
-        <div class="swatch" :style="{ background: colors.comment, color: getTextColor(colors.comment) }">
-          <span>comment</span>
+        <div class="swatch editable" :class="{ highlighted: highlightedColor === 'comment' }" :style="{ background: colors.comment, color: getTextColor(colors.comment) }">
+          <div class="swatch-header">
+            <span class="color-name">comment</span>
+            <code class="color-hex">{{ colors.comment }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.comment, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.comment, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.comment, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.comment, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.comment, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('comment', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('comment', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.commentLinked = !state.commentLinked" class="tool-btn" :class="{ active: state.commentLinked }" :title="state.commentLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.commentLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('comment')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('comment')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('comment', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.commentLinked ? ((state.hueOffset * state.commentMultiplier) + state.commentOffset).toFixed(0) : state.commentOffset }}° · L{{ state.commentLightness }}
+          </div>
+          <input
+            v-if="state.commentLinked"
+            type="range"
+            v-model.number="state.commentMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('comment') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.commentOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.commentLinked }"
+            :style="{ background: getOffsetGradient('comment') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.commentLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.commentLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('comment') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
           <code>{{ colors.comment }}</code>
         </div>
         <div class="swatch" :style="{ background: colors.fg, color: getTextColor(colors.fg) }">
