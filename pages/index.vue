@@ -11,11 +11,16 @@ const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLi
 // Export format selection - multi-select
 const exportFormats = ref<string[]>(['ghostty'])
 
+// Export modal state
+const showExportModal = ref(false)
+
 // Helper to generate config for a single format
 const generateConfig = (format: string, isDark: boolean) => {
   const themeColors = isDark ? darkColors.value : lightColors.value
-  const themeName = isDark ? 'theme-lab-dark' : 'theme-lab-light'
-  const themeNameUnderscore = isDark ? 'theme_lab_dark' : 'theme_lab_light'
+  // Use actual theme name from state
+  const baseThemeName = state.value.themeName || 'vulpes'
+  const themeName = isDark ? `${baseThemeName}-dark` : `${baseThemeName}-light`
+  const themeNameUnderscore = themeName.replace(/-/g, '_')
 
   switch (format) {
     case 'ghostty':
@@ -222,14 +227,15 @@ const exportBoth = () => {
     return
   }
 
+  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
       const ext = getFileExtension(format)
       const darkContent = generateConfig(format, true)
       const lightContent = generateConfig(format, false)
 
-      downloadFile(darkContent, `theme-lab-dark-${format}${ext}`)
-      setTimeout(() => downloadFile(lightContent, `theme-lab-light-${format}${ext}`), 50)
+      downloadFile(darkContent, `${baseThemeName}-dark-${format}${ext}`)
+      setTimeout(() => downloadFile(lightContent, `${baseThemeName}-light-${format}${ext}`), 50)
     }, index * 150)
   })
 }
@@ -241,11 +247,12 @@ const exportDark = () => {
     return
   }
 
+  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
       const ext = getFileExtension(format)
       const darkContent = generateConfig(format, true)
-      downloadFile(darkContent, `theme-lab-dark-${format}${ext}`)
+      downloadFile(darkContent, `${baseThemeName}-dark-${format}${ext}`)
     }, index * 100)
   })
 }
@@ -257,11 +264,12 @@ const exportLight = () => {
     return
   }
 
+  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
       const ext = getFileExtension(format)
       const lightContent = generateConfig(format, false)
-      downloadFile(lightContent, `theme-lab-light-${format}${ext}`)
+      downloadFile(lightContent, `${baseThemeName}-light-${format}${ext}`)
     }, index * 100)
   })
 }
@@ -277,6 +285,20 @@ const copyLight = async () => {
   const format = exportFormats.value[0] || 'ghostty'
   const content = generateConfig(format, false)
   await navigator.clipboard.writeText(content)
+}
+
+// Handle export from modal
+const handleModalExport = (formats: string[], mode: 'both' | 'dark' | 'light') => {
+  exportFormats.value = formats
+
+  // Use the appropriate export function based on mode
+  if (mode === 'both') {
+    exportBoth()
+  } else if (mode === 'dark') {
+    exportDark()
+  } else {
+    exportLight()
+  }
 }
 
 // Theme presets - based on real theme color analysis
@@ -729,28 +751,14 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
       <div class="actions" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
         <!-- Download section -->
         <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
-          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">download files</div>
-          <button @click="exportBoth" class="btn btn-primary" :style="{
+          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">export theme</div>
+          <button @click="showExportModal = true" class="btn btn-primary" :style="{
             background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
             borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
             color: state.mode === 'dark' ? '#fff' : '#000'
-          }" title="Download both dark and light theme files">
-            BOTH THEMES
+          }" title="Export theme to files">
+            EXPORT THEME
           </button>
-          <div class="button-grid">
-            <button @click="exportDark" class="btn btn-secondary" :style="{
-              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-              color: state.mode === 'dark' ? '#fff' : '#000'
-            }" title="Download dark theme file">
-              DARK
-            </button>
-            <button @click="exportLight" class="btn btn-secondary" :style="{
-              borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-              color: state.mode === 'dark' ? '#fff' : '#000'
-            }" title="Download light theme file">
-              LIGHT
-            </button>
-          </div>
         </div>
 
         <!-- Copy section -->
@@ -2078,6 +2086,13 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
         <GitPreview />
       </div>
     </main>
+
+    <!-- Export Modal -->
+    <ExportModal
+      :show="showExportModal"
+      @close="showExportModal = false"
+      @export="handleModalExport"
+    />
   </div>
 </template>
 
