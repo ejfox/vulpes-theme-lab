@@ -31,6 +31,14 @@ export interface ThemePalette {
   type: string         // Type names
   variable: string     // Variables
   operator: string     // Operators
+  builtin: string      // Built-in functions/types
+  parameter: string    // Function parameters
+  property: string     // Object properties
+  namespace: string    // Namespaces/modules
+  macro: string        // Preprocessor macros
+  tag: string          // HTML/XML tags
+  punctuation: string  // Delimiters and punctuation
+  heading: string      // Markdown headings
 
   // UI elements
   selection: string    // Selected text background

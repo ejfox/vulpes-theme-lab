@@ -29,6 +29,7 @@ const formats = [
   { id: 'iterm', label: 'iTerm2', desc: 'macOS terminal theme' },
   { id: 'tmux', label: 'Tmux', desc: 'Terminal multiplexer' },
   { id: 'neovim', label: 'Neovim', desc: 'Vim editor theme' },
+  { id: 'bat', label: 'Bat', desc: 'Syntax highlighter theme' },
   { id: 'lazygit', label: 'Lazygit', desc: 'Git TUI theme' },
   { id: 'yazi', label: 'Yazi', desc: 'File manager theme' },
   { id: 'zsh', label: 'ZSH/FZF', desc: 'Shell & fuzzy finder' }

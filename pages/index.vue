@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { serializeGhosttyTheme } from '~/utils/ghostty'
+import {
+  exportGhostty,
+  exportNeovim,
+  exportBat,
+  exportYazi,
+  exportLazygit,
+  exportZsh,
+  createSemanticPalette,
+  type ExportResult
+} from '~/utils/exporters'
 import { serializeItermTheme } from '~/utils/iterm'
 import { serializeTmuxTheme } from '~/utils/tmux'
-import { serializeNeovimTheme } from '~/utils/neovim'
-import { serializeLazygitTheme } from '~/utils/lazygit'
-import { serializeYaziTheme } from '~/utils/yazi'
-import { serializeZshTheme } from '~/utils/zsh'
 import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } = useTheme()
@@ -17,55 +22,47 @@ const exportFormats = ref<string[]>(['ghostty'])
 // Export modal state
 const showExportModal = ref(false)
 
-// Helper to generate config for a single format
-const generateConfig = (format: string, isDark: boolean) => {
+// Helper to generate config for a single format using new exporters
+const generateConfig = (format: string, isDark: boolean): string => {
   const themeColors = isDark ? darkColors.value : lightColors.value
-  // Use actual theme name from state
   const baseThemeName = state.value.themeName || 'vulpes'
-  const themeName = isDark ? `${baseThemeName}-dark` : `${baseThemeName}-light`
-  const themeNameUnderscore = themeName.replace(/-/g, '_')
+  const mode = isDark ? 'dark' : 'light'
+
+  // Create semantic palette for new exporters
+  const palette = createSemanticPalette(themeColors, mode)
+
+  let result: ExportResult
 
   switch (format) {
     case 'ghostty':
-      return serializeGhosttyTheme(
-        isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value,
-        themeName,
-        {
-          backgroundOpacity: state.value.backgroundOpacity,
-          backgroundBlur: state.value.backgroundBlur
-        }
-      )
-    case 'iterm':
-      return serializeItermTheme(themeColors, themeName)
-    case 'tmux':
-      return serializeTmuxTheme(themeColors, themeName)
+      result = exportGhostty(palette, baseThemeName)
+      break
     case 'neovim':
-      return serializeNeovimTheme(
-        themeColors,
-        themeNameUnderscore,
-        isDark,
-        options.value,
-        {
-          windowBlend: state.value.windowBlend,
-          popupBlend: state.value.popupBlend
-        }
-      )
-    case 'lazygit':
-      return serializeLazygitTheme(themeColors, !isDark)
+      result = exportNeovim(palette, baseThemeName)
+      break
+    case 'bat':
+      result = exportBat(palette, baseThemeName)
+      break
     case 'yazi':
-      return serializeYaziTheme(themeColors)
+      result = exportYazi(palette, baseThemeName)
+      break
+    case 'lazygit':
+      result = exportLazygit(palette, baseThemeName)
+      break
     case 'zsh':
-      return serializeZshTheme(themeColors)
+      result = exportZsh(palette, baseThemeName)
+      break
+    case 'iterm':
+      // iTerm not yet migrated to new exporter system
+      return serializeItermTheme(themeColors, `${baseThemeName}-${mode}`)
+    case 'tmux':
+      // Tmux not yet migrated to new exporter system
+      return serializeTmuxTheme(themeColors, `${baseThemeName}-${mode}`)
     default:
-      return serializeGhosttyTheme(
-        isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value,
-        themeName,
-        {
-          backgroundOpacity: state.value.backgroundOpacity,
-          backgroundBlur: state.value.backgroundBlur
-        }
-      )
+      result = exportGhostty(palette, baseThemeName)
   }
+
+  return result.content
 }
 
 // Generate preview config for first selected format
@@ -79,17 +76,45 @@ const lightConfig = computed(() => {
   return generateConfig(format, false)
 })
 
-// Get file extension based on format
-const getFileExtension = (format: string): string => {
+// Helper to generate export result with proper filename
+const generateExport = (format: string, isDark: boolean): ExportResult => {
+  const themeColors = isDark ? darkColors.value : lightColors.value
+  const baseThemeName = state.value.themeName || 'vulpes'
+  const mode = isDark ? 'dark' : 'light'
+  const themeName = `${baseThemeName}-${mode}`
+
+  // Create semantic palette for new exporters
+  const palette = createSemanticPalette(themeColors, mode)
+
   switch (format) {
-    case 'ghostty': return '.conf'
-    case 'iterm': return '.itermcolors'
-    case 'tmux': return '.tmux.conf'
-    case 'neovim': return '.lua'
-    case 'lazygit': return '.yml'
-    case 'yazi': return '.toml'
-    case 'zsh': return '.zsh'
-    default: return '.txt'
+    case 'ghostty':
+      return exportGhostty(palette, themeName)
+    case 'neovim':
+      return exportNeovim(palette, themeName)
+    case 'bat':
+      return exportBat(palette, themeName)
+    case 'yazi':
+      return exportYazi(palette, themeName)
+    case 'lazygit':
+      return exportLazygit(palette, themeName)
+    case 'zsh':
+      return exportZsh(palette, themeName)
+    case 'iterm':
+      // iTerm not yet migrated - create ExportResult manually
+      return {
+        filename: `${themeName}.itermcolors`,
+        content: serializeItermTheme(themeColors, themeName),
+        format: 'iterm' as any
+      }
+    case 'tmux':
+      // Tmux not yet migrated - create ExportResult manually
+      return {
+        filename: `${themeName}.tmux.conf`,
+        content: serializeTmuxTheme(themeColors, themeName),
+        format: 'tmux' as any
+      }
+    default:
+      return exportGhostty(palette, themeName)
   }
 }
 
@@ -254,15 +279,13 @@ const exportBoth = () => {
     return
   }
 
-  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
-      const ext = getFileExtension(format)
-      const darkContent = generateConfig(format, true)
-      const lightContent = generateConfig(format, false)
+      const darkResult = generateExport(format, true)
+      const lightResult = generateExport(format, false)
 
-      downloadFile(darkContent, `${baseThemeName}-dark-${format}${ext}`)
-      setTimeout(() => downloadFile(lightContent, `${baseThemeName}-light-${format}${ext}`), 50)
+      downloadFile(darkResult.content, darkResult.filename)
+      setTimeout(() => downloadFile(lightResult.content, lightResult.filename), 50)
     }, index * 150)
   })
 }
@@ -274,12 +297,10 @@ const exportDark = () => {
     return
   }
 
-  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
-      const ext = getFileExtension(format)
-      const darkContent = generateConfig(format, true)
-      downloadFile(darkContent, `${baseThemeName}-dark-${format}${ext}`)
+      const result = generateExport(format, true)
+      downloadFile(result.content, result.filename)
     }, index * 100)
   })
 }
@@ -291,12 +312,10 @@ const exportLight = () => {
     return
   }
 
-  const baseThemeName = state.value.themeName || 'vulpes'
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
-      const ext = getFileExtension(format)
-      const lightContent = generateConfig(format, false)
-      downloadFile(lightContent, `${baseThemeName}-light-${format}${ext}`)
+      const result = generateExport(format, false)
+      downloadFile(result.content, result.filename)
     }, index * 100)
   })
 }
