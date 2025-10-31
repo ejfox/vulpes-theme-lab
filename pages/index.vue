@@ -27,13 +27,29 @@ const generateConfig = (format: string, isDark: boolean) => {
 
   switch (format) {
     case 'ghostty':
-      return serializeGhosttyTheme(isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value, themeName)
+      return serializeGhosttyTheme(
+        isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value,
+        themeName,
+        {
+          backgroundOpacity: state.value.backgroundOpacity,
+          backgroundBlur: state.value.backgroundBlur
+        }
+      )
     case 'iterm':
       return serializeItermTheme(themeColors, themeName)
     case 'tmux':
       return serializeTmuxTheme(themeColors, themeName)
     case 'neovim':
-      return serializeNeovimTheme(themeColors, themeNameUnderscore, isDark, options.value)
+      return serializeNeovimTheme(
+        themeColors,
+        themeNameUnderscore,
+        isDark,
+        options.value,
+        {
+          windowBlend: state.value.windowBlend,
+          popupBlend: state.value.popupBlend
+        }
+      )
     case 'lazygit':
       return serializeLazygitTheme(themeColors, !isDark)
     case 'yazi':
@@ -41,7 +57,14 @@ const generateConfig = (format: string, isDark: boolean) => {
     case 'zsh':
       return serializeZshTheme(themeColors)
     default:
-      return serializeGhosttyTheme(isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value, themeName)
+      return serializeGhosttyTheme(
+        isDark ? ghosttyThemeDark.value : ghosttyThemeLight.value,
+        themeName,
+        {
+          backgroundOpacity: state.value.backgroundOpacity,
+          backgroundBlur: state.value.backgroundBlur
+        }
+      )
   }
 }
 
@@ -68,11 +91,6 @@ const getFileExtension = (format: string): string => {
     case 'zsh': return '.zsh'
     default: return '.txt'
   }
-}
-
-// Select all formats helper
-const selectAllFormats = () => {
-  exportFormats.value = ['ghostty', 'iterm', 'tmux', 'neovim', 'lazygit']
 }
 
 // Reset functions for each color - resets to 0 offset, 50 lightness, linked=true
@@ -725,6 +743,32 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
 
   state.value[`${colorName}Lightness` as keyof typeof state.value] = Math.round(bestLightness) as any
 }
+
+// Handle color picker changes - reverse-engineer the color to offset + lightness
+const handleColorPicker = (colorName: string, hexColor: string) => {
+  try {
+    // Parse the picked color to HSL
+    const color = chroma(hexColor)
+    const [hue, sat, lightness] = color.hsl()
+
+    // Calculate what offset would produce this hue
+    let offset = hue - state.value.baseHue
+
+    // Normalize offset to -180 to 180 range
+    while (offset > 180) offset -= 360
+    while (offset < -180) offset += 360
+
+    // Convert lightness (0-1) to our scale (0-100)
+    const lightnessValue = Math.round(lightness * 100)
+
+    // Update state: unlink the color and set direct offset
+    state.value[`${colorName}Linked` as keyof typeof state.value] = false as any
+    state.value[`${colorName}Offset` as keyof typeof state.value] = Math.round(offset) as any
+    state.value[`${colorName}Lightness` as keyof typeof state.value] = lightnessValue as any
+  } catch (e) {
+    console.error('Error parsing color:', e)
+  }
+}
 </script>
 
 <template>
@@ -812,6 +856,16 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           <div class="swatch-header">
             <span class="color-name">error</span>
             <code class="color-hex">{{ colors.error }}</code>
+          </div>
+          <div class="color-picker-wrapper">
+            <input
+              type="color"
+              :value="colors.error"
+              @input="(e) => handleColorPicker('error', (e.target as HTMLInputElement).value)"
+              class="color-picker"
+              title="pick any color"
+            />
+            <span class="picker-label">PICK</span>
           </div>
           <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.error, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.error, colors.bg))})`">
             <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.error, colors.bg)) }}</span>
@@ -2499,6 +2553,38 @@ h1 {
 
 .color-hex {
   font-size: 8px;
+  opacity: 0.7;
+}
+
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.color-picker {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-picker:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+.picker-label {
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   opacity: 0.7;
 }
 

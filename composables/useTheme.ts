@@ -54,6 +54,8 @@ interface ThemeState {
   italicStrings: boolean
   underlineErrors: boolean
   mode: 'dark' | 'light'
+  // Colorblind simulation
+  colorblindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'
   // Visual effects
   backgroundOpacity: number  // 0-100 (for Ghostty, Neovim, etc)
   backgroundBlur: number      // 0-100 (Ghostty only, macOS)
@@ -173,6 +175,8 @@ const defaultState: ThemeState = {
   italicStrings: true,
   underlineErrors: true,
   mode: 'dark' as 'dark' | 'light',
+  // Colorblind simulation
+  colorblindMode: 'none' as 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia',
   // Visual effects defaults
   backgroundOpacity: 100,     // Fully opaque by default
   backgroundBlur: 0,          // No blur by default
@@ -308,6 +312,7 @@ export const useTheme = () => {
     italicStrings: params.is === '1' || defaultState.italicStrings,
     underlineErrors: params.ue !== '0',
     mode: (params.mode as 'dark' | 'light') || defaultState.mode,
+    colorblindMode: (params.cbm as ThemeState['colorblindMode']) || defaultState.colorblindMode,
     backgroundOpacity: Number(params.bgop) || defaultState.backgroundOpacity,
     backgroundBlur: Number(params.bgbl) || defaultState.backgroundBlur,
     windowBlend: Number(params.wbl) || defaultState.windowBlend,
@@ -425,6 +430,7 @@ export const useTheme = () => {
       params.is = newState.italicStrings ? '1' : '0'
       params.ue = newState.underlineErrors ? '1' : '0'
       params.mode = newState.mode
+      params.cbm = newState.colorblindMode
       params.bgop = String(newState.backgroundOpacity)
       params.bgbl = String(newState.backgroundBlur)
       params.wbl = String(newState.windowBlend)
@@ -650,12 +656,67 @@ export const useTheme = () => {
     }
   }
 
-  // Current mode colors
-  const colors = computed(() => generateThemeVariant(state.value.mode))
+  // Apply colorblind simulation to a color
+  const simulateColorblind = (hexColor: string, mode: ThemeState['colorblindMode']): string => {
+    if (mode === 'none') return hexColor
 
-  // Both variants
-  const darkColors = computed(() => generateThemeVariant('dark'))
-  const lightColors = computed(() => generateThemeVariant('light'))
+    const color = chroma(hexColor)
+    const [h, s, l] = color.hsl()
+
+    if (mode === 'achromatopsia') {
+      // Pure grayscale - keep only luminance
+      return chroma.hsl(0, 0, l).hex()
+    }
+
+    if (mode === 'protanopia') {
+      // No red perception - shift reds toward yellows/browns
+      let newHue = h
+      if (h >= 0 && h < 60) newHue = h + 30 // red→orange
+      if (h >= 300) newHue = 60 // magenta→yellow
+      return chroma.hsl(newHue, s * 0.6, l).hex()
+    }
+
+    if (mode === 'deuteranopia') {
+      // No green perception - similar to protanopia
+      let newHue = h
+      if (h >= 60 && h < 180) newHue = 50 // green→yellow/brown
+      return chroma.hsl(newHue, s * 0.5, l).hex()
+    }
+
+    if (mode === 'tritanopia') {
+      // No blue perception - blues→greens, purples→reds
+      let newHue = h
+      if (h >= 180 && h < 300) newHue = h - 60 // blue→cyan/green
+      return chroma.hsl(newHue, s * 0.7, l).hex()
+    }
+
+    return hexColor
+  }
+
+  // Apply colorblind simulation to all colors in a theme
+  const applyColorblindSim = (theme: ThemeColors): ThemeColors => {
+    if (state.value.colorblindMode === 'none') return theme
+
+    const simulated: any = {}
+    for (const [key, value] of Object.entries(theme)) {
+      if (key === 'palette') {
+        simulated.palette = {}
+        for (const [idx, color] of Object.entries(value as Record<number, string>)) {
+          simulated.palette[idx] = simulateColorblind(color, state.value.colorblindMode)
+        }
+      } else {
+        simulated[key] = simulateColorblind(value as string, state.value.colorblindMode)
+      }
+    }
+    return simulated as ThemeColors
+  }
+
+  // Current mode colors with colorblind simulation
+  const colors = computed(() => applyColorblindSim(generateThemeVariant(state.value.mode)))
+
+  // Both variants with colorblind simulation
+  const darkColors = computed(() => applyColorblindSim(generateThemeVariant('dark')))
+  const lightColors = computed(() => applyColorblindSim(generateThemeVariant('light')))
 
   const ghosttyTheme = computed(() => ({
     background: colors.value.bg,

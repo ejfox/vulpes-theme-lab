@@ -42,10 +42,114 @@ const offsetSliders = colorTypes.map(type => ({
   step: 1
 }))
 
-const showAdvanced = ref(false)
+const fixingContrast = ref(false)
+const contrastFixSummary = ref<string[]>([])
 
-const toggleMode = () => {
-  state.value.mode = state.value.mode === 'dark' ? 'light' : 'dark'
+// Fix all colors to meet WCAG AAA contrast (7:1)
+const fixAllContrast = async () => {
+  fixingContrast.value = true
+  contrastFixSummary.value = []
+
+  // Import chroma dynamically
+  const chroma = (await import('chroma-js')).default
+
+  // Colors to check (exclude bg/fg as they define the contrast baseline)
+  const colorsToCheck = [
+    'error', 'warning', 'keyword', 'string', 'number', 'function',
+    'constant', 'type', 'variable', 'operator', 'builtin', 'parameter',
+    'property', 'namespace', 'macro', 'tag', 'punctuation', 'heading',
+    'comment', 'base', 'hint'
+  ]
+
+  // Temporarily disable colorblind sim to get true color values
+  const originalColorblindMode = state.value.colorblindMode
+  state.value.colorblindMode = 'none'
+
+  // Get base colors without simulation
+  const { colors } = useTheme()
+  const bgColor = colors.value.bg
+  const targetRatio = 7.0 // AAA level
+  const baseColors = { ...colors.value }
+
+  let checkedCount = 0
+  let fixedCount = 0
+
+  for (const colorName of colorsToCheck) {
+    const currentColor = baseColors[colorName as keyof typeof baseColors] as string
+
+    // Calculate current contrast
+    const currentRatio = chroma.contrast(currentColor, bgColor)
+    checkedCount++
+
+    if (currentRatio >= targetRatio) {
+      continue // Already compliant
+    }
+
+    fixedCount++
+
+    // Get current values
+    const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number || 0
+    const individualOffset = state.value[`${colorName}Offset` as keyof typeof state.value] as number || 0
+    const isLinked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
+    const sat = (state.value.mode === 'dark' ? state.value.saturation : state.value.lightModeSaturation) / 100
+
+    const currentOffset = isLinked ? (state.value.hueOffset * multiplier) + individualOffset : individualOffset
+    const hue = (state.value.baseHue + currentOffset + 360) % 360
+
+    // Binary search for AAA-compliant lightness
+    let low = 0
+    let high = 100
+    let bestLightness = 50
+
+    for (let i = 0; i < 20; i++) {
+      const mid = (low + high) / 2
+      const testColor = chroma.hsl(hue, sat, mid / 100).hex()
+      const ratio = chroma.contrast(testColor, bgColor)
+
+      if (ratio >= targetRatio) {
+        bestLightness = mid
+        if (state.value.mode === 'dark') {
+          low = mid
+        } else {
+          high = mid
+        }
+      } else {
+        if (state.value.mode === 'dark') {
+          high = mid
+        } else {
+          low = mid
+        }
+      }
+    }
+
+    const oldLightness = state.value[`${colorName}Lightness` as keyof typeof state.value] as number
+    const newLightness = Math.round(bestLightness)
+
+    if (Math.abs(newLightness - oldLightness) > 1) {
+      state.value[`${colorName}Lightness` as keyof typeof state.value] = newLightness as any
+      contrastFixSummary.value.push(`${colorName}: L${oldLightness} → L${newLightness}`)
+    }
+  }
+
+  // Restore colorblind mode
+  state.value.colorblindMode = originalColorblindMode
+
+  // Show summary
+  if (contrastFixSummary.value.length === 0) {
+    contrastFixSummary.value = [
+      `Checked ${checkedCount} colors - all AAA compliant! ✓`,
+      `(Contrast slider at ${state.value.contrast})`
+    ]
+  } else {
+    contrastFixSummary.value.unshift(`Fixed ${fixedCount} of ${checkedCount} colors:`)
+  }
+
+  fixingContrast.value = false
+
+  // Clear summary after 5 seconds
+  setTimeout(() => {
+    contrastFixSummary.value = []
+  }, 5000)
 }
 </script>
 
@@ -84,6 +188,58 @@ const toggleMode = () => {
         >
           LIGHT
         </button>
+      </div>
+    </div>
+
+    <!-- Colorblind Simulation -->
+    <div class="colorblind-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <label class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)' }">
+        COLORBLIND SIM
+      </label>
+      <select
+        v-model="state.colorblindMode"
+        class="colorblind-select"
+        :style="{
+          background: state.mode === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
+          borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+          color: state.mode === 'dark' ? '#fff' : '#000'
+        }"
+      >
+        <option value="none">Normal Vision</option>
+        <option value="protanopia">Protanopia (no red)</option>
+        <option value="deuteranopia">Deuteranopia (no green)</option>
+        <option value="tritanopia">Tritanopia (no blue)</option>
+        <option value="achromatopsia">Achromatopsia (grayscale)</option>
+      </select>
+      <div class="sim-hint" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">
+        Preview how your theme looks with different types of color vision
+      </div>
+    </div>
+
+    <!-- Fix All Contrast Button -->
+    <div class="fix-contrast-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <button
+        @click="fixAllContrast"
+        :disabled="fixingContrast"
+        class="fix-contrast-btn"
+        :style="{
+          background: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.15)' : 'rgba(0, 200, 0, 0.15)',
+          borderColor: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.4)' : 'rgba(0, 200, 0, 0.4)',
+          color: state.mode === 'dark' ? 'rgba(100, 255, 100, 1)' : 'rgba(0, 150, 0, 1)',
+          opacity: fixingContrast ? 0.5 : 1,
+          cursor: fixingContrast ? 'wait' : 'pointer'
+        }"
+        title="Automatically adjust all colors to meet WCAG AAA (7:1) contrast"
+      >
+        {{ fixingContrast ? 'FIXING...' : 'FIX ALL CONTRAST (AAA)' }}
+      </button>
+
+      <div v-if="contrastFixSummary.length > 0" class="contrast-summary">
+        <div v-for="(line, idx) in contrastFixSummary" :key="idx" class="summary-line" :style="{
+          color: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.9)' : 'rgba(0, 150, 0, 0.9)'
+        }">
+          {{ line }}
+        </div>
       </div>
     </div>
 
@@ -245,6 +401,85 @@ const toggleMode = () => {
 .mode-toggle-btn.active {
   font-weight: bold;
   border: 1px solid;
+}
+
+.colorblind-section {
+  padding: 12px 0;
+  border-bottom: 1px solid;
+  margin-bottom: 4px;
+}
+
+.section-label {
+  display: block;
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.colorblind-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.colorblind-select:hover {
+  opacity: 0.8;
+}
+
+.sim-hint {
+  font-size: 8px;
+  line-height: 1.4;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+.fix-contrast-section {
+  padding: 12px 0;
+  border-bottom: 1px solid;
+  margin-bottom: 4px;
+}
+
+.fix-contrast-btn {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.fix-contrast-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.fix-contrast-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.contrast-summary {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.summary-line {
+  font-size: 9px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  padding: 2px 0;
+  letter-spacing: 0.3px;
 }
 
 .checkbox-group {

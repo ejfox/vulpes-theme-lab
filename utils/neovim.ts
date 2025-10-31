@@ -1,6 +1,12 @@
 import type { ThemeColors, ThemeOptions } from '~/composables/useTheme'
 
-export function serializeNeovimTheme(theme: ThemeColors, name = 'theme_lab', isDark = true, options?: ThemeOptions): string {
+export function serializeNeovimTheme(
+  theme: ThemeColors,
+  name = 'theme_lab',
+  isDark = true,
+  options?: ThemeOptions,
+  visualEffects?: { windowBlend?: number; popupBlend?: number }
+): string {
   const boldKeywords = options?.boldKeywords ?? true
   const italicComments = options?.italicComments ?? true
   const boldFunctions = options?.boldFunctions ?? false
@@ -21,6 +27,25 @@ export function serializeNeovimTheme(theme: ThemeColors, name = 'theme_lab', isD
     `vim.g.colors_name = '${safeName}'`,
     `vim.o.background = '${isDark ? 'dark' : 'light'}'`,
     '',
+  ]
+
+  // Add visual effects if provided
+  if (visualEffects) {
+    if (visualEffects.windowBlend !== undefined && visualEffects.windowBlend > 0) {
+      lines.push(`-- Window transparency`)
+      lines.push(`vim.o.winblend = ${visualEffects.windowBlend}`)
+    }
+    if (visualEffects.popupBlend !== undefined && visualEffects.popupBlend > 0) {
+      lines.push(`-- Popup menu transparency`)
+      lines.push(`vim.o.pumblend = ${visualEffects.popupBlend}`)
+    }
+    if ((visualEffects.windowBlend !== undefined && visualEffects.windowBlend > 0) ||
+        (visualEffects.popupBlend !== undefined && visualEffects.popupBlend > 0)) {
+      lines.push('')
+    }
+  }
+
+  lines.push(
     `-- Helper function`,
     `local function hi(group, opts)`,
     `  vim.api.nvim_set_hl(0, group, opts)`,
@@ -74,7 +99,7 @@ export function serializeNeovimTheme(theme: ThemeColors, name = 'theme_lab', isD
     `hi('GitSignsAdd', { fg = '${theme.palette[2]}' })`,
     `hi('GitSignsChange', { fg = '${theme.palette[3]}' })`,
     `hi('GitSignsDelete', { fg = '${theme.error}' })`,
-  ]
+  )
 
   return lines.join('\n') + '\n'
 }
