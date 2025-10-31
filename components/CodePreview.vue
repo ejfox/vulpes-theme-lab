@@ -112,34 +112,79 @@ const createHighlighting = () => {
 
   return syntaxHighlighting(
     HighlightStyle.define([
+      // Keywords
       {
         tag: tags.keyword,
         color: currentColors.keyword,
         fontWeight: currentOptions.boldKeywords ? 'bold' : 'normal'
       },
+
+      // Comments
       {
         tag: tags.comment,
         color: currentColors.comment,
         fontStyle: currentOptions.italicComments ? 'italic' : 'normal'
       },
+
+      // Strings & Literals
       {
         tag: tags.string,
         color: currentColors.string,
         fontStyle: currentOptions.italicStrings ? 'italic' : 'normal'
       },
       { tag: tags.number, color: currentColors.number },
-      { tag: tags.bool, color: currentColors.error },
-      { tag: tags.null, color: currentColors.hint },
-      { tag: tags.operator, color: currentColors.operator },
+      { tag: tags.bool, color: currentColors.constant },
+      { tag: tags.null, color: currentColors.constant },
+
+      // Functions & Methods
       {
         tag: tags.function(tags.variableName),
         color: currentColors.function,
         fontWeight: currentOptions.boldFunctions ? 'bold' : 'normal'
       },
-      { tag: tags.className, color: currentColors.keyword },
+      { tag: tags.standard(tags.function(tags.variableName)), color: currentColors.builtin },
+
+      // Types
+      { tag: tags.className, color: currentColors.type },
       { tag: tags.typeName, color: currentColors.type },
-      { tag: tags.propertyName, color: currentColors.variable },
+      { tag: tags.standard(tags.typeName), color: currentColors.builtin },
+
+      // Properties & Variables
+      { tag: tags.propertyName, color: currentColors.property },
+      { tag: tags.definition(tags.propertyName), color: currentColors.property },
       { tag: tags.variableName, color: currentColors.variable },
+      { tag: tags.definition(tags.variableName), color: currentColors.parameter },
+      { tag: tags.local(tags.variableName), color: currentColors.variable },
+      { tag: tags.standard(tags.variableName), color: currentColors.builtin },
+
+      // Operators & Punctuation
+      { tag: tags.operator, color: currentColors.operator },
+      { tag: tags.separator, color: currentColors.punctuation },
+      { tag: tags.punctuation, color: currentColors.punctuation },
+      { tag: tags.bracket, color: currentColors.punctuation },
+      { tag: tags.brace, color: currentColors.punctuation },
+      { tag: tags.paren, color: currentColors.punctuation },
+
+      // Namespaces & Modules
+      { tag: tags.namespace, color: currentColors.namespace },
+      { tag: tags.moduleKeyword, color: currentColors.namespace },
+
+      // Tags (HTML/JSX)
+      { tag: tags.tagName, color: currentColors.tag },
+      { tag: tags.attributeName, color: currentColors.property },
+
+      // Macros & Preprocessor
+      { tag: tags.macroName, color: currentColors.macro },
+      { tag: tags.processingInstruction, color: currentColors.macro },
+
+      // Headings (Markdown)
+      { tag: tags.heading, color: currentColors.heading },
+      { tag: tags.heading1, color: currentColors.heading },
+      { tag: tags.heading2, color: currentColors.heading },
+      { tag: tags.heading3, color: currentColors.heading },
+
+      // Constants
+      { tag: tags.constant(tags.variableName), color: currentColors.constant },
     ])
   )
 }

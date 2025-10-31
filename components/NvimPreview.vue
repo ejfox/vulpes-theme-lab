@@ -2,40 +2,40 @@
 const { colors, options } = useTheme()
 
 const codeLines = [
-  { num: 1, text: 'import { useState, computed } from "vue"', highlighted: false, error: false, type: 'import' },
-  { num: 2, text: 'import type { ThemeColors, ColorPalette } from "@/types"', highlighted: false, error: false, type: 'import' },
-  { num: 3, text: 'import chroma from "chroma-js"', highlighted: false, error: false, type: 'import' },
-  { num: 4, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 5, text: '// HSL-based theme generation with mathematical precision', highlighted: false, error: false, type: 'comment' },
-  { num: 6, text: '// Tuftian design: ±7° hue offset for minimal variation', highlighted: false, error: false, type: 'comment' },
-  { num: 7, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 8, text: 'interface ThemeConfig {', highlighted: false, error: false, type: 'keyword' },
-  { num: 9, text: '  baseHue: number', highlighted: false, error: false, type: 'property' },
-  { num: 10, text: '  offset: number', highlighted: false, error: false, type: 'property' },
-  { num: 11, text: '  saturation: number', highlighted: false, error: false, type: 'property' },
-  { num: 12, text: '  palette: ColorPalette', highlighted: false, error: false, type: 'property' },
-  { num: 13, text: '}', highlighted: false, error: false, type: 'keyword' },
-  { num: 14, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 15, text: 'export const useTheme = () => {', highlighted: false, error: false, type: 'keyword' },
-  { num: 16, text: '  const state = useState<ThemeConfig>("theme", () => ({', highlighted: false, error: false, type: 'code' },
-  { num: 17, text: '    baseHue: 267,  // Catppuccin mauve', highlighted: true, error: false, type: 'comment' },
-  { num: 18, text: '    offset: 7,', highlighted: true, error: false, type: 'code' },
-  { num: 19, text: '    saturation: 0.85', highlighted: false, error: true, type: 'code' },
-  { num: 20, text: '    // Expected \',\' after property value', highlighted: false, error: false, type: 'comment' },
-  { num: 21, text: '  }))', highlighted: false, error: false, type: 'code' },
-  { num: 22, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 23, text: '  const generateColor = async (hue: number, offset: number) => {', highlighted: false, error: false, type: 'function' },
-  { num: 24, text: '    return chroma.hsl(hue + offset, 0.85, 0.60).hex()', highlighted: false, error: false, type: 'function' },
-  { num: 25, text: '  }', highlighted: false, error: false, type: 'keyword' },
-  { num: 26, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 27, text: '  const colors = computed(() => ({', highlighted: false, error: false, type: 'function' },
-  { num: 28, text: '    error: "#f38ba8",    // Catppuccin red', highlighted: false, error: false, type: 'string' },
-  { num: 29, text: '    keyword: "#cba6f7",  // Catppuccin mauve', highlighted: false, error: false, type: 'string' },
-  { num: 30, text: '    string: "#a6e3a1",   // Catppuccin green', highlighted: false, error: false, type: 'string' },
-  { num: 31, text: '  }))', highlighted: false, error: false, type: 'code' },
-  { num: 32, text: '', highlighted: false, error: false, type: 'empty' },
-  { num: 33, text: '  return { state, colors }', highlighted: false, error: false, type: 'code' },
-  { num: 34, text: '}', highlighted: false, error: false, type: 'keyword' },
+  { num: 1, text: 'import { useState, computed } from "vue"', highlighted: false, error: false, keyword: 'import', builtin: 'useState, computed', string: '"vue"' },
+  { num: 2, text: 'import type { ThemeColors, ColorPalette } from "@/types"', highlighted: false, error: false, keyword: 'import type', type: 'ThemeColors, ColorPalette', string: '"@/types"' },
+  { num: 3, text: 'import chroma from "chroma-js"', highlighted: false, error: false, keyword: 'import', string: '"chroma-js"' },
+  { num: 4, text: '', highlighted: false, error: false },
+  { num: 5, text: '// HSL-based theme generation with mathematical precision', highlighted: false, error: false, comment: true },
+  { num: 6, text: '// Tuftian design: ±7° hue offset for minimal variation', highlighted: false, error: false, comment: true },
+  { num: 7, text: '', highlighted: false, error: false },
+  { num: 8, text: 'interface ThemeConfig {', highlighted: false, error: false, keyword: 'interface', type: 'ThemeConfig', punctuation: '{' },
+  { num: 9, text: '  baseHue: number', highlighted: false, error: false, property: 'baseHue', punctuation: ':', type: 'number' },
+  { num: 10, text: '  offset: number', highlighted: false, error: false, property: 'offset', punctuation: ':', type: 'number' },
+  { num: 11, text: '  saturation: number', highlighted: false, error: false, property: 'saturation', punctuation: ':', type: 'number' },
+  { num: 12, text: '  palette: ColorPalette', highlighted: false, error: false, property: 'palette', punctuation: ':', type: 'ColorPalette' },
+  { num: 13, text: '}', highlighted: false, error: false, punctuation: '}' },
+  { num: 14, text: '', highlighted: false, error: false },
+  { num: 15, text: 'export const useTheme = () => {', highlighted: false, error: false, keyword: 'export const', func: 'useTheme' },
+  { num: 16, text: '  const state = useState<ThemeConfig>("theme", () => ({', highlighted: false, error: false, keyword: 'const', builtin: 'useState', type: 'ThemeConfig' },
+  { num: 17, text: '    baseHue: 267,  // Catppuccin mauve', highlighted: true, error: false, property: 'baseHue', number: '267', comment: '// Catppuccin mauve' },
+  { num: 18, text: '    offset: 7,', highlighted: true, error: false, property: 'offset', number: '7' },
+  { num: 19, text: '    saturation: 0.85', highlighted: false, error: true, property: 'saturation', number: '0.85' },
+  { num: 20, text: '    // Expected \',\' after property value', highlighted: false, error: false, comment: true },
+  { num: 21, text: '  }))', highlighted: false, error: false, punctuation: '))' },
+  { num: 22, text: '', highlighted: false, error: false },
+  { num: 23, text: '  const generateColor = async (hue: number, offset: number) => {', highlighted: false, error: false, keyword: 'const async', func: 'generateColor', parameter: 'hue, offset', type: 'number' },
+  { num: 24, text: '    return chroma.hsl(hue + offset, 0.85, 0.60).hex()', highlighted: false, error: false, keyword: 'return', namespace: 'chroma', func: 'hsl, hex', parameter: 'hue, offset' },
+  { num: 25, text: '  }', highlighted: false, error: false, punctuation: '}' },
+  { num: 26, text: '', highlighted: false, error: false },
+  { num: 27, text: '  const colors = computed(() => ({', highlighted: false, error: false, keyword: 'const', builtin: 'computed' },
+  { num: 28, text: '    error: "#f38ba8",    // Catppuccin red', highlighted: false, error: false, property: 'error', string: '"#f38ba8"', comment: '// Catppuccin red' },
+  { num: 29, text: '    keyword: "#cba6f7",  // Catppuccin mauve', highlighted: false, error: false, property: 'keyword', string: '"#cba6f7"', comment: '// Catppuccin mauve' },
+  { num: 30, text: '    string: "#a6e3a1",   // Catppuccin green', highlighted: false, error: false, property: 'string', string: '"#a6e3a1"', comment: '// Catppuccin green' },
+  { num: 31, text: '  }))', highlighted: false, error: false, punctuation: '))' },
+  { num: 32, text: '', highlighted: false, error: false },
+  { num: 33, text: '  return { state, colors }', highlighted: false, error: false, keyword: 'return', variable: 'state, colors' },
+  { num: 34, text: '}', highlighted: false, error: false, punctuation: '}' },
 ]
 </script>
 
@@ -81,38 +81,71 @@ const codeLines = [
             paddingLeft: line.highlighted ? '10px' : '12px'
           }"
         >
-          <span v-if="line.text" :style="{
-            color: line.error ? colors.error :
-                   line.type === 'import' ? colors.keyword :
-                   line.type === 'keyword' ? colors.keyword :
-                   line.type === 'string' ? colors.string :
-                   line.type === 'function' ? colors.function :
-                   line.type === 'property' ? colors.fg :
-                   line.type === 'comment' ? colors.comment :
-                   line.type === 'empty' ? colors.fg :
-                   colors.fg,
-            fontWeight:
-              ((line.type === 'import' || line.type === 'keyword') && options.boldKeywords) ||
-              (line.type === 'function' && options.boldFunctions)
-                ? 'bold' : 'normal',
-            fontStyle:
-              (line.type === 'comment' && options.italicComments) ||
-              (line.type === 'string' && options.italicStrings)
-                ? 'italic' : 'normal',
-            textDecoration: line.error && options.underlineErrors ? 'underline wavy' : 'none',
-            textDecorationColor: line.error ? colors.error : 'transparent'
-          }">
-            <template v-if="line.type === 'import'">
+          <span v-if="line.text">
+            <template v-if="line.comment">
+              <span :style="{
+                color: colors.comment,
+                fontStyle: options.italicComments ? 'italic' : 'normal'
+              }">{{ line.text }}</span>
+            </template>
+            <template v-else-if="line.keyword">
               <span :style="{
                 color: colors.keyword,
                 fontWeight: options.boldKeywords ? 'bold' : 'normal'
-              }">{{ line.text.split(' ')[0] }}</span>
-              <span :style="{
+              }">{{ line.keyword }}</span><span :style="{ color: colors.fg }"> </span>
+              <span v-if="line.builtin" :style="{ color: colors.builtin }">{{ line.builtin }}</span>
+              <span v-if="line.type" :style="{ color: colors.type }">{{ line.type }}</span>
+              <span v-if="line.func" :style="{
+                color: colors.function,
+                fontWeight: options.boldFunctions ? 'bold' : 'normal'
+              }">{{ line.func }}</span>
+              <span v-if="line.string" :style="{
                 color: colors.string,
                 fontStyle: options.italicStrings ? 'italic' : 'normal'
-              }"> {{ line.text.split(' ').slice(1).join(' ') }}</span>
+              }"> {{ line.string }}</span>
+              <span v-if="line.punctuation" :style="{ color: colors.punctuation }">{{ line.punctuation }}</span>
             </template>
-            <template v-else>{{ line.text }}</template>
+            <template v-else-if="line.property">
+              <span :style="{ color: colors.fg }">  </span>
+              <span :style="{ color: colors.property }">{{ line.property }}</span>
+              <span v-if="line.punctuation" :style="{ color: colors.punctuation }">{{ line.punctuation }}</span>
+              <span v-if="line.type" :style="{ color: colors.type }"> {{ line.type }}</span>
+              <span v-if="line.number" :style="{ color: colors.number }"> {{ line.number }}</span>
+              <span v-if="line.string" :style="{
+                color: colors.string,
+                fontStyle: options.italicStrings ? 'italic' : 'normal'
+              }"> {{ line.string }}</span>
+              <span v-if="line.comment" :style="{
+                color: colors.comment,
+                fontStyle: options.italicComments ? 'italic' : 'normal'
+              }">  {{ line.comment }}</span>
+            </template>
+            <template v-else-if="line.namespace">
+              <span :style="{ color: colors.keyword }">{{ line.keyword }}</span>
+              <span :style="{ color: colors.namespace }"> {{ line.namespace }}</span>
+              <span v-if="line.func" :style="{
+                color: colors.function,
+                fontWeight: options.boldFunctions ? 'bold' : 'normal'
+              }">.{{ line.func }}</span>
+              <span v-if="line.parameter" :style="{ color: colors.parameter }">({{ line.parameter }}</span>
+              <span v-if="line.punctuation" :style="{ color: colors.punctuation }">{{ line.punctuation }}</span>
+            </template>
+            <template v-else-if="line.punctuation">
+              <span :style="{ color: colors.punctuation }">{{ line.text }}</span>
+            </template>
+            <template v-else-if="line.variable">
+              <span :style="{ color: colors.keyword }">{{ line.keyword }}</span>
+              <span :style="{ color: colors.punctuation }"> {{ '{' }}</span>
+              <span :style="{ color: colors.variable }"> {{ line.variable }}</span>
+              <span :style="{ color: colors.punctuation }"> {{ '}' }}</span>
+            </template>
+            <template v-else>
+              <span :style="{
+                color: line.error ? colors.error : colors.fg,
+                textDecoration: line.error && options.underlineErrors ? 'underline wavy' : 'none',
+                textDecorationColor: line.error ? colors.error : 'transparent'
+              }">{{ line.text }}</span>
+            </template>
           </span>
         </div>
       </div>

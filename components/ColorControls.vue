@@ -1,10 +1,12 @@
 <script setup lang="ts">
 const { state } = useTheme()
 
+// Ordered by importance: base hue first, offset second (most impactful controls)
 const sliders = [
   { key: 'baseHue', label: 'base hue', min: 0, max: 360, step: 1 },
   { key: 'hueOffset', label: 'offset ±', min: 1, max: 45, step: 1 },
-  { key: 'saturation', label: 'saturation', min: 0, max: 100, step: 1 },
+  { key: 'saturation', label: 'dark sat', min: 0, max: 100, step: 1 },
+  { key: 'lightModeSaturation', label: 'light sat', min: 0, max: 100, step: 1 },
   { key: 'contrast', label: 'contrast', min: 1, max: 100, step: 1 },
 ]
 
@@ -13,14 +15,23 @@ const monochromeSliders = [
   { key: 'monochromeLightness', label: 'mono light', min: 0, max: 100, step: 1 },
 ]
 
-const offsetSliders = [
-  { key: 'errorOffset', label: 'error', min: -180, max: 180, step: 1 },
-  { key: 'warningOffset', label: 'warning', min: -180, max: 180, step: 1 },
-  { key: 'keywordOffset', label: 'keyword', min: -180, max: 180, step: 1 },
-  { key: 'stringOffset', label: 'string', min: -180, max: 180, step: 1 },
-  { key: 'numberOffset', label: 'number', min: -180, max: 180, step: 1 },
-  { key: 'functionOffset', label: 'function', min: -180, max: 180, step: 1 },
+// Programmatically generate all 18 color offset sliders for maximum granular control
+// Ordered by semantic importance for code legibility (matches multiplier importance)
+const colorTypes = [
+  // Row 1: Core structural elements (most important)
+  'keyword', 'function', 'builtin', 'type', 'string', 'number',
+  // Row 2: Medium importance
+  'constant', 'macro', 'tag', 'heading', 'namespace', 'property',
+  // Row 3: Lower prominence + diagnostics
+  'variable', 'parameter', 'operator', 'punctuation', 'error', 'warning'
 ]
+const offsetSliders = colorTypes.map(type => ({
+  key: `${type}Offset`,
+  label: type,
+  min: -180,
+  max: 180,
+  step: 1
+}))
 
 const showAdvanced = ref(false)
 
@@ -31,13 +42,40 @@ const toggleMode = () => {
 
 <template>
   <div class="controls">
-    <div class="mode-toggle" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
-      <button @click="toggleMode" class="mode-btn" :class="'mode-' + state.mode" :style="{
-        borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-        color: state.mode === 'dark' ? '#fff' : '#000'
-      }">
-        {{ state.mode === 'dark' ? 'DARK' : 'LIGHT' }}
-      </button>
+    <!-- Theme name + mode display -->
+    <div class="theme-header" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+      <div class="theme-name" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+        {{ state.themeName }}
+      </div>
+      <div class="mode-toggle-group">
+        <button
+          @click="state.mode = 'dark'"
+          class="mode-toggle-btn"
+          :class="{ active: state.mode === 'dark' }"
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : (state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'),
+            borderColor: state.mode === 'dark' ? 'rgba(100, 150, 255, 0.5)' : 'transparent',
+            background: state.mode === 'dark' ? 'rgba(100, 150, 255, 0.1)' : 'transparent'
+          }"
+          title="Switch to dark mode"
+        >
+          DARK
+        </button>
+        <span :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)', fontSize: '8px' }">|</span>
+        <button
+          @click="state.mode = 'light'"
+          class="mode-toggle-btn"
+          :class="{ active: state.mode === 'light' }"
+          :style="{
+            color: state.mode === 'light' ? 'rgba(255, 200, 0, 1)' : (state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'),
+            borderColor: state.mode === 'light' ? 'rgba(255, 200, 0, 0.5)' : 'transparent',
+            background: state.mode === 'light' ? 'rgba(255, 200, 0, 0.1)' : 'transparent'
+          }"
+          title="Switch to light mode"
+        >
+          LIGHT
+        </button>
+      </div>
     </div>
 
     <div class="checkbox-group" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
@@ -101,32 +139,6 @@ const toggleMode = () => {
       </div>
     </div>
 
-    <!-- Advanced offset controls -->
-    <div class="advanced-section" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
-      <button @click="showAdvanced = !showAdvanced" class="advanced-toggle" :style="{
-        color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
-      }">
-        <span>{{ showAdvanced ? '▼' : '▶' }}</span>
-        <span>offset math</span>
-      </button>
-
-      <div v-if="showAdvanced" class="advanced-controls">
-        <div class="control-group" v-for="slider in offsetSliders" :key="slider.key">
-          <label>
-            <span class="label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">{{ slider.label }}</span>
-            <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{ state[slider.key as keyof typeof state] }}</span>
-          </label>
-          <input
-            type="range"
-            v-model.number="state[slider.key as keyof typeof state]"
-            :min="slider.min"
-            :max="slider.max"
-            :step="slider.step"
-            :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -138,49 +150,50 @@ const toggleMode = () => {
   padding: 0;
 }
 
-.mode-toggle {
+.theme-header {
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.mode-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+.theme-name {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   color: #fff;
-  padding: 6px 10px;
+}
+
+.mode-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mode-toggle-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px 8px;
   font-family: inherit;
-  font-size: 8px;
+  font-size: 7px;
   cursor: pointer;
-  width: 100%;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.15s;
+  flex: 1;
 }
 
-.mode-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
+.mode-toggle-btn:hover {
+  opacity: 0.8;
 }
 
-.mode-btn.mode-light {
-  border-color: rgba(255, 200, 0, 0.5);
-  color: rgba(255, 200, 0, 1);
-}
-
-.mode-btn.mode-light:hover {
-  background: rgba(255, 200, 0, 0.1);
-  border-color: rgba(255, 200, 0, 0.7);
-}
-
-.mode-btn.mode-dark {
-  border-color: rgba(100, 150, 255, 0.5);
-  color: rgba(150, 180, 255, 1);
-}
-
-.mode-btn.mode-dark:hover {
-  background: rgba(100, 150, 255, 0.1);
-  border-color: rgba(100, 150, 255, 0.7);
+.mode-toggle-btn.active {
+  font-weight: bold;
+  border: 1px solid;
 }
 
 .checkbox-group {
@@ -271,9 +284,38 @@ const toggleMode = () => {
 
 .advanced-controls {
   padding-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(18, 100px);
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  padding-right: 8px;
+  /* Make scrollbar visible */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+}
+
+.advanced-controls::-webkit-scrollbar {
+  height: 6px;
+}
+
+.advanced-controls::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.advanced-controls::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.advanced-controls::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.advanced-controls .control-group {
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 label {

@@ -61,19 +61,29 @@ const selectAllFormats = () => {
   exportFormats.value = ['ghostty', 'iterm', 'tmux', 'neovim', 'lazygit']
 }
 
-// Reset functions for each color
+// Reset functions for each color - resets to 0 offset, 50 lightness, linked=true
 const resetColor = (colorName: string) => {
+  // All colors reset to: offset=0, lightness=50, linked=true
+  // Multipliers come from defaultState in useTheme
   const defaults: Record<string, { multiplier: number, offset: number, lightness: number, linked: boolean }> = {
-    error: { multiplier: 1, offset: 0, lightness: 50, linked: true },
-    warning: { multiplier: -1, offset: 0, lightness: 50, linked: true },
-    keyword: { multiplier: 1.5, offset: 0, lightness: 50, linked: true },
-    string: { multiplier: -1.5, offset: 0, lightness: 50, linked: true },
-    number: { multiplier: 2, offset: 0, lightness: 50, linked: true },
-    function: { multiplier: -2, offset: 0, lightness: 50, linked: true },
-    constant: { multiplier: 3, offset: 0, lightness: 50, linked: true },
-    type: { multiplier: 2.5, offset: 0, lightness: 50, linked: true },
-    variable: { multiplier: -2.5, offset: 0, lightness: 50, linked: true },
+    error: { multiplier: 5, offset: 0, lightness: 50, linked: true },
+    warning: { multiplier: -5, offset: 0, lightness: 50, linked: true },
+    keyword: { multiplier: 3, offset: 0, lightness: 50, linked: true },
+    string: { multiplier: 4, offset: 0, lightness: 50, linked: true },
+    number: { multiplier: -4, offset: 0, lightness: 50, linked: true },
+    function: { multiplier: -3, offset: 0, lightness: 50, linked: true },
+    constant: { multiplier: 3.5, offset: 0, lightness: 50, linked: true },
+    type: { multiplier: -2.5, offset: 0, lightness: 50, linked: true },
+    variable: { multiplier: -1, offset: 0, lightness: 50, linked: true },
     operator: { multiplier: 0.5, offset: 0, lightness: 50, linked: true },
+    builtin: { multiplier: 2.5, offset: 0, lightness: 50, linked: true },
+    parameter: { multiplier: -0.5, offset: 0, lightness: 50, linked: true },
+    property: { multiplier: -1.5, offset: 0, lightness: 50, linked: true },
+    namespace: { multiplier: 1.5, offset: 0, lightness: 50, linked: true },
+    macro: { multiplier: -2, offset: 0, lightness: 50, linked: true },
+    tag: { multiplier: 2, offset: 0, lightness: 50, linked: true },
+    punctuation: { multiplier: 0.25, offset: 0, lightness: 50, linked: true },
+    heading: { multiplier: 3.5, offset: 0, lightness: 50, linked: true },
   }
 
   const d = defaults[colorName]
@@ -140,6 +150,54 @@ const resetColor = (colorName: string) => {
       state.value.operatorLightness = d.lightness
       state.value.operatorLinked = d.linked
       state.value.operatorMultiplier = d.multiplier
+      break
+    case 'builtin':
+      state.value.builtinOffset = d.offset
+      state.value.builtinLightness = d.lightness
+      state.value.builtinLinked = d.linked
+      state.value.builtinMultiplier = d.multiplier
+      break
+    case 'parameter':
+      state.value.parameterOffset = d.offset
+      state.value.parameterLightness = d.lightness
+      state.value.parameterLinked = d.linked
+      state.value.parameterMultiplier = d.multiplier
+      break
+    case 'property':
+      state.value.propertyOffset = d.offset
+      state.value.propertyLightness = d.lightness
+      state.value.propertyLinked = d.linked
+      state.value.propertyMultiplier = d.multiplier
+      break
+    case 'namespace':
+      state.value.namespaceOffset = d.offset
+      state.value.namespaceLightness = d.lightness
+      state.value.namespaceLinked = d.linked
+      state.value.namespaceMultiplier = d.multiplier
+      break
+    case 'macro':
+      state.value.macroOffset = d.offset
+      state.value.macroLightness = d.lightness
+      state.value.macroLinked = d.linked
+      state.value.macroMultiplier = d.multiplier
+      break
+    case 'tag':
+      state.value.tagOffset = d.offset
+      state.value.tagLightness = d.lightness
+      state.value.tagLinked = d.linked
+      state.value.tagMultiplier = d.multiplier
+      break
+    case 'punctuation':
+      state.value.punctuationOffset = d.offset
+      state.value.punctuationLightness = d.lightness
+      state.value.punctuationLinked = d.linked
+      state.value.punctuationMultiplier = d.multiplier
+      break
+    case 'heading':
+      state.value.headingOffset = d.offset
+      state.value.headingLightness = d.lightness
+      state.value.headingLinked = d.linked
+      state.value.headingMultiplier = d.multiplier
       break
   }
 }
@@ -640,8 +698,8 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
 
 <template>
   <div class="lab" :style="{ background: colors.bg || '#000', color: colors.fg || '#fff' }">
-    <!-- Floating frosted glass controls -->
-    <aside class="floating-controls" :style="{
+    <!-- Left sidebar (30% width, full height) -->
+    <aside class="sidebar-left" :style="{
       background: state.mode === 'dark' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
       boxShadow: state.mode === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -669,37 +727,6 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
       <ColorControls />
 
       <div class="actions" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
-        <!-- Format selector -->
-        <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
-          <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">export formats</div>
-          <div class="format-checkboxes">
-            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-              <input type="checkbox" v-model="exportFormats" value="ghostty" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
-              <span>ghostty</span>
-            </label>
-            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-              <input type="checkbox" v-model="exportFormats" value="iterm" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
-              <span>iterm2</span>
-            </label>
-            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-              <input type="checkbox" v-model="exportFormats" value="tmux" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
-              <span>tmux</span>
-            </label>
-            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-              <input type="checkbox" v-model="exportFormats" value="neovim" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
-              <span>neovim</span>
-            </label>
-            <label class="format-checkbox" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-              <input type="checkbox" v-model="exportFormats" value="lazygit" :style="{ accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)' }" />
-              <span>lazygit</span>
-            </label>
-          </div>
-          <button @click="selectAllFormats" class="btn-select-all" :style="{
-            borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)'
-          }">select all</button>
-        </div>
-
         <!-- Download section -->
         <div class="export-section" :style="{ borderBottomColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
           <div class="section-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">download files</div>
@@ -754,8 +781,10 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
       </div>
     </aside>
 
-    <!-- Main preview area -->
-    <main class="preview">
+    <!-- Right preview area (70% width) -->
+    <main class="preview-right">
+      <!-- Floating color swatches at top -->
+      <div class="swatches-float">
       <!-- Color swatches -->
       <div class="swatches">
         <div class="swatch" :style="{ background: colors.base, color: getTextColor(colors.base) }">
@@ -1446,6 +1475,550 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           />
           <code>{{ colors.operator }}</code>
         </div>
+        <div class="swatch editable" :style="{ background: colors.builtin, color: getTextColor(colors.builtin) }">
+          <div class="swatch-header">
+            <span class="color-name">builtin</span>
+            <code class="color-hex">{{ colors.builtin }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.builtin, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.builtin, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.builtin, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.builtin, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.builtin, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('builtin', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('builtin', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.builtinLinked = !state.builtinLinked" class="tool-btn" :class="{ active: state.builtinLinked }" :title="state.builtinLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.builtinLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('builtin')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('builtin')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('builtin', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.builtinLinked ? ((state.hueOffset * state.builtinMultiplier) + state.builtinOffset).toFixed(0) : state.builtinOffset }}° · L{{ state.builtinLightness }}
+          </div>
+          <input
+            v-if="state.builtinLinked"
+            type="range"
+            v-model.number="state.builtinMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('builtin') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.builtinOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.builtinLinked }"
+            :style="{ background: getOffsetGradient('builtin') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.builtinLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.builtinLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('builtin') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.builtin }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.parameter, color: getTextColor(colors.parameter) }">
+          <div class="swatch-header">
+            <span class="color-name">parameter</span>
+            <code class="color-hex">{{ colors.parameter }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.parameter, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.parameter, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.parameter, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.parameter, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.parameter, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('parameter', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('parameter', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.parameterLinked = !state.parameterLinked" class="tool-btn" :class="{ active: state.parameterLinked }" :title="state.parameterLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.parameterLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('parameter')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('parameter')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('parameter', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.parameterLinked ? ((state.hueOffset * state.parameterMultiplier) + state.parameterOffset).toFixed(0) : state.parameterOffset }}° · L{{ state.parameterLightness }}
+          </div>
+          <input
+            v-if="state.parameterLinked"
+            type="range"
+            v-model.number="state.parameterMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('parameter') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.parameterOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.parameterLinked }"
+            :style="{ background: getOffsetGradient('parameter') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.parameterLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.parameterLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('parameter') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.parameter }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.property, color: getTextColor(colors.property) }">
+          <div class="swatch-header">
+            <span class="color-name">property</span>
+            <code class="color-hex">{{ colors.property }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.property, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.property, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.property, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.property, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.property, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('property', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('property', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.propertyLinked = !state.propertyLinked" class="tool-btn" :class="{ active: state.propertyLinked }" :title="state.propertyLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.propertyLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('property')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('property')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('property', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.propertyLinked ? ((state.hueOffset * state.propertyMultiplier) + state.propertyOffset).toFixed(0) : state.propertyOffset }}° · L{{ state.propertyLightness }}
+          </div>
+          <input
+            v-if="state.propertyLinked"
+            type="range"
+            v-model.number="state.propertyMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('property') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.propertyOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.propertyLinked }"
+            :style="{ background: getOffsetGradient('property') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.propertyLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.propertyLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('property') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.property }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.namespace, color: getTextColor(colors.namespace) }">
+          <div class="swatch-header">
+            <span class="color-name">namespace</span>
+            <code class="color-hex">{{ colors.namespace }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.namespace, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.namespace, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.namespace, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.namespace, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.namespace, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('namespace', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('namespace', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.namespaceLinked = !state.namespaceLinked" class="tool-btn" :class="{ active: state.namespaceLinked }" :title="state.namespaceLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.namespaceLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('namespace')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('namespace')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('namespace', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.namespaceLinked ? ((state.hueOffset * state.namespaceMultiplier) + state.namespaceOffset).toFixed(0) : state.namespaceOffset }}° · L{{ state.namespaceLightness }}
+          </div>
+          <input
+            v-if="state.namespaceLinked"
+            type="range"
+            v-model.number="state.namespaceMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('namespace') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.namespaceOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.namespaceLinked }"
+            :style="{ background: getOffsetGradient('namespace') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.namespaceLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.namespaceLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('namespace') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.namespace }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.macro, color: getTextColor(colors.macro) }">
+          <div class="swatch-header">
+            <span class="color-name">macro</span>
+            <code class="color-hex">{{ colors.macro }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.macro, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.macro, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.macro, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.macro, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.macro, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('macro', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('macro', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.macroLinked = !state.macroLinked" class="tool-btn" :class="{ active: state.macroLinked }" :title="state.macroLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.macroLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('macro')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('macro')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('macro', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.macroLinked ? ((state.hueOffset * state.macroMultiplier) + state.macroOffset).toFixed(0) : state.macroOffset }}° · L{{ state.macroLightness }}
+          </div>
+          <input
+            v-if="state.macroLinked"
+            type="range"
+            v-model.number="state.macroMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('macro') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.macroOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.macroLinked }"
+            :style="{ background: getOffsetGradient('macro') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.macroLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.macroLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('macro') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.macro }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.tag, color: getTextColor(colors.tag) }">
+          <div class="swatch-header">
+            <span class="color-name">tag</span>
+            <code class="color-hex">{{ colors.tag }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.tag, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.tag, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.tag, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.tag, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.tag, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('tag', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('tag', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.tagLinked = !state.tagLinked" class="tool-btn" :class="{ active: state.tagLinked }" :title="state.tagLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.tagLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('tag')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('tag')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('tag', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.tagLinked ? ((state.hueOffset * state.tagMultiplier) + state.tagOffset).toFixed(0) : state.tagOffset }}° · L{{ state.tagLightness }}
+          </div>
+          <input
+            v-if="state.tagLinked"
+            type="range"
+            v-model.number="state.tagMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('tag') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.tagOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.tagLinked }"
+            :style="{ background: getOffsetGradient('tag') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.tagLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.tagLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('tag') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.tag }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.punctuation, color: getTextColor(colors.punctuation) }">
+          <div class="swatch-header">
+            <span class="color-name">punctuation</span>
+            <code class="color-hex">{{ colors.punctuation }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.punctuation, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.punctuation, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.punctuation, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.punctuation, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.punctuation, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('punctuation', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('punctuation', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.punctuationLinked = !state.punctuationLinked" class="tool-btn" :class="{ active: state.punctuationLinked }" :title="state.punctuationLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.punctuationLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('punctuation')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('punctuation')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('punctuation', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.punctuationLinked ? ((state.hueOffset * state.punctuationMultiplier) + state.punctuationOffset).toFixed(0) : state.punctuationOffset }}° · L{{ state.punctuationLightness }}
+          </div>
+          <input
+            v-if="state.punctuationLinked"
+            type="range"
+            v-model.number="state.punctuationMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('punctuation') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.punctuationOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.punctuationLinked }"
+            :style="{ background: getOffsetGradient('punctuation') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.punctuationLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.punctuationLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('punctuation') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.punctuation }}</code>
+        </div>
+        <div class="swatch editable" :style="{ background: colors.heading, color: getTextColor(colors.heading) }">
+          <div class="swatch-header">
+            <span class="color-name">heading</span>
+            <code class="color-hex">{{ colors.heading }}</code>
+          </div>
+          <div class="contrast-info" :title="`Contrast ratio: ${getContrastRatio(colors.heading, colors.bg).toFixed(2)}:1 (WCAG ${getContrastLevel(getContrastRatio(colors.heading, colors.bg))})`">
+            <span class="contrast-icon">{{ getContrastIcon(getContrastRatio(colors.heading, colors.bg)) }}</span>
+            <span class="contrast-ratio">{{ getContrastRatio(colors.heading, colors.bg).toFixed(1) }}:1</span>
+            <span class="contrast-level">{{ getContrastLevel(getContrastRatio(colors.heading, colors.bg)) }}</span>
+          </div>
+          <div class="wcag-locks">
+            <button @click="lockToWCAG('heading', 'AA')" class="lock-btn lock-aa" title="lock to WCAG AA (4.5:1)">
+              Lock AA
+            </button>
+            <button @click="lockToWCAG('heading', 'AAA')" class="lock-btn lock-aaa" title="lock to WCAG AAA (7:1)">
+              Lock AAA
+            </button>
+          </div>
+          <div class="swatch-tools">
+            <button @click="state.headingLinked = !state.headingLinked" class="tool-btn" :class="{ active: state.headingLinked }" :title="state.headingLinked ? 'unlink from global offset' : 'link to global offset'">
+              {{ state.headingLinked ? 'LINK' : 'UNLNK' }}
+            </button>
+            <button @click="shuffleColor('heading')" class="tool-btn" title="randomize">RAND</button>
+            <button @click="resetColor('heading')" class="tool-btn" title="reset">RESET</button>
+            <select @change="(e) => { const el = e.target as HTMLSelectElement; if (el.value) { applyColorMath('heading', el.value as any); el.value = ''; } }" class="tool-select" title="color theory">
+              <option value="">math</option>
+              <option value="complementary">180°</option>
+              <option value="triadic">120°</option>
+              <option value="analogous">30°</option>
+            </select>
+          </div>
+          <div class="value-display">
+            {{ state.headingLinked ? ((state.hueOffset * state.headingMultiplier) + state.headingOffset).toFixed(0) : state.headingOffset }}° · L{{ state.headingLightness }}
+          </div>
+          <input
+            v-if="state.headingLinked"
+            type="range"
+            v-model.number="state.headingMultiplier"
+            class="offset-slider linked"
+            :style="{ background: getMultiplierGradient('heading') }"
+            min="-5"
+            max="5"
+            step="0.1"
+            title="multiplier: how this color relates to global offset"
+          />
+          <input
+            type="range"
+            v-model.number="state.headingOffset"
+            class="offset-slider"
+            :class="{ 'add-mode': state.headingLinked }"
+            :style="{ background: getOffsetGradient('heading') }"
+            min="-180"
+            max="180"
+            step="1"
+            :title="state.headingLinked ? 'fine-tune: additional offset on top of global' : 'offset: direct hue adjustment'"
+          />
+          <input
+            type="range"
+            v-model.number="state.headingLightness"
+            class="lightness-slider"
+            :style="{ background: getLightnessGradient('heading') }"
+            min="0"
+            max="100"
+            step="1"
+            title="lightness: brightness (50 = default)"
+          />
+          <code>{{ colors.heading }}</code>
+        </div>
         <div class="swatch" :style="{ background: colors.comment, color: getTextColor(colors.comment) }">
           <span>comment</span>
           <code>{{ colors.comment }}</code>
@@ -1458,6 +2031,7 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
           <span :style="{ color: colors.fg }">background</span>
           <code :style="{ color: colors.fg }">{{ colors.bg }}</code>
         </div>
+      </div>
       </div>
 
       <!-- Live previews -->
@@ -1513,25 +2087,26 @@ const lockToWCAG = (colorName: string, level: 'AA' | 'AAA') => {
   width: 100vw;
   font-family: 'Monaspace Krypton', monospace;
   position: relative;
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
 }
 
-.floating-controls {
-  position: fixed;
-  bottom: 8px;
-  right: 8px;
-  width: 240px;
+.sidebar-left {
+  width: 30%;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 0;
-  padding: 16px;
-  z-index: 100;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  gap: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
 }
 
 .header {
@@ -1732,23 +2307,55 @@ h1 {
   color: rgba(255, 150, 150, 1);
 }
 
-.preview {
-  padding: 0;
-  overflow: auto;
+.preview-right {
+  width: 70%;
   height: 100vh;
-  width: 100vw;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  flex-grow: 1;
+}
+
+.swatches-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .swatches {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(18, minmax(120px, 1fr));
   gap: 4px;
-  margin-bottom: 8px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: #000;
-  padding-bottom: 8px;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Horizontal scrollbar for swatches */
+.swatches-float::-webkit-scrollbar {
+  height: 6px;
+}
+
+.swatches-float::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.swatches-float::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.swatches-float::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .swatch {
@@ -2136,6 +2743,11 @@ h1 {
   gap: 2px;
   margin-bottom: 4px;
   min-height: 500px;
+  margin-top: 220px;
+}
+
+.previews:first-of-type {
+  margin-top: 220px;
 }
 
 .configs {
@@ -2181,5 +2793,123 @@ h1 {
   text-transform: uppercase;
   background: #0a0a0a;
   margin-bottom: 2px;
+}
+
+/* Scrollbar styling for sidebar */
+.sidebar-left::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-left::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-left::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.sidebar-left::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Scrollbar styling for preview area */
+.preview-right::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preview-right::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-right::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.preview-right::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Responsive layout for mobile/tablet */
+@media (max-width: 1024px) {
+  .lab {
+    flex-direction: column;
+  }
+
+  .sidebar-left {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 16px;
+  }
+
+  .preview-right {
+    width: 100%;
+    height: auto;
+    flex-grow: 1;
+  }
+
+  .swatches {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .previews:first-of-type {
+    margin-top: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-left {
+    max-height: 50vh;
+    padding: 12px;
+  }
+
+  .swatches {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .swatches-float {
+    padding: 4px;
+  }
+
+  .swatch {
+    padding: 8px;
+    font-size: 8px;
+  }
+
+  .previews {
+    grid-template-columns: 1fr;
+    margin-top: 320px;
+  }
+
+  .previews:first-of-type {
+    margin-top: 320px;
+  }
+
+  .configs {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .swatches {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sidebar-left {
+    padding: 8px;
+  }
+
+  h1 {
+    font-size: 8px;
+  }
+
+  .previews:first-of-type {
+    margin-top: 400px;
+  }
 }
 </style>

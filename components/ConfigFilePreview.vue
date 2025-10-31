@@ -59,22 +59,23 @@ jobs:
 
 const activeTab = ref(0)
 
-// Color JSON/YAML syntax
+// Color JSON/YAML syntax with granular colors
 const colorLine = (line: string, lang: string) => {
   if (lang === 'json') {
-    // Highlight JSON: keys, strings, numbers, booleans, null
+    // Highlight JSON: keys (property), strings, numbers, booleans, null, punctuation
     return line
-      .replace(/"([^"]+)":/g, `<span style="color: ${colors.value.keyword}">"$1"</span>:`)
-      .replace(/: "([^"]+)"/g, `: <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">"$1"</span>`)
-      .replace(/: (\d+\.?\d*)/g, `: <span style="color: ${colors.value.number}">$1</span>`)
-      .replace(/: (true|false|null)/g, `: <span style="color: ${colors.value.constant}">$1</span>`)
+      .replace(/"([^"]+)":/g, `<span style="color: ${colors.value.property}">"$1"</span><span style="color: ${colors.value.punctuation}">:</span>`)
+      .replace(/: "([^"]+)"/g, ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">"$1"</span>`)
+      .replace(/: (\d+\.?\d*)/g, ` <span style="color: ${colors.value.number}">$1</span>`)
+      .replace(/: (true|false|null)/g, ` <span style="color: ${colors.value.constant}">$1</span>`)
+      .replace(/[{}\[\],]/g, (match) => `<span style="color: ${colors.value.punctuation}">${match}</span>`)
   } else {
-    // YAML highlighting
+    // YAML highlighting: keys (property), strings, numbers, operators, comments
     return line
-      .replace(/^(\s*)([a-zA-Z_-]+):/g, `$1<span style="color: ${colors.value.keyword}">$2</span>:`)
-      .replace(/: "?([^"\n]+)"?$/g, `: <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">$1</span>`)
-      .replace(/: (\d+\.?\d*)$/g, `: <span style="color: ${colors.value.number}">$1</span>`)
-      .replace(/- /g, `<span style="color: ${colors.value.operator}">-</span> `)
+      .replace(/^(\s*)([a-zA-Z_-]+):/g, `$1<span style="color: ${colors.value.property}">$2</span><span style="color: ${colors.value.punctuation}">:</span>`)
+      .replace(/: "?([^"\n]+)"?$/g, ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">$1</span>`)
+      .replace(/: (\d+\.?\d*)$/g, ` <span style="color: ${colors.value.number}">$1</span>`)
+      .replace(/- /g, `<span style="color: ${colors.value.punctuation}">-</span> `)
       .replace(/#.+$/g, (match) => `<span style="color: ${colors.value.comment}; ${options.value.italicComments ? 'font-style: italic' : ''}">${match}</span>`)
   }
 }

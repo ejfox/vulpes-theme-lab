@@ -18,6 +18,14 @@ export interface ThemeColors {
   type: string
   variable: string
   operator: string
+  builtin: string
+  parameter: string
+  property: string
+  namespace: string
+  macro: string
+  tag: string
+  punctuation: string
+  heading: string
   palette: Record<number, string>
 }
 
@@ -31,9 +39,11 @@ export interface ThemeOptions {
 }
 
 interface ThemeState {
+  themeName: string    // Name of the active theme
   baseHue: number
   hueOffset: number
   saturation: number
+  lightModeSaturation: number  // Independent saturation control for light mode
   contrast: number
   monochromeMode: boolean
   monochromeIntensity: number
@@ -57,6 +67,14 @@ interface ThemeState {
   typeOffset: number
   variableOffset: number
   operatorOffset: number
+  builtinOffset: number
+  parameterOffset: number
+  propertyOffset: number
+  namespaceOffset: number
+  macroOffset: number
+  tagOffset: number
+  punctuationOffset: number
+  headingOffset: number
   // Individual color lightness (0-100)
   errorLightness: number
   warningLightness: number
@@ -68,6 +86,14 @@ interface ThemeState {
   typeLightness: number
   variableLightness: number
   operatorLightness: number
+  builtinLightness: number
+  parameterLightness: number
+  propertyLightness: number
+  namespaceLightness: number
+  macroLightness: number
+  tagLightness: number
+  punctuationLightness: number
+  headingLightness: number
   // Link to global offset (when true, uses hueOffset * multiplier)
   errorLinked: boolean
   warningLinked: boolean
@@ -79,6 +105,14 @@ interface ThemeState {
   typeLinked: boolean
   variableLinked: boolean
   operatorLinked: boolean
+  builtinLinked: boolean
+  parameterLinked: boolean
+  propertyLinked: boolean
+  namespaceLinked: boolean
+  macroLinked: boolean
+  tagLinked: boolean
+  punctuationLinked: boolean
+  headingLinked: boolean
   // Multipliers for linked colors
   errorMultiplier: number
   warningMultiplier: number
@@ -90,12 +124,22 @@ interface ThemeState {
   typeMultiplier: number
   variableMultiplier: number
   operatorMultiplier: number
+  builtinMultiplier: number
+  parameterMultiplier: number
+  propertyMultiplier: number
+  namespaceMultiplier: number
+  macroMultiplier: number
+  tagMultiplier: number
+  punctuationMultiplier: number
+  headingMultiplier: number
 }
 
 const defaultState: ThemeState = {
+  themeName: 'vulpes',
   baseHue: 309,
   hueOffset: 1,
   saturation: 100,
+  lightModeSaturation: 100,  // Default to same as dark mode
   contrast: 86,
   monochromeMode: true,
   monochromeIntensity: 100,
@@ -119,6 +163,14 @@ const defaultState: ThemeState = {
   typeOffset: 0,
   variableOffset: 0,
   operatorOffset: 0,
+  builtinOffset: 0,
+  parameterOffset: 0,
+  propertyOffset: 0,
+  namespaceOffset: 0,
+  macroOffset: 0,
+  tagOffset: 0,
+  punctuationOffset: 0,
+  headingOffset: 0,
   // Default lightness values (50 = use auto-calculated)
   errorLightness: 50,
   warningLightness: 50,
@@ -130,6 +182,14 @@ const defaultState: ThemeState = {
   typeLightness: 50,
   variableLightness: 50,
   operatorLightness: 50,
+  builtinLightness: 50,
+  parameterLightness: 50,
+  propertyLightness: 50,
+  namespaceLightness: 50,
+  macroLightness: 50,
+  tagLightness: 50,
+  punctuationLightness: 50,
+  headingLightness: 50,
   // Default linked state (all linked by default)
   errorLinked: true,
   warningLinked: true,
@@ -141,17 +201,40 @@ const defaultState: ThemeState = {
   typeLinked: true,
   variableLinked: true,
   operatorLinked: true,
-  // Default multipliers
-  errorMultiplier: 1,
-  warningMultiplier: -1,
-  keywordMultiplier: 1.5,
-  stringMultiplier: -1.5,
-  numberMultiplier: 2,
-  functionMultiplier: -2,
-  constantMultiplier: 3,
-  typeMultiplier: 2.5,
-  variableMultiplier: -2.5,
-  operatorMultiplier: 0.5,
+  builtinLinked: true,
+  parameterLinked: true,
+  propertyLinked: true,
+  namespaceLinked: true,
+  macroLinked: true,
+  tagLinked: true,
+  punctuationLinked: true,
+  headingLinked: true,
+  // Default multipliers - semantically driven for maximum code legibility
+  // High prominence (structural understanding)
+  keywordMultiplier: 3,        // Control flow - most important
+  functionMultiplier: -3,      // Function calls - very visible
+  builtinMultiplier: 2.5,      // Built-in functions/types - distinct from user code
+  typeMultiplier: -2.5,        // Type information - structural
+
+  // Medium prominence (common elements)
+  stringMultiplier: 4,         // String literals - stand out
+  numberMultiplier: -4,        // Numeric literals - distinct
+  constantMultiplier: 3.5,     // Constants - important values
+  macroMultiplier: -2,         // Macros/decorators - special behavior
+  tagMultiplier: 2,            // HTML/JSX tags - structural
+  headingMultiplier: 3.5,      // Markdown headings - hierarchy
+  namespaceMultiplier: 1.5,    // Modules/packages - context
+
+  // Lower prominence (reduce visual noise)
+  variableMultiplier: -1,      // Variables - too common to be loud
+  propertyMultiplier: -1.5,    // Properties - too common
+  parameterMultiplier: -0.5,   // Parameters - subtle
+  operatorMultiplier: 0.5,     // Operators - very subtle
+  punctuationMultiplier: 0.25, // Punctuation - barely tinted
+
+  // Diagnostics
+  errorMultiplier: 5,          // Errors - maximum visibility
+  warningMultiplier: -5,       // Warnings - high visibility
 }
 
 export const useTheme = () => {
@@ -160,9 +243,11 @@ export const useTheme = () => {
 
   // Initialize state from URL or defaults
   const state = useState<ThemeState>('theme', () => ({
+    themeName: String(params.n || defaultState.themeName),
     baseHue: Number(params.h) || defaultState.baseHue,
     hueOffset: Number(params.o) || defaultState.hueOffset,
     saturation: Number(params.s) || defaultState.saturation,
+    lightModeSaturation: Number(params.ls) || defaultState.lightModeSaturation,
     contrast: Number(params.c) || defaultState.contrast,
     monochromeMode: params.m === '1' || defaultState.monochromeMode,
     monochromeIntensity: Number(params.mi) || defaultState.monochromeIntensity,
@@ -213,14 +298,49 @@ export const useTheme = () => {
     typeMultiplier: Number(params.tm) || defaultState.typeMultiplier,
     variableMultiplier: Number(params.vm) || defaultState.variableMultiplier,
     operatorMultiplier: Number(params.om) || defaultState.operatorMultiplier,
+    // New granular colors
+    builtinOffset: Number(params.bio) || defaultState.builtinOffset,
+    parameterOffset: Number(params.pao) || defaultState.parameterOffset,
+    propertyOffset: Number(params.pro) || defaultState.propertyOffset,
+    namespaceOffset: Number(params.nso) || defaultState.namespaceOffset,
+    macroOffset: Number(params.mao) || defaultState.macroOffset,
+    tagOffset: Number(params.tao) || defaultState.tagOffset,
+    punctuationOffset: Number(params.puo) || defaultState.punctuationOffset,
+    headingOffset: Number(params.heo) || defaultState.headingOffset,
+    builtinLightness: Number(params.bil) || defaultState.builtinLightness,
+    parameterLightness: Number(params.pal) || defaultState.parameterLightness,
+    propertyLightness: Number(params.prl) || defaultState.propertyLightness,
+    namespaceLightness: Number(params.nsl) || defaultState.namespaceLightness,
+    macroLightness: Number(params.mal) || defaultState.macroLightness,
+    tagLightness: Number(params.tal) || defaultState.tagLightness,
+    punctuationLightness: Number(params.pul) || defaultState.punctuationLightness,
+    headingLightness: Number(params.hel) || defaultState.headingLightness,
+    builtinLinked: params.bilink !== '0',
+    parameterLinked: params.palink !== '0',
+    propertyLinked: params.prlink !== '0',
+    namespaceLinked: params.nslink !== '0',
+    macroLinked: params.malink !== '0',
+    tagLinked: params.talink !== '0',
+    punctuationLinked: params.pulink !== '0',
+    headingLinked: params.helink !== '0',
+    builtinMultiplier: Number(params.bim) || defaultState.builtinMultiplier,
+    parameterMultiplier: Number(params.pam) || defaultState.parameterMultiplier,
+    propertyMultiplier: Number(params.prm) || defaultState.propertyMultiplier,
+    namespaceMultiplier: Number(params.nsm) || defaultState.namespaceMultiplier,
+    macroMultiplier: Number(params.mam) || defaultState.macroMultiplier,
+    tagMultiplier: Number(params.tam) || defaultState.tagMultiplier,
+    punctuationMultiplier: Number(params.pum) || defaultState.punctuationMultiplier,
+    headingMultiplier: Number(params.hem) || defaultState.headingMultiplier,
   }))
 
   // Watch state and sync to URL
   if (import.meta.client) {
     watch(state, (newState) => {
+      params.n = newState.themeName
       params.h = String(newState.baseHue)
       params.o = String(newState.hueOffset)
       params.s = String(newState.saturation)
+      params.ls = String(newState.lightModeSaturation)
       params.c = String(newState.contrast)
       params.m = newState.monochromeMode ? '1' : '0'
       params.mi = String(newState.monochromeIntensity)
@@ -271,6 +391,39 @@ export const useTheme = () => {
       params.tm = String(newState.typeMultiplier)
       params.vm = String(newState.variableMultiplier)
       params.om = String(newState.operatorMultiplier)
+      // New granular colors
+      params.bio = String(newState.builtinOffset)
+      params.pao = String(newState.parameterOffset)
+      params.pro = String(newState.propertyOffset)
+      params.nso = String(newState.namespaceOffset)
+      params.mao = String(newState.macroOffset)
+      params.tao = String(newState.tagOffset)
+      params.puo = String(newState.punctuationOffset)
+      params.heo = String(newState.headingOffset)
+      params.bil = String(newState.builtinLightness)
+      params.pal = String(newState.parameterLightness)
+      params.prl = String(newState.propertyLightness)
+      params.nsl = String(newState.namespaceLightness)
+      params.mal = String(newState.macroLightness)
+      params.tal = String(newState.tagLightness)
+      params.pul = String(newState.punctuationLightness)
+      params.hel = String(newState.headingLightness)
+      params.bilink = newState.builtinLinked ? '1' : '0'
+      params.palink = newState.parameterLinked ? '1' : '0'
+      params.prlink = newState.propertyLinked ? '1' : '0'
+      params.nslink = newState.namespaceLinked ? '1' : '0'
+      params.malink = newState.macroLinked ? '1' : '0'
+      params.talink = newState.tagLinked ? '1' : '0'
+      params.pulink = newState.punctuationLinked ? '1' : '0'
+      params.helink = newState.headingLinked ? '1' : '0'
+      params.bim = String(newState.builtinMultiplier)
+      params.pam = String(newState.parameterMultiplier)
+      params.prm = String(newState.propertyMultiplier)
+      params.nsm = String(newState.namespaceMultiplier)
+      params.mam = String(newState.macroMultiplier)
+      params.tam = String(newState.tagMultiplier)
+      params.pum = String(newState.punctuationMultiplier)
+      params.hem = String(newState.headingMultiplier)
     }, { deep: true })
   }
 
@@ -278,7 +431,8 @@ export const useTheme = () => {
   const generateThemeVariant = (mode: 'dark' | 'light') => {
     const isDark = mode === 'dark'
     const contrastFactor = state.value.contrast / 100
-    const sat = state.value.saturation / 100
+    // Use mode-specific saturation
+    const sat = (isDark ? state.value.saturation : state.value.lightModeSaturation) / 100
 
     // Background is always grayscale - use contrast to adjust
     const bgLightness = isDark ? 0.05 + (contrastFactor * 0.02) : 0.97 - (contrastFactor * 0.05)
@@ -339,6 +493,14 @@ export const useTheme = () => {
     const typeL = applyLightnessAdjust(62, 41, state.value.typeLightness)
     const variableL = applyLightnessAdjust(57, 44, state.value.variableLightness)
     const operatorL = applyLightnessAdjust(60, 40, state.value.operatorLightness)
+    const builtinL = applyLightnessAdjust(58, 42, state.value.builtinLightness)
+    const parameterL = applyLightnessAdjust(56, 43, state.value.parameterLightness)
+    const propertyL = applyLightnessAdjust(57, 44, state.value.propertyLightness)
+    const namespaceL = applyLightnessAdjust(61, 40, state.value.namespaceLightness)
+    const macroL = applyLightnessAdjust(59, 41, state.value.macroLightness)
+    const tagL = applyLightnessAdjust(60, 39, state.value.tagLightness)
+    const punctuationL = applyLightnessAdjust(55, 45, state.value.punctuationLightness)
+    const headingL = applyLightnessAdjust(62, 38, state.value.headingLightness)
 
     // Helper to get actual offset (linked = hueOffset * multiplier + individual offset, unlinked = fixed offset)
     const getOffset = (colorName: string): number => {
@@ -369,6 +531,14 @@ export const useTheme = () => {
       type: colorAt(getOffset('type'), typeL.dark, typeL.light),
       variable: colorAt(getOffset('variable'), variableL.dark, variableL.light),
       operator: colorAt(getOffset('operator'), operatorL.dark, operatorL.light),
+      builtin: colorAt(getOffset('builtin'), builtinL.dark, builtinL.light),
+      parameter: colorAt(getOffset('parameter'), parameterL.dark, parameterL.light),
+      property: colorAt(getOffset('property'), propertyL.dark, propertyL.light),
+      namespace: colorAt(getOffset('namespace'), namespaceL.dark, namespaceL.light),
+      macro: colorAt(getOffset('macro'), macroL.dark, macroL.light),
+      tag: colorAt(getOffset('tag'), tagL.dark, tagL.light),
+      punctuation: colorAt(getOffset('punctuation'), punctuationL.dark, punctuationL.light),
+      heading: colorAt(getOffset('heading'), headingL.dark, headingL.light),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),
