@@ -259,6 +259,14 @@ const resetColor = (colorName: string) => {
   }
 }
 
+// Helper to get file extension from format for display
+const getFileExtension = (format: string): string => {
+  const result = generateExport(format, true)
+  const filename = result.filename
+  const lastDot = filename.lastIndexOf('.')
+  return lastDot !== -1 ? filename.slice(lastDot) : ''
+}
+
 // Download file helper
 const downloadFile = (content: string, filename: string) => {
   const blob = new Blob([content], { type: 'text/plain' })
