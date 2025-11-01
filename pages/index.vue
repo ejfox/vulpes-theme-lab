@@ -261,10 +261,17 @@ const resetColor = (colorName: string) => {
 
 // Helper to get file extension from format for display
 const getFileExtension = (format: string): string => {
-  const result = generateExport(format, true)
-  const filename = result.filename
-  const lastDot = filename.lastIndexOf('.')
-  return lastDot !== -1 ? filename.slice(lastDot) : ''
+  const extensionMap: Record<string, string> = {
+    'ghostty': '.ghostty',
+    'neovim': '.lua',
+    'bat': '.tmTheme',
+    'yazi': '.toml',
+    'lazygit': '.yml',
+    'zsh': '.zsh',
+    'iterm': '.itermcolors',
+    'tmux': '.tmux.conf'
+  }
+  return extensionMap[format] || '.txt'
 }
 
 // Download file helper
