@@ -118,7 +118,7 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
 /**
  * Export format types supported by the theme lab
  */
-export type ExportFormat = 'ghostty' | 'neovim' | 'bat' | 'yazi' | 'lazygit' | 'zsh'
+export type ExportFormat = 'ghostty' | 'neovim' | 'bat' | 'yazi' | 'lazygit' | 'zsh' | 'tweakcc'
 
 /**
  * Result of a theme export operation
@@ -127,4 +127,5 @@ export interface ExportResult {
   filename: string
   content: string
   format: ExportFormat
+  metadata?: Record<string, any>  // Optional metadata for exporters
 }

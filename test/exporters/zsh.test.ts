@@ -73,11 +73,15 @@ describe('ZSH Exporter', () => {
     })
   })
 
-  it('should use valid hex colors', () => {
+  it('should use valid hex colors for FZF', () => {
     const result = exportZsh(palette)
     const content = result.content
 
-    const colorMatches = content.match(/#[0-9a-f]{6}/gi)
+    // Only FZF section should have hex colors
+    const fzfSection = content.split('# FZF Colors')[1]?.split('# Powerlevel10k')[0]
+    expect(fzfSection).toBeTruthy()
+
+    const colorMatches = fzfSection!.match(/#[0-9a-f]{6}/gi)
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
@@ -108,10 +112,20 @@ describe('ZSH Exporter', () => {
     const result = exportZsh(palette)
     const content = result.content
 
-    expect(content).toContain(palette.fg)
-    expect(content).toContain(palette.bg)
-    expect(content).toContain(palette.base)
-    expect(content).toContain(palette.string)
-    expect(content).toContain(palette.comment)
+    // FZF should use hex colors (color names can appear after --color= or after commas)
+    expect(content).toMatch(/fg:#[0-9a-f]{6}/i)
+    expect(content).toMatch(/bg:#[0-9a-f]{6}/i)
+    expect(content).toMatch(/hl:#[0-9a-f]{6}/i)
+    expect(content).toMatch(/info:#[0-9a-f]{6}/i)
+    expect(content).toMatch(/prompt:#[0-9a-f]{6}/i)
+
+    // ZSH_HIGHLIGHT_STYLES should use 256 color codes (numbers only, no # prefix)
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[default\]='fg=\d+'/);
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[comment\]='fg=\d+'/);
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[command\]='fg=\d+'/);
+
+    // Powerlevel10k should use 256 color codes without quotes
+    expect(content).toMatch(/POWERLEVEL9K_DIR_BACKGROUND=\d+/);
+    expect(content).toMatch(/POWERLEVEL9K_VCS_CLEAN_BACKGROUND=\d+/);
   })
 })

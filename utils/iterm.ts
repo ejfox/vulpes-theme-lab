@@ -1,7 +1,6 @@
 import type { ThemeColors } from '~/composables/useTheme'
 
 export function serializeItermTheme(colors: ThemeColors, name: string): string {
-  // iTerm2 uses 0-1 float values for RGB
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result ? {
@@ -57,8 +56,4 @@ ${colorToXml(colors.variable, 'Ansi 14 Color')}
 ${colorToXml(colors.fg, 'Ansi 15 Color')}
 </dict>
 </plist>`
-}
-
-export function getItermFileExtension(): string {
-  return '.itermcolors'
 }

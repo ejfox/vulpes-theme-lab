@@ -1,128 +1,76 @@
 #!/bin/bash
 # Example ZSH theme export from vulpes-theme-lab
-# Add these functions to your ~/.zshrc
-#
-# This demonstrates the ZSH syntax highlighting and FZF color configuration
-# exported from vulpes-theme-lab.
+# This demonstrates the correct format for ZSH syntax highlighting, FZF, and Powerlevel10k
+# Updated to use 256-color palette for ZSH (not hex), hex for FZF
 
-# Dark theme function (Dracula-inspired)
-theme-dark() {
-  # ZSH Syntax Highlighting Colors (dark mode)
-  # Format: 'scope:fg=#HEX_COLOR' or 'scope:fg=COLOR_NAME,bold'
-  ZSH_HIGHLIGHT_STYLES=(
-    # Commands and keywords
-    'alias:fg=#50fa7b'
-    'builtin:fg=#8be9fd'
-    'command:fg=#50fa7b'
-    'function:fg=#50fa7b'
-    'hashed-command:fg=#50fa7b'
-    'reserved-word:fg=#ff79c6,bold'
-    'suffix-alias:fg=#50fa7b'
+# ZSH Syntax Highlighting Colors
+# NOTE: ZSH uses 256-color palette (0-255), NOT hex colors!
+# Run this to see all colors: for i in {0..255}; do print -Pn "%K{$i} %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done
+typeset -A ZSH_HIGHLIGHT_STYLES
 
-    # Strings and quoting
-    'string:fg=#f1fa8c'
-    'double-quoted-argument:fg=#f1fa8c'
-    'single-quoted-argument:fg=#f1fa8c'
-    'dollar-quoted-argument:fg=#f1fa8c'
+# Commands and keywords (using 256-color codes)
+ZSH_HIGHLIGHT_STYLES[default]='fg=253'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=203,bold'
+ZSH_HIGHLIGHT_STYLES[reserved-word]='fg=212,bold'
+ZSH_HIGHLIGHT_STYLES[alias]='fg=117'
+ZSH_HIGHLIGHT_STYLES[builtin]='fg=81'
+ZSH_HIGHLIGHT_STYLES[function]='fg=117'
+ZSH_HIGHLIGHT_STYLES[command]='fg=81'
+ZSH_HIGHLIGHT_STYLES[precommand]='fg=212'
 
-    # Variables and parameters
-    'dollar-double-quoted-argument:fg=#f1fa8c'
-    'parameter:fg=#f8f8f2'
-    'unknown-token:fg=#ff5555,bold'
+# Strings and paths
+ZSH_HIGHLIGHT_STYLES[path]='fg=228'
+ZSH_HIGHLIGHT_STYLES[path_pathseparator]='fg=212'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=228'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=228'
+ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=228'
 
-    # Paths and globbing
-    'path:fg=#f8f8f2'
-    'path-separator:fg=#6272a4'
-    'globbing:fg=#f1fa8c'
-    'history-expansion:fg=#f1fa8c'
+# Variables and operators
+ZSH_HIGHLIGHT_STYLES[assign]='fg=253'
+ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]='fg=253'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=212'
+ZSH_HIGHLIGHT_STYLES[redirection]='fg=212'
 
-    # Comments and special
-    'comment:fg=#6272a4,italic'
-    'comment-delimiter:fg=#6272a4'
-    'default:fg=#f8f8f2'
-    'unmatched-bracket:fg=#ff5555,bold'
+# Comments
+ZSH_HIGHLIGHT_STYLES[comment]='fg=241'
 
-    # Options and redirection
-    'option-flag:fg=#bd93f9'
-    'option-letter:fg=#bd93f9'
-    'redirection:fg=#ff79c6'
-    'exec-descriptor:fg=#f1fa8c'
-  )
+# FZF Colors
+# NOTE: FZF DOES support hex colors (#RRGGBB format)
+export FZF_DEFAULT_OPTS="\\
+--color=fg:#f8f8f2,bg:#282a36,hl:#8be9fd \\
+--color=fg+:#f8f8f2,bg+:#44475a,hl+:#8be9fd \\
+--color=info:#bd93f9,prompt:#ff79c6,pointer:#ff79c6 \\
+--color=marker:#50fa7b,spinner:#ffb86c,header:#6272a4 \\
+--color=border:#44475a,label:#f8f8f2,query:#f8f8f2"
 
-  # FZF Configuration (dark mode)
-  # Format: --color=element:hex_or_name,...
-  export FZF_DEFAULT_OPTS=$'--color=fg:#f8f8f2,bg:#282a36,hl:#8be9fd \
-    --color=fg+:#f8f8f2,bg+:#44475a,hl+:#8be9fd \
-    --color=info:#f1fa8c,prompt:#ff79c6,pointer:#ff79c6 \
-    --color=marker:#ff79c6,spinner:#f1fa8c,header:#6272a4 \
-    --color=border:#6272a4,preview-bg:#282a36 \
-    --border-label-pos=2 \
-    --scrollbar="▐"'
+# Powerlevel10k Colors
+# NOTE: Uses POWERLEVEL9K_ prefix (not 10K!) and 256-color palette
+# Foreground colors are automatically calculated for contrast by chroma-js
+typeset -g POWERLEVEL9K_DIR_BACKGROUND=81
+typeset -g POWERLEVEL9K_DIR_FOREGROUND=16
 
-  echo "🌙 Switched to dark mode (Dracula-inspired)"
-}
+typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=84
+typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=16
 
-# Light theme function
-theme-light() {
-  # ZSH Syntax Highlighting Colors (light mode)
-  # Lighter/brighter colors for better contrast on light backgrounds
-  ZSH_HIGHLIGHT_STYLES=(
-    # Commands and keywords
-    'alias:fg=#0064c6'
-    'builtin:fg=#00649f'
-    'command:fg=#0064c6'
-    'function:fg=#0064c6'
-    'hashed-command:fg=#0064c6'
-    'reserved-word:fg=#9e0d65,bold'
-    'suffix-alias:fg=#0064c6'
+typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=214
+typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=16
 
-    # Strings and quoting
-    'string:fg=#a68700'
-    'double-quoted-argument:fg=#a68700'
-    'single-quoted-argument:fg=#a68700'
-    'dollar-quoted-argument:fg=#a68700'
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=141
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=16
 
-    # Variables and parameters
-    'dollar-double-quoted-argument:fg=#a68700'
-    'parameter:fg=#4c5668'
-    'unknown-token:fg=#d20f39,bold'
+typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND=84
+typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=16
 
-    # Paths and globbing
-    'path:fg=#4c5668'
-    'path-separator:fg=#acb0be'
-    'globbing:fg=#a68700'
-    'history-expansion:fg=#a68700'
+typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=203
+typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=231
 
-    # Comments and special
-    'comment:fg:#7287a8,italic'
-    'comment-delimiter:fg:#7287a8'
-    'default:fg=#4c5668'
-    'unmatched-bracket:fg=#d20f39,bold'
+# Usage:
+# 1. Add to your ~/.zshrc
+# 2. Make sure you have zsh-syntax-highlighting installed
+# 3. Make sure you have fzf installed
+# 4. For p10k, add BEFORE loading p10k in ~/.zshrc
 
-    # Options and redirection
-    'option-flag:fg:#6b68b6'
-    'option-letter:fg:#6b68b6'
-    'redirection:fg:#9e0d65'
-    'exec-descriptor:fg:#a68700'
-  )
-
-  # FZF Configuration (light mode)
-  export FZF_DEFAULT_OPTS=$'--color=fg:#4c5668,bg:#eff1f5,hl:#0064c6 \
-    --color=fg+:#4c5668,bg+:#e6e9ef,hl+:#0064c6 \
-    --color=info:#a68700,prompt:#9e0d65,pointer:#9e0d65 \
-    --color=marker:#9e0d65,spinner:#a68700,header:#acb0be \
-    --color=border:#acb0be,preview-bg:#eff1f5 \
-    --border-label-pos=2 \
-    --scrollbar="▐"'
-
-  echo "☀️ Switched to light mode"
-}
-
-# Initialize with dark mode by default
-theme-dark
-
-# Optional: Source this file from your ~/.zshrc
-# Add this line to ~/.zshrc:
-#   [ -f ~/path/to/this/theme-export.sh ] && source ~/path/to/this/theme-export.sh
-#
-# Or add the functions directly to ~/.zshrc without a separate file.
+echo "✓ ZSH theme configured (256-color palette)"
+echo "  - ZSH syntax highlighting: 256-color codes"
+echo "  - FZF: hex colors (#RRGGBB)"
+echo "  - Powerlevel10k: 256-color codes with auto-contrast"

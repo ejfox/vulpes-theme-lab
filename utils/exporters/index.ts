@@ -9,6 +9,7 @@ export { exportBat } from './bat'
 export { exportYazi } from './yazi'
 export { exportLazygit } from './lazygit'
 export { exportZsh } from './zsh'
+export { exportTweakcc } from './tweakcc'
 
 export type { ThemePalette, ExportFormat, ExportResult } from '../types'
 export { createSemanticPalette } from '../types'

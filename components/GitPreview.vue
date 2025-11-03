@@ -2,24 +2,24 @@
 const { colors, options } = useTheme()
 
 const commits = [
-  { hash: 'a3f2d1e', msg: 'fix: resolve merge conflicts in auth flow', author: 'ejfox', time: '2m ago', selected: false },
-  { hash: '9c4b8e7', msg: 'feat: add LSP diagnostics to nvim preview', author: 'ejfox', time: '1h ago', selected: true },
-  { hash: '2d1f5a9', msg: 'refactor: optimize theme generation algorithm', author: 'ejfox', time: '3h ago', selected: false },
-  { hash: '7e8c2b4', msg: 'docs: add Tuftian design principles', author: 'ejfox', time: '5h ago', selected: false },
-  { hash: '4a9e3d1', msg: 'test: add unit tests for color utilities', author: 'ejfox', time: '1d ago', selected: false },
+  { hash: 'c0ffee0', msg: 'fix: patch reality.construct memory leak', author: 'neo', time: '2m ago', selected: false },
+  { hash: 'deadbee', msg: 'feat: jack into the metaverse mainframe', author: 'hiro', time: '1h ago', selected: true },
+  { hash: 'facade1', msg: 'refactor: simulacrum rendering pipeline', author: 'raven', time: '3h ago', selected: false },
+  { hash: 'badc0de', msg: 'chore: update desert_of_the_real.toml', author: 'morpheus', time: '5h ago', selected: false },
+  { hash: 'a11c47', msg: 'test: verify red pill compatibility', author: 'trinity', time: '1d ago', selected: false },
 ]
 
 const files = [
-  { name: 'components/NvimPreview.vue', status: 'M', insertions: 45, deletions: 12 },
-  { name: 'components/LazyGitPreview.vue', status: 'M', insertions: 23, deletions: 8 },
-  { name: 'composables/useTheme.ts', status: 'M', insertions: 12, deletions: 3 },
-  { name: 'utils/ghostty.ts', status: 'A', insertions: 89, deletions: 0 },
-  { name: 'types/theme.d.ts', status: 'A', insertions: 34, deletions: 0 },
+  { name: 'avatar/neo.construct', status: 'M', insertions: 45, deletions: 12 },
+  { name: 'street/yt-delivery.rs', status: 'M', insertions: 23, deletions: 8 },
+  { name: 'core/simulacrum.ts', status: 'M', insertions: 12, deletions: 3 },
+  { name: 'matrix/agent-smith.exe', status: 'D', insertions: 0, deletions: 89 },
+  { name: 'metaverse/black-sun.wasm', status: 'A', insertions: 34, deletions: 0 },
 ]
 
 const stashes = [
-  { id: 'stash@{0}', msg: 'WIP: telescope fuzzy finder UI', branch: 'feature/telescope' },
-  { id: 'stash@{1}', msg: 'WIP: color picker improvements', branch: 'main' },
+  { id: 'stash@{0}', msg: 'WIP: jack into Sense/Net mainframe', branch: 'feature/gibson' },
+  { id: 'stash@{1}', msg: 'WIP: enhance hypercard protocol', branch: 'main' },
 ]
 
 const branches = [

@@ -1,4 +1,5 @@
 import type { ThemePalette, ExportResult } from '../types'
+import { detectThemeType } from '../contrast'
 
 /**
  * Generates a comprehensive Neovim Lua colorscheme plugin
@@ -20,6 +21,9 @@ export function exportNeovim(
 ): ExportResult {
   const { boldKeywords, italicComments, boldFunctions, italicStrings, underlineErrors } = options
 
+  // Auto-detect theme type based on background luminance
+  const themeType = detectThemeType(palette)
+
   // Build style helpers
   const bold = boldKeywords ? ', bold = true' : ''
   const italic = italicComments ? ', italic = true' : ''
@@ -39,7 +43,7 @@ function M.setup()
     vim.cmd('syntax reset')
   end
 
-  vim.o.background = 'dark'
+  vim.o.background = '${themeType}'
   vim.g.colors_name = '${themeName}'
 
   local colors = {

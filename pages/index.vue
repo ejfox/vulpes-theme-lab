@@ -6,11 +6,13 @@ import {
   exportYazi,
   exportLazygit,
   exportZsh,
+  exportTweakcc,
   createSemanticPalette,
   type ExportResult
 } from '~/utils/exporters'
 import { serializeItermTheme } from '~/utils/iterm'
 import { serializeTmuxTheme } from '~/utils/tmux'
+import { validateThemeContrast, applyContrastFixes, generateAccessibilityReport } from '~/utils/contrast'
 import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } = useTheme()
@@ -21,6 +23,20 @@ const exportFormats = ref<string[]>(['ghostty'])
 
 // Export modal state
 const showExportModal = ref(false)
+
+// Contrast warning modal state
+const showContrastWarning = ref(false)
+const contrastIssues = ref<any[]>([])
+const pendingExport = ref<{
+  palette: any
+  themeName: string
+  formats: string[]
+  mode: 'both' | 'dark' | 'light'
+} | null>(null)
+
+// Success toast state
+const showSuccessToast = ref(false)
+const successMessage = ref('')
 
 // Helper to generate config for a single format using new exporters
 const generateConfig = (format: string, isDark: boolean): string => {
@@ -51,6 +67,9 @@ const generateConfig = (format: string, isDark: boolean): string => {
       break
     case 'zsh':
       result = exportZsh(palette, baseThemeName)
+      break
+    case 'tweakcc':
+      result = exportTweakcc(palette, baseThemeName)
       break
     case 'iterm':
       // iTerm not yet migrated to new exporter system
@@ -99,6 +118,8 @@ const generateExport = (format: string, isDark: boolean): ExportResult => {
       return exportLazygit(palette, themeName)
     case 'zsh':
       return exportZsh(palette, themeName)
+    case 'tweakcc':
+      return exportTweakcc(palette, themeName)
     case 'iterm':
       // iTerm not yet migrated - create ExportResult manually
       return {
@@ -268,6 +289,7 @@ const getFileExtension = (format: string): string => {
     'yazi': '.toml',
     'lazygit': '.yml',
     'zsh': '.zsh',
+    'tweakcc': '.json',
     'iterm': '.itermcolors',
     'tmux': '.tmux.conf'
   }
@@ -287,52 +309,184 @@ const downloadFile = (content: string, filename: string) => {
   URL.revokeObjectURL(url)
 }
 
-// Export both dark and light for all selected formats
-const exportBoth = () => {
+// Validate and export with contrast checking
+const validateAndExport = (mode: 'both' | 'dark' | 'light') => {
   if (exportFormats.value.length === 0) {
     alert('Please select at least one format to export')
     return
   }
 
+  // Check dark theme contrast
+  const darkPalette = createSemanticPalette(darkColors.value, 'dark')
+  const darkIssues = validateThemeContrast(darkPalette)
+
+  // Check light theme contrast if exporting both or light only
+  const lightPalette = createSemanticPalette(lightColors.value, 'light')
+  const lightIssues = mode !== 'dark' ? validateThemeContrast(lightPalette) : []
+
+  // Combine issues
+  const allIssues = mode === 'both'
+    ? [...darkIssues, ...lightIssues]
+    : mode === 'dark'
+    ? darkIssues
+    : lightIssues
+
+  if (allIssues.length > 0) {
+    // Show contrast warning modal
+    contrastIssues.value = allIssues
+    pendingExport.value = {
+      palette: mode === 'dark' ? darkPalette : lightPalette,
+      themeName: state.value.themeName || 'vulpes',
+      formats: exportFormats.value,
+      mode
+    }
+    showContrastWarning.value = true
+  } else {
+    // No issues - export directly
+    performExport(mode)
+    successMessage.value = '✓ WCAG AA Compliant - Themes Exported!'
+    showSuccessToast.value = true
+  }
+}
+
+// Perform the actual export
+const performExport = (mode: 'both' | 'dark' | 'light', fixedPalettes?: { dark?: any, light?: any }) => {
   exportFormats.value.forEach((format, index) => {
     setTimeout(() => {
-      const darkResult = generateExport(format, true)
-      const lightResult = generateExport(format, false)
+      if (mode === 'both') {
+        const darkResult = fixedPalettes?.dark
+          ? generateExportFromPalette(format, fixedPalettes.dark, true)
+          : generateExport(format, true)
+        const lightResult = fixedPalettes?.light
+          ? generateExportFromPalette(format, fixedPalettes.light, false)
+          : generateExport(format, false)
 
-      downloadFile(darkResult.content, darkResult.filename)
-      setTimeout(() => downloadFile(lightResult.content, lightResult.filename), 50)
+        downloadFile(darkResult.content, darkResult.filename)
+        setTimeout(() => downloadFile(lightResult.content, lightResult.filename), 50)
+      } else if (mode === 'dark') {
+        const result = fixedPalettes?.dark
+          ? generateExportFromPalette(format, fixedPalettes.dark, true)
+          : generateExport(format, true)
+        downloadFile(result.content, result.filename)
+      } else {
+        const result = fixedPalettes?.light
+          ? generateExportFromPalette(format, fixedPalettes.light, false)
+          : generateExport(format, false)
+        downloadFile(result.content, result.filename)
+      }
     }, index * 150)
   })
 }
 
+// Generate export from a fixed palette
+const generateExportFromPalette = (format: string, palette: any, isDark: boolean): ExportResult => {
+  const baseThemeName = state.value.themeName || 'vulpes'
+  const mode = isDark ? 'dark' : 'light'
+  const themeName = `${baseThemeName}-${mode}`
+
+  switch (format) {
+    case 'ghostty':
+      return exportGhostty(palette, themeName)
+    case 'neovim':
+      return exportNeovim(palette, themeName)
+    case 'bat':
+      return exportBat(palette, themeName)
+    case 'yazi':
+      return exportYazi(palette, themeName)
+    case 'lazygit':
+      return exportLazygit(palette, themeName)
+    case 'zsh':
+      return exportZsh(palette, themeName)
+    case 'tweakcc':
+      return exportTweakcc(palette, themeName)
+    default:
+      return exportGhostty(palette, themeName)
+  }
+}
+
+// Export both dark and light for all selected formats
+const exportBoth = () => {
+  validateAndExport('both')
+}
+
 // Export only dark for all selected formats
 const exportDark = () => {
-  if (exportFormats.value.length === 0) {
-    alert('Please select at least one format to export')
-    return
-  }
-
-  exportFormats.value.forEach((format, index) => {
-    setTimeout(() => {
-      const result = generateExport(format, true)
-      downloadFile(result.content, result.filename)
-    }, index * 100)
-  })
+  validateAndExport('dark')
 }
 
 // Export only light for all selected formats
 const exportLight = () => {
-  if (exportFormats.value.length === 0) {
-    alert('Please select at least one format to export')
-    return
+  validateAndExport('light')
+}
+
+// Modal action handlers
+const handleAutoFix = () => {
+  if (!pendingExport.value) return
+
+  const mode = pendingExport.value.mode
+
+  // Apply fixes to dark theme
+  const darkPalette = createSemanticPalette(darkColors.value, 'dark')
+  const { fixed: fixedDark, changes: darkChanges } = applyContrastFixes(darkPalette)
+
+  // Apply fixes to light theme
+  const lightPalette = createSemanticPalette(lightColors.value, 'light')
+  const { fixed: fixedLight, changes: lightChanges } = applyContrastFixes(lightPalette)
+
+  const totalChanges = darkChanges.length + lightChanges.length
+
+  // Export with fixed palettes
+  performExport(mode, { dark: fixedDark, light: fixedLight })
+
+  // Show success
+  successMessage.value = `✓ Auto-Fixed ${totalChanges} Color${totalChanges > 1 ? 's' : ''} - Exported!`
+  showSuccessToast.value = true
+
+  // Close modal
+  showContrastWarning.value = false
+  pendingExport.value = null
+}
+
+const handleExportAnyway = () => {
+  if (!pendingExport.value) return
+
+  // Export without fixes
+  performExport(pendingExport.value.mode)
+
+  // Close modal
+  showContrastWarning.value = false
+  pendingExport.value = null
+}
+
+const handleExportWithReport = () => {
+  if (!pendingExport.value) return
+
+  const mode = pendingExport.value.mode
+
+  // Generate accessibility report
+  if (mode === 'both' || mode === 'dark') {
+    const darkPalette = createSemanticPalette(darkColors.value, 'dark')
+    const darkReport = generateAccessibilityReport(darkPalette, `${state.value.themeName || 'vulpes'}-dark`)
+    downloadFile(darkReport, `${state.value.themeName || 'vulpes'}-dark-accessibility.md`)
   }
 
-  exportFormats.value.forEach((format, index) => {
-    setTimeout(() => {
-      const result = generateExport(format, false)
-      downloadFile(result.content, result.filename)
-    }, index * 100)
-  })
+  if (mode === 'both' || mode === 'light') {
+    const lightPalette = createSemanticPalette(lightColors.value, 'light')
+    const lightReport = generateAccessibilityReport(lightPalette, `${state.value.themeName || 'vulpes'}-light`)
+    downloadFile(lightReport, `${state.value.themeName || 'vulpes'}-light-accessibility.md`)
+  }
+
+  // Export themes
+  performExport(mode)
+
+  // Close modal
+  showContrastWarning.value = false
+  pendingExport.value = null
+}
+
+const handleCancelExport = () => {
+  showContrastWarning.value = false
+  pendingExport.value = null
 }
 
 // Copy configs to clipboard (first selected format only)
@@ -2214,6 +2368,10 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
         <HtopPreview />
       </div>
 
+      <div class="previews">
+        <EditorPreview />
+      </div>
+
       <!-- Live config previews - both variants -->
       <div class="configs">
         <div class="config-preview" :style="{ background: darkColors.bg, borderColor: darkColors.comment }">
@@ -2236,6 +2394,12 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
         </div>
       </div>
 
+      <!-- Accessibility Validation - CRITICAL -->
+      <div class="scenario-section">
+        <div class="scenario-label">wcag contrast validation - accessibility compliance</div>
+        <ContrastValidator />
+      </div>
+
       <!-- Additional example scenarios -->
       <div class="scenario-section">
         <div class="scenario-label">nvim - editing session with LSP diagnostics</div>
@@ -2245,6 +2409,18 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
       <div class="scenario-section">
         <div class="scenario-label">lazygit - git interface</div>
         <GitPreview />
+      </div>
+
+      <div class="scenario-section">
+        <div class="scenario-label">simulacra palette - the hyperreal rendered</div>
+        <ColorReferencePreview />
+      </div>
+
+      <div class="scenario-section">
+        <div class="scenario-label">color space - perceptual topology</div>
+        <div class="color-wheel-wrapper" :style="{ background: colors.bg, border: `1px solid ${colors.comment}30` }">
+          <ColorWheel />
+        </div>
       </div>
     </main>
 
@@ -2257,6 +2433,24 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
 
     <!-- Color Tooltip -->
     <ColorTooltip />
+
+    <!-- Color Fidelity Indicator -->
+    <ColorFidelity />
+
+    <!-- Contrast Warning Modal -->
+    <ContrastWarningModal
+      :show="showContrastWarning"
+      :palette="pendingExport?.palette"
+      :themeName="pendingExport?.themeName || ''"
+      :issues="contrastIssues"
+      :onAutoFix="handleAutoFix"
+      :onExportAnyway="handleExportAnyway"
+      :onExportWithReport="handleExportWithReport"
+      :onCancel="handleCancelExport"
+    />
+
+    <!-- Success Toast -->
+    <SuccessToast :show="showSuccessToast" :message="successMessage" />
   </div>
 </template>
 
@@ -3014,6 +3208,14 @@ h1 {
 .scenario-section {
   margin-top: 4px;
   min-height: 600px;
+}
+
+.color-wheel-wrapper {
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
 .scenario-label {

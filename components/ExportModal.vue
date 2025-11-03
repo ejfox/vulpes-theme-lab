@@ -32,7 +32,8 @@ const formats = [
   { id: 'bat', label: 'Bat', desc: 'Syntax highlighter theme' },
   { id: 'lazygit', label: 'Lazygit', desc: 'Git TUI theme' },
   { id: 'yazi', label: 'Yazi', desc: 'File manager theme' },
-  { id: 'zsh', label: 'ZSH/FZF', desc: 'Shell & fuzzy finder' }
+  { id: 'zsh', label: 'ZSH/FZF', desc: 'Shell & fuzzy finder' },
+  { id: 'tweakcc', label: 'tweakcc', desc: 'Claude Code customization' }
 ]
 
 const selectAll = () => {

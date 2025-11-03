@@ -13,14 +13,14 @@ const cpuBars = [
 ]
 
 const processes = [
-  { pid: 1234, user: 'ejfox', pri: 20, ni: 0, virt: '12.5g', res: '2.1g', shr: '1.2g', s: 'R', cpu: 89.2, mem: 12.5, time: '45:23', command: 'node /theme-lab/server', selected: true },
-  { pid: 5678, user: 'ejfox', pri: 20, ni: 0, virt: '8.2g', res: '1.8g', shr: '980m', s: 'S', cpu: 45.1, mem: 9.8, time: '12:45', command: 'nuxt dev', selected: false },
-  { pid: 9012, user: 'root', pri: -20, ni: -20, virt: '2.1g', res: '456m', shr: '234m', s: 'S', cpu: 23.4, mem: 2.3, time: '89:12', command: 'system_kernel', selected: false },
-  { pid: 3456, user: 'ejfox', pri: 20, ni: 0, virt: '4.5g', res: '890m', shr: '567m', s: 'S', cpu: 12.1, mem: 4.5, time: '3:34', command: 'ghostty', selected: false },
-  { pid: 7890, user: 'ejfox', pri: 20, ni: 0, virt: '3.2g', res: '678m', shr: '345m', s: 'S', cpu: 8.7, mem: 3.2, time: '1:23', command: 'nvim', selected: false },
-  { pid: 2345, user: 'ejfox', pri: 20, ni: 0, virt: '1.8g', res: '234m', shr: '123m', s: 'S', cpu: 2.3, mem: 1.2, time: '0:45', command: 'lazygit', selected: false },
-  { pid: 6789, user: 'root', pri: 20, ni: 0, virt: '890m', res: '123m', shr: '67m', s: 'S', cpu: 0.7, mem: 0.6, time: '23:45', command: 'systemd', selected: false },
-  { pid: 1357, user: 'ejfox', pri: 20, ni: 0, virt: '567m', res: '89m', shr: '45m', s: 'S', cpu: 0.3, mem: 0.4, time: '0:12', command: 'tmux: server', selected: false },
+  { pid: 1337, user: 'neo', pri: 20, ni: 0, virt: '12.5g', res: '2.1g', shr: '1.2g', s: 'R', cpu: 89.2, mem: 12.5, time: '45:23', command: 'matrix --follow-white-rabbit', selected: true },
+  { pid: 5678, user: 'hiro', pri: 20, ni: 0, virt: '8.2g', res: '1.8g', shr: '980m', s: 'S', cpu: 45.1, mem: 9.8, time: '12:45', command: 'metaverse-server --black-sun', selected: false },
+  { pid: 9012, user: 'root', pri: -20, ni: -20, virt: '2.1g', res: '456m', shr: '234m', s: 'S', cpu: 23.4, mem: 2.3, time: '89:12', command: 'construct_loader', selected: false },
+  { pid: 3456, user: 'yt', pri: 20, ni: 0, virt: '4.5g', res: '890m', shr: '567m', s: 'S', cpu: 12.1, mem: 4.5, time: '3:34', command: 'pizza-delivery --kourier', selected: false },
+  { pid: 7890, user: 'trinity', pri: 20, ni: 0, virt: '3.2g', res: '678m', shr: '345m', s: 'S', cpu: 8.7, mem: 3.2, time: '1:23', command: 'redpill.bin', selected: false },
+  { pid: 2345, user: 'morpheus', pri: 20, ni: 0, virt: '1.8g', res: '234m', shr: '123m', s: 'S', cpu: 2.3, mem: 1.2, time: '0:45', command: 'oracle --simulation', selected: false },
+  { pid: 6789, user: 'wintermute', pri: 20, ni: 0, virt: '890m', res: '123m', shr: '67m', s: 'S', cpu: 0.7, mem: 0.6, time: '23:45', command: 'neuromancer_ai', selected: false },
+  { pid: 4242, user: 'raven', pri: 20, ni: 0, virt: '567m', res: '89m', shr: '45m', s: 'S', cpu: 0.3, mem: 0.4, time: '0:12', command: 'snow-crash --daemon', selected: false },
 ]
 
 const getBarColor = (colorKey: string) => {
