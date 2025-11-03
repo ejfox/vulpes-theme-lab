@@ -1,6 +1,6 @@
 {
   "name": "theme-lab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -12,9 +12,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "changelog": "changelogen --output CHANGELOG.md",
-    "release": "changelogen --release --push",
-    "release:minor": "changelogen --release --minor --push",
-    "release:major": "changelogen --release --major --push"
+    "release": "changelogen --release",
+    "release:minor": "changelogen --release --minor",
+    "release:major": "changelogen --release --major"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.0",
