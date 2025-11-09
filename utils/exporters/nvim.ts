@@ -1,5 +1,6 @@
 import type { ThemePalette, ExportResult } from '../types'
 import { detectThemeType } from '../contrast'
+import chroma from 'chroma-js'
 
 /**
  * Generates a comprehensive Neovim Lua colorscheme plugin
@@ -23,6 +24,10 @@ export function exportNeovim(
 
   // Auto-detect theme type based on background luminance
   const themeType = detectThemeType(palette)
+
+  // Create ultra-subtle color for UI chrome (line numbers, indent guides)
+  // Mix bg with fg at only 8% for barely-there appearance
+  const bgSubtle = chroma.mix(palette.bg, palette.fg, 0.08, 'lab').hex()
 
   // Build style helpers
   const bold = boldKeywords ? ', bold = true' : ''
@@ -49,6 +54,7 @@ function M.setup()
   local colors = {
     bg = '${palette.bg}',
     bg_alt = '${palette.bg_alt}',
+    bg_subtle = '${bgSubtle}',  -- Very subtle (8% mix with fg) for UI chrome
     fg = '${palette.fg}',
     base = '${palette.base}',
 
@@ -101,9 +107,9 @@ function M.setup()
     CursorLine = { bg = colors.cursorline },
     CursorColumn = { bg = colors.cursorline },
     CursorLineNr = { fg = colors.base${bold} },
-    LineNr = { fg = colors.bg_alt },  -- Subtle line numbers using bg_alt
-    LineNrAbove = { fg = colors.bg_alt },
-    LineNrBelow = { fg = colors.bg_alt },
+    LineNr = { fg = colors.bg_subtle },  -- Very subtle line numbers
+    LineNrAbove = { fg = colors.bg_subtle },
+    LineNrBelow = { fg = colors.bg_subtle },
 
     SignColumn = { bg = colors.bg },
     SignColumnSB = { link = 'SignColumn' },
@@ -468,11 +474,11 @@ function M.setup()
     WhichKeyFloat = { bg = colors.bg_alt },
     WhichKeyValue = { fg = colors.string },
 
-    -- Indent Blankline (very subtle)
-    IblIndent = { fg = colors.cursorline, nocombine = true },
-    IblScope = { fg = colors.bg_alt, nocombine = true },
-    IndentBlanklineChar = { fg = colors.cursorline, nocombine = true },
-    IndentBlanklineContextChar = { fg = colors.bg_alt, nocombine = true },
+    -- Indent Blankline (ultra subtle - barely visible)
+    IblIndent = { fg = colors.bg_subtle, nocombine = true },
+    IblScope = { fg = colors.cursorline, nocombine = true },
+    IndentBlanklineChar = { fg = colors.bg_subtle, nocombine = true },
+    IndentBlanklineContextChar = { fg = colors.cursorline, nocombine = true },
 
     -- Dashboard / Alpha
     DashboardHeader = { fg = colors.base },
