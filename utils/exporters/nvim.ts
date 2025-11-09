@@ -101,9 +101,9 @@ function M.setup()
     CursorLine = { bg = colors.cursorline },
     CursorColumn = { bg = colors.cursorline },
     CursorLineNr = { fg = colors.base${bold} },
-    LineNr = { fg = colors.comment },
-    LineNrAbove = { fg = colors.comment },
-    LineNrBelow = { fg = colors.comment },
+    LineNr = { fg = colors.bg_alt },  -- Subtle line numbers using bg_alt
+    LineNrAbove = { fg = colors.bg_alt },
+    LineNrBelow = { fg = colors.bg_alt },
 
     SignColumn = { bg = colors.bg },
     SignColumnSB = { link = 'SignColumn' },
@@ -439,8 +439,8 @@ function M.setup()
     CmpItemKindOperator = { fg = colors.operator },
     CmpItemKindTypeParameter = { fg = colors.type },
 
-    -- nvim-tree / neo-tree
-    NvimTreeNormal = { fg = colors.fg, bg = colors.bg_alt },
+    -- nvim-tree / neo-tree (blend with main bg, not panel bg)
+    NvimTreeNormal = { fg = colors.fg, bg = colors.bg },
     NvimTreeFolderName = { fg = colors.info },
     NvimTreeFolderIcon = { fg = colors.info },
     NvimTreeOpenedFolderName = { fg = colors.base },
@@ -450,7 +450,7 @@ function M.setup()
     NvimTreeGitNew = { fg = colors.success },
     NvimTreeGitDeleted = { fg = colors.error },
 
-    NeoTreeNormal = { fg = colors.fg, bg = colors.bg_alt },
+    NeoTreeNormal = { fg = colors.fg, bg = colors.bg },
     NeoTreeDirectoryName = { fg = colors.info },
     NeoTreeDirectoryIcon = { fg = colors.info },
     NeoTreeRootName = { fg = colors.base${bold} },
@@ -468,9 +468,11 @@ function M.setup()
     WhichKeyFloat = { bg = colors.bg_alt },
     WhichKeyValue = { fg = colors.string },
 
-    -- Indent Blankline
-    IblIndent = { fg = colors.bg_alt },
-    IblScope = { fg = colors.comment },
+    -- Indent Blankline (very subtle)
+    IblIndent = { fg = colors.cursorline, nocombine = true },
+    IblScope = { fg = colors.bg_alt, nocombine = true },
+    IndentBlanklineChar = { fg = colors.cursorline, nocombine = true },
+    IndentBlanklineContextChar = { fg = colors.bg_alt, nocombine = true },
 
     -- Dashboard / Alpha
     DashboardHeader = { fg = colors.base },
