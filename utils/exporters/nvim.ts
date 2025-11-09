@@ -117,7 +117,7 @@ function M.setup()
     Folded = { fg = colors.comment, bg = colors.bg_alt },
     ColorColumn = { bg = colors.bg_alt },
 
-    -- Selections & Search
+    -- Selections & Search (with subtle base color tint for cohesion)
     Visual = { bg = colors.selection },
     VisualNOS = { bg = colors.selection },
     Search = { fg = colors.bg, bg = colors.warning },
@@ -156,10 +156,13 @@ function M.setup()
     ErrorMsg = { fg = colors.error },
 
     Conceal = { fg = colors.comment },
-    NonText = { fg = colors.comment },
-    SpecialKey = { fg = colors.comment },
-    Whitespace = { fg = colors.comment },
+    NonText = { fg = colors.bg_subtle },
+    SpecialKey = { fg = colors.bg_subtle },
+    Whitespace = { fg = colors.bg_subtle },
     EndOfBuffer = { fg = colors.bg },
+
+    -- Matching parens/brackets
+    MatchParen = { fg = colors.base, bg = colors.cursorline, bold = true },
 
     -- Spell checking
     SpellBad = { sp = colors.error, undercurl = true },
