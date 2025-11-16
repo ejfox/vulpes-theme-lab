@@ -26,12 +26,15 @@ watch(themeName, (newName) => {
 
 const formats = [
   { id: 'ghostty', label: 'Ghostty', desc: 'Terminal emulator config' },
+  { id: 'wezterm', label: 'WezTerm', desc: 'Terminal emulator theme' },
+  { id: 'alacritty', label: 'Alacritty', desc: 'Terminal emulator theme' },
   { id: 'iterm', label: 'iTerm2', desc: 'macOS terminal theme' },
   { id: 'tmux', label: 'Tmux', desc: 'Terminal multiplexer' },
   { id: 'neovim', label: 'Neovim', desc: 'Vim editor theme' },
   { id: 'bat', label: 'Bat', desc: 'Syntax highlighter theme' },
   { id: 'lazygit', label: 'Lazygit', desc: 'Git TUI theme' },
   { id: 'yazi', label: 'Yazi', desc: 'File manager theme' },
+  { id: 'neomutt', label: 'Neomutt', desc: 'Email client theme' },
   { id: 'zsh', label: 'ZSH/FZF', desc: 'Shell & fuzzy finder' },
   { id: 'tweakcc', label: 'tweakcc', desc: 'Claude Code customization' }
 ]

@@ -7,6 +7,9 @@ import {
   exportLazygit,
   exportZsh,
   exportTweakcc,
+  exportNeomutt,
+  exportWezterm,
+  exportAlacritty,
   createSemanticPalette,
   type ExportResult
 } from '~/utils/exporters'
@@ -71,6 +74,15 @@ const generateConfig = (format: string, isDark: boolean): string => {
     case 'tweakcc':
       result = exportTweakcc(palette, baseThemeName)
       break
+    case 'neomutt':
+      result = exportNeomutt(palette, baseThemeName)
+      break
+    case 'wezterm':
+      result = exportWezterm(palette, baseThemeName)
+      break
+    case 'alacritty':
+      result = exportAlacritty(palette, baseThemeName)
+      break
     case 'iterm':
       // iTerm not yet migrated to new exporter system
       return serializeItermTheme(themeColors, `${baseThemeName}-${mode}`)
@@ -120,6 +132,12 @@ const generateExport = (format: string, isDark: boolean): ExportResult => {
       return exportZsh(palette, themeName)
     case 'tweakcc':
       return exportTweakcc(palette, themeName)
+    case 'neomutt':
+      return exportNeomutt(palette, themeName)
+    case 'wezterm':
+      return exportWezterm(palette, themeName)
+    case 'alacritty':
+      return exportAlacritty(palette, themeName)
     case 'iterm':
       // iTerm not yet migrated - create ExportResult manually
       return {
@@ -399,6 +417,12 @@ const generateExportFromPalette = (format: string, palette: any, isDark: boolean
       return exportZsh(palette, themeName)
     case 'tweakcc':
       return exportTweakcc(palette, themeName)
+    case 'neomutt':
+      return exportNeomutt(palette, themeName)
+    case 'wezterm':
+      return exportWezterm(palette, themeName)
+    case 'alacritty':
+      return exportAlacritty(palette, themeName)
     default:
       return exportGhostty(palette, themeName)
   }
