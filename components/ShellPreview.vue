@@ -5,13 +5,13 @@ const { colors, options } = useTheme()
 const p10kPrompt = {
   dir: { text: '~/metaverse', bg: 'base', fg: 'bg' },
   git: { text: ' main', icon: '', bg: 'success', fg: 'bg' },
-  status: { text: '✓', bg: 'success', fg: 'bg' }
+  status: { text: '✓', bg: 'success', fg: 'bg' },
 }
 
 const p10kPromptModified = {
   dir: { text: '~/metaverse', bg: 'base', fg: 'bg' },
   git: { text: ' main', icon: '', bg: 'warning', fg: 'bg' },
-  status: { text: '±3', bg: 'warning', fg: 'bg' }
+  status: { text: '±3', bg: 'warning', fg: 'bg' },
 }
 
 const commands = [
@@ -23,8 +23,8 @@ const commands = [
       { text: 'npm', color: 'base' },
       { text: ' run', color: 'keyword' },
       { text: ' ', color: 'fg' },
-      { text: 'dev', color: 'string' }
-    ]
+      { text: 'dev', color: 'string' },
+    ],
   },
   { text: '> nuxt dev', type: 'output' },
   { text: '', type: 'empty' },
@@ -41,11 +41,11 @@ const commands = [
     prompt: p10kPromptModified,
     parts: [
       { text: 'git', color: 'base' },
-      { text: ' status', color: 'keyword' }
-    ]
+      { text: ' status', color: 'keyword' },
+    ],
   },
   { text: 'On branch main', type: 'output' },
-  { text: 'Your branch is ahead of \'origin/main\' by 3 commits.', type: 'info' },
+  { text: "Your branch is ahead of 'origin/main' by 3 commits.", type: 'info' },
   { text: '', type: 'empty' },
   { text: 'Changes not staged for commit:', type: 'warning' },
   { text: '  (use "git add <file>..." to jack in)', type: 'comment' },
@@ -63,8 +63,8 @@ const commands = [
       { text: ' $DESERT_OF_THE_REAL', color: 'variable' },
       { text: '"', color: 'string' },
       { text: ' >', color: 'operator' },
-      { text: ' ~/.matrix/red_pill.txt', color: 'string' }
-    ]
+      { text: ' ~/.matrix/red_pill.txt', color: 'string' },
+    ],
   },
   { text: '', type: 'empty' },
   {
@@ -72,8 +72,8 @@ const commands = [
     prompt: p10kPrompt,
     parts: [
       { text: 'pnpm', color: 'base' },
-      { text: ' test', color: 'keyword' }
-    ]
+      { text: ' test', color: 'keyword' },
+    ],
   },
   { text: '> metaverse@0.42.0 test', type: 'output' },
   { text: '> vitest run --mode=hyperreal', type: 'output' },
@@ -90,23 +90,42 @@ const commands = [
 
 const getColor = (type: string) => {
   switch (type) {
-    case 'success': return colors.value.string
-    case 'error': return colors.value.error
-    case 'warning': return colors.value.warning
-    case 'info': return colors.value.function
-    case 'comment': return colors.value.comment
-    case 'modified': return colors.value.warning
-    case 'untracked': return colors.value.error
-    case 'output': return colors.value.fg
-    default: return colors.value.fg
+    case 'success':
+      return colors.value.string
+    case 'error':
+      return colors.value.error
+    case 'warning':
+      return colors.value.warning
+    case 'info':
+      return colors.value.function
+    case 'comment':
+      return colors.value.comment
+    case 'modified':
+      return colors.value.warning
+    case 'untracked':
+      return colors.value.error
+    case 'output':
+      return colors.value.fg
+    default:
+      return colors.value.fg
   }
 }
 </script>
 
 <template>
   <div class="shell" :style="{ background: colors.bg, color: colors.fg }">
-    <div class="shell-header" :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30` }">
-      <div class="tab" :style="{ background: colors.base + '20', color: colors.base, borderRight: `1px solid ${colors.base}40` }">
+    <div
+      class="shell-header"
+      :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30` }"
+    >
+      <div
+        class="tab"
+        :style="{
+          background: colors.base + '20',
+          color: colors.base,
+          borderRight: `1px solid ${colors.base}40`,
+        }"
+      >
         zsh
       </div>
       <div class="tab-controls" :style="{ color: colors.comment }">
@@ -124,7 +143,7 @@ const getColor = (type: string) => {
         :style="{
           background: line.highlight ? colors.base + '10' : 'transparent',
           borderLeft: line.highlight ? `2px solid ${colors.base}` : 'none',
-          paddingLeft: line.highlight ? '10px' : '12px'
+          paddingLeft: line.highlight ? '10px' : '12px',
         }"
       >
         <!-- Powerlevel10k-style prompt with syntax highlighting -->
@@ -137,7 +156,7 @@ const getColor = (type: string) => {
                 background: colors[line.prompt.dir.bg],
                 color: colors[line.prompt.dir.fg],
                 padding: '2px 8px',
-                marginRight: '2px'
+                marginRight: '2px',
               }"
             >
               {{ line.prompt.dir.text }}
@@ -149,7 +168,7 @@ const getColor = (type: string) => {
                 background: colors[line.prompt.git.bg],
                 color: colors[line.prompt.git.fg],
                 padding: '2px 8px',
-                marginRight: '2px'
+                marginRight: '2px',
               }"
             >
               <span>{{ line.prompt.git.icon }}</span>
@@ -162,17 +181,15 @@ const getColor = (type: string) => {
                 background: colors[line.prompt.status.bg],
                 color: colors[line.prompt.status.fg],
                 padding: '2px 8px',
-                marginRight: '8px'
+                marginRight: '8px',
               }"
             >
               {{ line.prompt.status.text }}
             </span>
             <!-- Syntax-highlighted command parts -->
-            <span
-              v-for="(part, j) in line.parts"
-              :key="j"
-              :style="{ color: colors[part.color] }"
-            >{{ part.text }}</span>
+            <span v-for="(part, j) in line.parts" :key="j" :style="{ color: colors[part.color] }">{{
+              part.text
+            }}</span>
           </div>
         </template>
         <!-- Regular input (old style) -->
@@ -188,7 +205,14 @@ const getColor = (type: string) => {
       </div>
     </div>
 
-    <div class="shell-status" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}30`, color: colors.comment }">
+    <div
+      class="shell-status"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}30`,
+        color: colors.comment,
+      }"
+    >
       <span :style="{ color: colors.base }">●</span>
       <span>zsh</span>
       <span :style="{ marginLeft: 'auto' }">3 jobs running</span>

@@ -11,10 +11,7 @@ import chroma from 'chroma-js'
  * @param themeName - Name of the theme
  * @returns tweakcc theme configuration as JSON
  */
-export function exportTweakcc(
-  palette: ThemePalette,
-  themeName: string = 'vulpes'
-): ExportResult {
+export function exportTweakcc(palette: ThemePalette, themeName: string = 'vulpes'): ExportResult {
   // Helper: Create shimmer effect (lighter/more saturated version)
   const shimmer = (color: string): string => {
     try {
@@ -43,40 +40,40 @@ export function exportTweakcc(
       // ========================================================================
       // CORE UI ELEMENTS (8 properties)
       // ========================================================================
-      autoAccept: palette.success,              // Auto-accept mode indicator
-      bashBorder: palette.base,                 // Bash command border
-      promptBorder: palette.base,               // Input prompt border
+      autoAccept: palette.success, // Auto-accept mode indicator
+      bashBorder: palette.base, // Bash command border
+      promptBorder: palette.base, // Input prompt border
       promptBorderShimmer: shimmer(palette.base), // Input prompt shimmer
-      background: palette.bg,                   // Background for UI elements
-      planMode: palette.info,                   // Plan mode indicator
-      ide: palette.info,                        // IDE-related messages
-      remember: palette.hint,                   // Memory-related text
+      background: palette.bg, // Background for UI elements
+      planMode: palette.info, // Plan mode indicator
+      ide: palette.info, // IDE-related messages
+      remember: palette.hint, // Memory-related text
 
       // ========================================================================
       // CLAUDE BRANDING (4 properties)
       // ========================================================================
-      claude: palette.base,                     // Logo, welcome, thinking text
-      claudeShimmer: shimmer(palette.base),     // Thinking verb shimmer
+      claude: palette.base, // Logo, welcome, thinking text
+      claudeShimmer: shimmer(palette.base), // Thinking verb shimmer
       claudeBlue_FOR_SYSTEM_SPINNER: palette.base,
       claudeBlueShimmer_FOR_SYSTEM_SPINNER: shimmer(palette.base),
 
       // ========================================================================
       // TEXT STYLING (7 properties)
       // ========================================================================
-      text: palette.fg,                         // Code color in diffs
-      inverseText: palette.bg,                  // Tab text with filled background
-      inactive: palette.comment,                // Line numbers, less prominent text
-      subtle: dimmed(palette.comment),          // Help text, secondary info
-      suggestion: palette.hint,                 // Theme name suggestions, UI hints
-      permission: palette.warning,              // Permission prompt color
+      text: palette.fg, // Code color in diffs
+      inverseText: palette.bg, // Tab text with filled background
+      inactive: palette.comment, // Line numbers, less prominent text
+      subtle: dimmed(palette.comment), // Help text, secondary info
+      suggestion: palette.hint, // Theme name suggestions, UI hints
+      permission: palette.warning, // Permission prompt color
       permissionShimmer: shimmer(palette.warning), // Permission shimmer
 
       // ========================================================================
       // STATUS INDICATORS (4 properties)
       // ========================================================================
-      success: palette.success,                 // Successful tool calls
-      error: palette.error,                     // Error indicator
-      warning: palette.warning,                 // Warning indicator
+      success: palette.success, // Successful tool calls
+      error: palette.error, // Error indicator
+      warning: palette.warning, // Warning indicator
       warningShimmer: shimmer(palette.warning), // Warning shimmer
 
       // ========================================================================
@@ -102,7 +99,7 @@ export function exportTweakcc(
       purple_FOR_SUBAGENTS_ONLY: palette.type,
       orange_FOR_SUBAGENTS_ONLY: palette.warning, // Reuse warning (orange-ish)
       pink_FOR_SUBAGENTS_ONLY: palette.macro,
-      cyan_FOR_SUBAGENTS_ONLY: palette.info,      // Reuse info (cyan-ish)
+      cyan_FOR_SUBAGENTS_ONLY: palette.info, // Reuse info (cyan-ish)
 
       // ========================================================================
       // RAINBOW/ULTRATHINK COLORS (14 properties)
@@ -126,19 +123,19 @@ export function exportTweakcc(
       // ========================================================================
       // CHARACTER & CONTEXT (5 properties)
       // ========================================================================
-      professionalBlue: palette.base,           // Professional contexts
-      clawd_body: palette.base,                 // "Clawd" character body
-      clawd_background: palette.bg_alt,         // "Clawd" character background
-      userMessageBackground: palette.bg_alt,    // User message background
+      professionalBlue: palette.base, // Professional contexts
+      clawd_body: palette.base, // "Clawd" character body
+      clawd_background: palette.bg_alt, // "Clawd" character background
+      userMessageBackground: palette.bg_alt, // User message background
       bashMessageBackgroundColor: chroma(palette.bg_alt).darken(0.2).hex(),
       memoryBackgroundColor: chroma(palette.hint).alpha(0.1).hex(),
 
       // ========================================================================
       // RATE LIMITING (2 properties)
       // ========================================================================
-      rate_limit_fill: palette.warning,         // Rate limit indicator fill
+      rate_limit_fill: palette.warning, // Rate limit indicator fill
       rate_limit_empty: dimmed(palette.comment), // Rate limit indicator empty
-    }
+    },
   }
 
   // Generate JSON with proper formatting
@@ -214,8 +211,8 @@ https://github.com/yourusername/vulpes-theme-lab
       instructions,
       schemaVersion: '1.0',
       colorCount: 56,
-      generatedAt: new Date().toISOString()
-    }
+      generatedAt: new Date().toISOString(),
+    },
   }
 }
 

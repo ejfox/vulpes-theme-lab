@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   devServer: {
-    port: 3322
+    port: 3322,
   },
   // GitHub Pages deployment
   app: {

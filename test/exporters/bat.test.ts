@@ -49,7 +49,7 @@ describe('Bat Exporter', () => {
       'storage.type',
     ]
 
-    requiredScopes.forEach(scope => {
+    requiredScopes.forEach((scope) => {
       expect(content).toContain(scope)
     })
   })
@@ -62,7 +62,7 @@ describe('Bat Exporter', () => {
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
-    colorMatches!.forEach(color => {
+    colorMatches!.forEach((color) => {
       expect(isValidHexColor(color)).toBe(true)
     })
   })

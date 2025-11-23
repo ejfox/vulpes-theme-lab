@@ -77,7 +77,9 @@ export function isValidHexColor(color: string): boolean {
  * Validates that content contains no placeholder values
  */
 export function hasNoPlaceholders(content: string): boolean {
-  return !content.includes('undefined') &&
-         !content.includes('null') &&
-         !content.includes('[object Object]')
+  return (
+    !content.includes('undefined') &&
+    !content.includes('null') &&
+    !content.includes('[object Object]')
+  )
 }

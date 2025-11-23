@@ -125,13 +125,7 @@ const showLabels = ref(false)
       </defs>
 
       <!-- Center dot -->
-      <circle
-        cx="0"
-        cy="0"
-        r="2"
-        :fill="colors.comment"
-        opacity="0.3"
-      />
+      <circle cx="0" cy="0" r="2" :fill="colors.comment" opacity="0.3" />
 
       <!-- Concentric saturation rings -->
       <circle
@@ -166,11 +160,7 @@ const showLabels = ref(false)
 
       <!-- Theme color points -->
       <g class="color-points">
-        <g
-          v-for="point in colorPoints"
-          :key="point.name"
-          class="point-group"
-        >
+        <g v-for="point in colorPoints" :key="point.name" class="point-group">
           <!-- Color dot -->
           <circle
             :cx="point.x"
@@ -265,7 +255,12 @@ const showLabels = ref(false)
 .color-dot,
 .ansi-dot {
   /* Smooth transitions when colors change */
-  transition: cx 0.3s ease, cy 0.3s ease, r 0.2s ease, opacity 0.2s ease, fill 0.3s ease;
+  transition:
+    cx 0.3s ease,
+    cy 0.3s ease,
+    r 0.2s ease,
+    opacity 0.2s ease,
+    fill 0.3s ease;
   cursor: pointer;
 }
 

@@ -8,42 +8,42 @@ import type { ThemeColors } from '~/composables/useTheme'
  */
 export interface ThemePalette {
   // Base colors
-  bg: string           // Main background
-  bg_alt: string       // Alternate background (panels, sidebars)
-  fg: string           // Main foreground text
-  base: string         // Primary accent color
+  bg: string // Main background
+  bg_alt: string // Alternate background (panels, sidebars)
+  fg: string // Main foreground text
+  base: string // Primary accent color
 
   // Semantic status colors
-  error: string        // Red for errors
-  warning: string      // Yellow/orange for warnings
-  success: string      // Green for success states
-  info: string         // Blue for informational
-  hint: string         // Subtle hints/suggestions
+  error: string // Red for errors
+  warning: string // Yellow/orange for warnings
+  success: string // Green for success states
+  info: string // Blue for informational
+  hint: string // Subtle hints/suggestions
 
   // Syntax highlighting
-  comment: string      // Comments
-  keyword: string      // Keywords (if, else, function)
-  string: string       // String literals
-  number: string       // Numeric literals
-  boolean: string      // Boolean values
-  function: string     // Function names
-  constant: string     // Constants
-  type: string         // Type names
-  variable: string     // Variables
-  operator: string     // Operators
-  builtin: string      // Built-in functions/types
-  parameter: string    // Function parameters
-  property: string     // Object properties
-  namespace: string    // Namespaces/modules
-  macro: string        // Preprocessor macros
-  tag: string          // HTML/XML tags
-  punctuation: string  // Delimiters and punctuation
-  heading: string      // Markdown headings
+  comment: string // Comments
+  keyword: string // Keywords (if, else, function)
+  string: string // String literals
+  number: string // Numeric literals
+  boolean: string // Boolean values
+  function: string // Function names
+  constant: string // Constants
+  type: string // Type names
+  variable: string // Variables
+  operator: string // Operators
+  builtin: string // Built-in functions/types
+  parameter: string // Function parameters
+  property: string // Object properties
+  namespace: string // Namespaces/modules
+  macro: string // Preprocessor macros
+  tag: string // HTML/XML tags
+  punctuation: string // Delimiters and punctuation
+  heading: string // Markdown headings
 
   // UI elements
-  selection: string    // Selected text background
-  cursor: string       // Cursor color
-  cursorline: string   // Current line highlight
+  selection: string // Selected text background
+  cursor: string // Cursor color
+  cursorline: string // Current line highlight
 
   // ANSI palette (0-15)
   palette: Record<number, string>
@@ -62,14 +62,10 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
 
   // Create alternate background (slightly lighter/darker than main bg)
   const bgColor = chroma(colors.bg)
-  const bg_alt = isDark
-    ? bgColor.brighten(0.3).hex()
-    : bgColor.darken(0.15).hex()
+  const bg_alt = isDark ? bgColor.brighten(0.3).hex() : bgColor.darken(0.15).hex()
 
   // Create subtle cursorline (very subtle bg variation)
-  const cursorline = isDark
-    ? bgColor.brighten(0.15).hex()
-    : bgColor.darken(0.08).hex()
+  const cursorline = isDark ? bgColor.brighten(0.15).hex() : bgColor.darken(0.08).hex()
 
   return {
     // Base colors (direct mapping)
@@ -81,8 +77,8 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
     // Semantic status colors
     error: colors.error,
     warning: colors.warning,
-    success: colors.palette[2],   // ANSI green - perfect for success
-    info: colors.palette[4],      // ANSI blue - perfect for info
+    success: colors.palette[2], // ANSI green - perfect for success
+    info: colors.palette[4], // ANSI blue - perfect for info
     hint: colors.hint,
 
     // Syntax highlighting (direct mapping from granular colors)
@@ -90,7 +86,7 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
     keyword: colors.keyword,
     string: colors.string,
     number: colors.number,
-    boolean: colors.constant,     // Reuse constant color for booleans
+    boolean: colors.constant, // Reuse constant color for booleans
     function: colors.function,
     constant: colors.constant,
     type: colors.type,
@@ -106,8 +102,8 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
     heading: colors.heading,
 
     // UI elements
-    selection: colors.warning,    // Use warning color for selection (high visibility)
-    cursor: colors.base,          // Use base accent for cursor
+    selection: colors.warning, // Use warning color for selection (high visibility)
+    cursor: colors.base, // Use base accent for cursor
     cursorline,
 
     // ANSI palette (direct passthrough)
@@ -118,7 +114,17 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
 /**
  * Export format types supported by the theme lab
  */
-export type ExportFormat = 'ghostty' | 'neovim' | 'bat' | 'yazi' | 'lazygit' | 'zsh' | 'tweakcc' | 'neomutt' | 'wezterm' | 'alacritty'
+export type ExportFormat =
+  | 'ghostty'
+  | 'neovim'
+  | 'bat'
+  | 'yazi'
+  | 'lazygit'
+  | 'zsh'
+  | 'tweakcc'
+  | 'neomutt'
+  | 'wezterm'
+  | 'alacritty'
 
 /**
  * Result of a theme export operation
@@ -127,5 +133,5 @@ export interface ExportResult {
   filename: string
   content: string
   format: ExportFormat
-  metadata?: Record<string, any>  // Optional metadata for exporters
+  metadata?: Record<string, any> // Optional metadata for exporters
 }

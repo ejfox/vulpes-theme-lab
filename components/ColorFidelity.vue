@@ -14,22 +14,17 @@ const fidelityData = computed(() => {
   let count = 0
 
   // Sample a few key colors
-  const samples = [
-    colors.value.base,
-    colors.value.error,
-    colors.value.success,
-    colors.value.string
-  ]
+  const samples = [colors.value.base, colors.value.error, colors.value.success, colors.value.string]
 
-  samples.forEach(color => {
+  samples.forEach((color) => {
     try {
       const intended = chroma(color)
       // Simulate 8-bit quantization per channel
       const [r, g, b] = intended.rgb()
       const quantized = chroma(
-        Math.round(r / 255 * 255),
-        Math.round(g / 255 * 255),
-        Math.round(b / 255 * 255)
+        Math.round((r / 255) * 255),
+        Math.round((g / 255) * 255),
+        Math.round((b / 255) * 255)
       )
 
       // Delta E - perceptual color difference
@@ -48,7 +43,7 @@ const fidelityData = computed(() => {
     fidelity: fidelity.toFixed(1),
     // Gap between map and territory
     loss: (100 - fidelity).toFixed(1),
-    shouldShow: (100 - fidelity) > 0.1
+    shouldShow: 100 - fidelity > 0.1,
   }
 })
 </script>
@@ -59,7 +54,7 @@ const fidelityData = computed(() => {
     class="fidelity-note"
     :style="{
       color: colors.comment,
-      borderTop: `1px solid ${colors.comment}15`
+      borderTop: `1px solid ${colors.comment}15`,
     }"
   >
     <span class="label">terminal fidelity:</span>

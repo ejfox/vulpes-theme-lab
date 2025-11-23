@@ -2,11 +2,41 @@
 const { colors, options } = useTheme()
 
 const commits = [
-  { hash: 'c0ffee0', msg: 'fix: patch reality.construct memory leak', author: 'neo', time: '2m ago', selected: false },
-  { hash: 'deadbee', msg: 'feat: jack into the metaverse mainframe', author: 'hiro', time: '1h ago', selected: true },
-  { hash: 'facade1', msg: 'refactor: simulacrum rendering pipeline', author: 'raven', time: '3h ago', selected: false },
-  { hash: 'badc0de', msg: 'chore: update desert_of_the_real.toml', author: 'morpheus', time: '5h ago', selected: false },
-  { hash: 'a11c47', msg: 'test: verify red pill compatibility', author: 'trinity', time: '1d ago', selected: false },
+  {
+    hash: 'c0ffee0',
+    msg: 'fix: patch reality.construct memory leak',
+    author: 'neo',
+    time: '2m ago',
+    selected: false,
+  },
+  {
+    hash: 'deadbee',
+    msg: 'feat: jack into the metaverse mainframe',
+    author: 'hiro',
+    time: '1h ago',
+    selected: true,
+  },
+  {
+    hash: 'facade1',
+    msg: 'refactor: simulacrum rendering pipeline',
+    author: 'raven',
+    time: '3h ago',
+    selected: false,
+  },
+  {
+    hash: 'badc0de',
+    msg: 'chore: update desert_of_the_real.toml',
+    author: 'morpheus',
+    time: '5h ago',
+    selected: false,
+  },
+  {
+    hash: 'a11c47',
+    msg: 'test: verify red pill compatibility',
+    author: 'trinity',
+    time: '1d ago',
+    selected: false,
+  },
 ]
 
 const files = [
@@ -30,15 +60,19 @@ const branches = [
 </script>
 
 <template>
-  <div class="lazygit" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.comment }">
+  <div
+    class="lazygit"
+    :style="{ background: colors.bg, color: colors.fg, borderColor: colors.comment }"
+  >
     <!-- Branch info header -->
-    <div class="branch-header" :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}` }">
+    <div
+      class="branch-header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}` }"
+    >
       <span :style="{ color: colors.base, fontWeight: 'bold' }">
         <span :style="{ fontSize: '10px' }">⎇</span> main
       </span>
-      <span :style="{ color: colors.hint, fontSize: '8px', marginLeft: '8px' }">
-        ↑3 ↓0
-      </span>
+      <span :style="{ color: colors.hint, fontSize: '8px', marginLeft: '8px' }"> ↑3 ↓0 </span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.comment }">
         origin/main
       </span>
@@ -53,16 +87,26 @@ const branches = [
           :key="file.name"
           class="file-item"
           :class="{ selected: idx === 0 }"
-          :style="idx === 0 ? { background: colors.base + '20', borderLeft: `2px solid ${colors.base}` } : {}"
+          :style="
+            idx === 0
+              ? { background: colors.base + '20', borderLeft: `2px solid ${colors.base}` }
+              : {}
+          "
         >
           <span
             class="file-status"
             :style="{
-              color: file.status === 'M' ? colors.warning :
-                     file.status === 'A' ? colors.hint :
-                     file.status === 'D' ? colors.error : colors.fg
+              color:
+                file.status === 'M'
+                  ? colors.warning
+                  : file.status === 'A'
+                    ? colors.hint
+                    : file.status === 'D'
+                      ? colors.error
+                      : colors.fg,
             }"
-          >{{ file.status }}</span>
+            >{{ file.status }}</span
+          >
           <span class="file-name">{{ file.name }}</span>
           <span class="file-stats" :style="{ color: colors.comment }">
             <span :style="{ color: colors.hint }">+{{ file.insertions }}</span>
@@ -76,14 +120,12 @@ const branches = [
     <div class="panel stash-panel">
       <div class="panel-header" :style="{ color: colors.keyword }">▼ Stash</div>
       <div class="stash-list">
-        <div
-          v-for="stash in stashes"
-          :key="stash.id"
-          class="stash-item"
-        >
+        <div v-for="stash in stashes" :key="stash.id" class="stash-item">
           <span class="stash-id" :style="{ color: colors.warning }">{{ stash.id }}</span>
           <span class="stash-msg">{{ stash.msg }}</span>
-          <span class="stash-branch" :style="{ color: colors.hint, fontSize: '8px' }">{{ stash.branch }}</span>
+          <span class="stash-branch" :style="{ color: colors.hint, fontSize: '8px' }">{{
+            stash.branch
+          }}</span>
         </div>
       </div>
     </div>
@@ -96,28 +138,48 @@ const branches = [
           v-for="commit in commits"
           :key="commit.hash"
           class="commit-item"
-          :style="commit.selected ? { background: colors.base + '20', borderLeft: `2px solid ${colors.base}`, paddingLeft: '4px' } : {}"
+          :style="
+            commit.selected
+              ? {
+                  background: colors.base + '20',
+                  borderLeft: `2px solid ${colors.base}`,
+                  paddingLeft: '4px',
+                }
+              : {}
+          "
         >
           <span class="commit-hash" :style="{ color: colors.warning }">{{ commit.hash }}</span>
-          <span class="commit-msg" :style="{ color: commit.selected ? colors.base : colors.fg }">{{ commit.msg }}</span>
-          <span class="commit-author" :style="{ color: colors.comment, fontSize: '8px' }">{{ commit.author }}</span>
+          <span class="commit-msg" :style="{ color: commit.selected ? colors.base : colors.fg }">{{
+            commit.msg
+          }}</span>
+          <span class="commit-author" :style="{ color: colors.comment, fontSize: '8px' }">{{
+            commit.author
+          }}</span>
           <span class="commit-time" :style="{ color: colors.comment }">{{ commit.time }}</span>
         </div>
       </div>
     </div>
 
     <!-- Command bar -->
-    <div class="command-bar" :style="{ background: colors.base + '10', borderTop: `1px solid ${colors.comment}40` }">
+    <div
+      class="command-bar"
+      :style="{ background: colors.base + '10', borderTop: `1px solid ${colors.comment}40` }"
+    >
       <span :style="{ color: colors.base }">▸</span>
-      <span :style="{ color: colors.keyword }">s</span><span :style="{ color: colors.comment }">tage</span>
+      <span :style="{ color: colors.keyword }">s</span
+      ><span :style="{ color: colors.comment }">tage</span>
       <span :style="{ color: colors.comment, margin: '0 4px' }">|</span>
-      <span :style="{ color: colors.keyword }">c</span><span :style="{ color: colors.comment }">ommit</span>
+      <span :style="{ color: colors.keyword }">c</span
+      ><span :style="{ color: colors.comment }">ommit</span>
       <span :style="{ color: colors.comment, margin: '0 4px' }">|</span>
-      <span :style="{ color: colors.keyword }">P</span><span :style="{ color: colors.comment }">ush</span>
+      <span :style="{ color: colors.keyword }">P</span
+      ><span :style="{ color: colors.comment }">ush</span>
       <span :style="{ color: colors.comment, margin: '0 4px' }">|</span>
-      <span :style="{ color: colors.keyword }">p</span><span :style="{ color: colors.comment }">ull</span>
+      <span :style="{ color: colors.keyword }">p</span
+      ><span :style="{ color: colors.comment }">ull</span>
       <span :style="{ color: colors.comment, margin: '0 4px' }">|</span>
-      <span :style="{ color: colors.keyword }">b</span><span :style="{ color: colors.comment }">ranch</span>
+      <span :style="{ color: colors.keyword }">b</span
+      ><span :style="{ color: colors.comment }">ranch</span>
     </div>
   </div>
 </template>
@@ -156,7 +218,9 @@ const branches = [
   font-size: 10px;
 }
 
-.file-list, .commit-list, .stash-list {
+.file-list,
+.commit-list,
+.stash-list {
   display: flex;
   flex-direction: column;
   gap: 2px;

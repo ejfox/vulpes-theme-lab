@@ -27,14 +27,25 @@ const showPreview = ref(false)
     <div class="modal" :style="{ background: colors.bg, color: colors.fg }" @click.stop>
       <!-- Header -->
       <div class="modal-header" :style="{ borderBottom: `1px solid ${colors.error}` }">
-        <span :style="{ color: colors.error, fontSize: '11px' }">╔══[ <span class="blink">!</span> WCAG VALIDATION FAILED ]══════════════════════════════════╗</span>
+        <span :style="{ color: colors.error, fontSize: '11px' }"
+          >╔══[ <span class="blink">!</span> WCAG VALIDATION FAILED
+          ]══════════════════════════════════╗</span
+        >
       </div>
 
       <!-- Issue Summary -->
       <div class="modal-body">
-        <div class="summary" :style="{ background: colors.error + '10', borderLeft: `3px solid ${colors.error}`, padding: '12px' }">
+        <div
+          class="summary"
+          :style="{
+            background: colors.error + '10',
+            borderLeft: `3px solid ${colors.error}`,
+            padding: '12px',
+          }"
+        >
           <div :style="{ fontWeight: 'bold', marginBottom: '8px', color: colors.error }">
-            ║ ERROR: {{ issues.length }} color{{ issues.length > 1 ? 's' : '' }} fail WCAG AA (4.5:1)
+            ║ ERROR: {{ issues.length }} color{{ issues.length > 1 ? 's' : '' }} fail WCAG AA
+            (4.5:1)
           </div>
           <div :style="{ fontSize: '9px', color: colors.comment }">
             ║ Insufficient contrast detected. Low vision accessibility compromised.
@@ -49,7 +60,7 @@ const showPreview = ref(false)
             class="issue-item"
             :style="{
               background: colors.bg_alt,
-              borderLeft: `3px solid ${issue.severity === 'critical' ? colors.error : colors.warning}`
+              borderLeft: `3px solid ${issue.severity === 'critical' ? colors.error : colors.warning}`,
             }"
           >
             <div class="issue-header">
@@ -61,7 +72,7 @@ const showPreview = ref(false)
                   color: colors.bg,
                   fontSize: '7px',
                   padding: '2px 6px',
-                  borderRadius: '2px'
+                  borderRadius: '2px',
                 }"
               >
                 {{ issue.severity === 'critical' ? 'CRITICAL' : 'WARNING' }}
@@ -76,7 +87,10 @@ const showPreview = ref(false)
 
         <!-- Fix Preview -->
         <div v-if="showPreview && fixPreview.changes.length > 0" class="fix-preview">
-          <div class="preview-header" :style="{ color: colors.success, fontWeight: 'bold', marginBottom: '8px' }">
+          <div
+            class="preview-header"
+            :style="{ color: colors.success, fontWeight: 'bold', marginBottom: '8px' }"
+          >
             Auto-Fix Preview
           </div>
           <div
@@ -88,13 +102,23 @@ const showPreview = ref(false)
             <div :style="{ fontWeight: 'bold', fontSize: '9px' }">{{ change.color }}</div>
             <div class="color-comparison">
               <div class="color-before">
-                <div class="swatch" :style="{ background: change.old, width: '40px', height: '20px' }"></div>
-                <span :style="{ fontSize: '8px', color: colors.error }">{{ change.oldRatio.toFixed(2) }}:1</span>
+                <div
+                  class="swatch"
+                  :style="{ background: change.old, width: '40px', height: '20px' }"
+                ></div>
+                <span :style="{ fontSize: '8px', color: colors.error }"
+                  >{{ change.oldRatio.toFixed(2) }}:1</span
+                >
               </div>
               <span :style="{ color: colors.comment }">→</span>
               <div class="color-after">
-                <div class="swatch" :style="{ background: change.new, width: '40px', height: '20px' }"></div>
-                <span :style="{ fontSize: '8px', color: colors.success }">{{ change.newRatio.toFixed(2) }}:1 ✓</span>
+                <div
+                  class="swatch"
+                  :style="{ background: change.new, width: '40px', height: '20px' }"
+                ></div>
+                <span :style="{ fontSize: '8px', color: colors.success }"
+                  >{{ change.newRatio.toFixed(2) }}:1 ✓</span
+                >
               </div>
             </div>
           </div>
@@ -109,7 +133,7 @@ const showPreview = ref(false)
           :style="{
             background: 'transparent',
             border: `1px solid ${colors.comment}`,
-            color: colors.comment
+            color: colors.comment,
           }"
         >
           {{ showPreview ? 'Hide' : 'Preview' }} Changes
@@ -121,7 +145,7 @@ const showPreview = ref(false)
           :style="{
             background: 'transparent',
             border: `1px solid ${colors.comment}`,
-            color: colors.comment
+            color: colors.comment,
           }"
         >
           Cancel
@@ -133,7 +157,7 @@ const showPreview = ref(false)
           :style="{
             background: colors.warning + '20',
             border: `1px solid ${colors.warning}`,
-            color: colors.warning
+            color: colors.warning,
           }"
         >
           Export + Report
@@ -146,7 +170,7 @@ const showPreview = ref(false)
             background: 'transparent',
             border: `1px solid ${colors.error}40`,
             color: colors.error,
-            opacity: 0.6
+            opacity: 0.6,
           }"
         >
           Export Anyway
@@ -159,7 +183,7 @@ const showPreview = ref(false)
             background: colors.success,
             color: colors.bg,
             fontWeight: 'bold',
-            border: 'none'
+            border: 'none',
           }"
         >
           ✓ Auto-Fix & Export
@@ -191,7 +215,8 @@ const showPreview = ref(false)
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -200,7 +225,8 @@ const showPreview = ref(false)
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {
@@ -301,14 +327,30 @@ const showPreview = ref(false)
   animation: slideUp 0.3s ease-out backwards;
 }
 
-.issue-item:nth-child(1) { animation-delay: 0.05s; }
-.issue-item:nth-child(2) { animation-delay: 0.1s; }
-.issue-item:nth-child(3) { animation-delay: 0.15s; }
-.issue-item:nth-child(4) { animation-delay: 0.2s; }
-.issue-item:nth-child(5) { animation-delay: 0.25s; }
-.issue-item:nth-child(6) { animation-delay: 0.3s; }
-.issue-item:nth-child(7) { animation-delay: 0.35s; }
-.issue-item:nth-child(8) { animation-delay: 0.4s; }
+.issue-item:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.issue-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.issue-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.issue-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.issue-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.issue-item:nth-child(6) {
+  animation-delay: 0.3s;
+}
+.issue-item:nth-child(7) {
+  animation-delay: 0.35s;
+}
+.issue-item:nth-child(8) {
+  animation-delay: 0.4s;
+}
 
 .issue-header {
   display: flex;
@@ -390,7 +432,9 @@ const showPreview = ref(false)
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition:
+    width 0.6s,
+    height 0.6s;
 }
 
 .btn:active::before {

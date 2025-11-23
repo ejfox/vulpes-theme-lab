@@ -18,7 +18,7 @@ const contrastChecks = computed(() => {
     { label: 'Errors', fg: colors.value.error, bg: colors.value.bg },
     { label: 'Warnings', fg: colors.value.warning, bg: colors.value.bg },
     { label: 'Success', fg: colors.value.success, bg: colors.value.bg },
-  ].map(pair => ({
+  ].map((pair) => ({
     ...pair,
     ratio: getContrastRatio(pair.fg, pair.bg),
     meetsAA: meetsWCAG(getContrastRatio(pair.fg, pair.bg), 'AA'),
@@ -35,10 +35,10 @@ const contrastChecks = computed(() => {
       :style="{
         background: accessibility.passed ? colors.success + '15' : colors.error + '15',
         borderBottom: `2px solid ${accessibility.passed ? colors.success : colors.error}`,
-        color: accessibility.passed ? colors.success : colors.error
+        color: accessibility.passed ? colors.success : colors.error,
       }"
     >
-      <span style="font-weight: bold;">
+      <span style="font-weight: bold">
         {{ accessibility.passed ? '✓' : '⚠' }}
         WCAG Contrast Validation
       </span>
@@ -48,13 +48,20 @@ const contrastChecks = computed(() => {
     </div>
 
     <!-- Summary -->
-    <div class="summary" :style="{ borderBottom: `1px solid ${colors.comment}30`, padding: '12px' }">
+    <div
+      class="summary"
+      :style="{ borderBottom: `1px solid ${colors.comment}30`, padding: '12px' }"
+    >
       <div class="summary-item">
-        <span :style="{ color: colors.success }">{{ accessibility.total - accessibility.failed }} passed</span>
+        <span :style="{ color: colors.success }"
+          >{{ accessibility.total - accessibility.failed }} passed</span
+        >
       </div>
       <div v-if="accessibility.warnings > 0" class="summary-item">
         <span :style="{ color: colors.warning }">{{ accessibility.warnings }} warnings</span>
-        <span :style="{ fontSize: '8px', color: colors.comment, marginLeft: '4px' }">(3:1 - 4.5:1)</span>
+        <span :style="{ fontSize: '8px', color: colors.comment, marginLeft: '4px' }"
+          >(3:1 - 4.5:1)</span
+        >
       </div>
       <div v-if="accessibility.critical > 0" class="summary-item">
         <span :style="{ color: colors.error }">{{ accessibility.critical }} critical</span>
@@ -70,7 +77,7 @@ const contrastChecks = computed(() => {
         class="check-item"
         :style="{
           borderLeft: `3px solid ${check.meetsAA ? colors.success : colors.error}`,
-          background: check.meetsAA ? 'transparent' : colors.error + '08'
+          background: check.meetsAA ? 'transparent' : colors.error + '08',
         }"
       >
         <div class="check-label">
@@ -86,8 +93,12 @@ const contrastChecks = computed(() => {
           <span
             class="ratio"
             :style="{
-              color: check.meetsAAA ? colors.success : check.meetsAA ? colors.warning : colors.error,
-              fontWeight: 'bold'
+              color: check.meetsAAA
+                ? colors.success
+                : check.meetsAA
+                  ? colors.warning
+                  : colors.error,
+              fontWeight: 'bold',
             }"
           >
             {{ check.ratio.toFixed(2) }}:1
@@ -98,7 +109,7 @@ const contrastChecks = computed(() => {
               :style="{
                 background: check.meetsAA ? colors.success + '20' : colors.error + '20',
                 color: check.meetsAA ? colors.success : colors.error,
-                border: `1px solid ${check.meetsAA ? colors.success : colors.error}`
+                border: `1px solid ${check.meetsAA ? colors.success : colors.error}`,
               }"
             >
               AA {{ check.meetsAA ? '✓' : '✗' }}
@@ -108,7 +119,7 @@ const contrastChecks = computed(() => {
               :style="{
                 background: check.meetsAAA ? colors.success + '20' : colors.comment + '10',
                 color: check.meetsAAA ? colors.success : colors.comment,
-                border: `1px solid ${check.meetsAAA ? colors.success : colors.comment}40`
+                border: `1px solid ${check.meetsAAA ? colors.success : colors.comment}40`,
               }"
             >
               AAA {{ check.meetsAAA ? '✓' : '✗' }}
@@ -119,8 +130,17 @@ const contrastChecks = computed(() => {
     </div>
 
     <!-- Footer with info -->
-    <div class="validator-footer" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}30`, color: colors.comment }">
-      <span style="font-size: 7px;">WCAG 2.1 Standards: AA ≥ 4.5:1 (minimum) · AAA ≥ 7:1 (enhanced)</span>
+    <div
+      class="validator-footer"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}30`,
+        color: colors.comment,
+      }"
+    >
+      <span style="font-size: 7px"
+        >WCAG 2.1 Standards: AA ≥ 4.5:1 (minimum) · AAA ≥ 7:1 (enhanced)</span
+      >
     </div>
   </div>
 </template>

@@ -6,14 +6,17 @@ const props = defineProps<{
 
 const visible = ref(false)
 
-watch(() => props.show, (newVal) => {
-  if (newVal) {
-    visible.value = true
-    setTimeout(() => {
-      visible.value = false
-    }, 3000)
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal) {
+      visible.value = true
+      setTimeout(() => {
+        visible.value = false
+      }, 3000)
+    }
   }
-})
+)
 </script>
 
 <template>

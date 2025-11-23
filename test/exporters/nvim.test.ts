@@ -38,7 +38,7 @@ describe('Neovim Exporter', () => {
       'Operator',
     ]
 
-    requiredGroups.forEach(group => {
+    requiredGroups.forEach((group) => {
       expect(content).toContain(group)
     })
   })
@@ -70,7 +70,7 @@ describe('Neovim Exporter', () => {
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
-    colorMatches!.forEach(color => {
+    colorMatches!.forEach((color) => {
       expect(isValidHexColor(color)).toBe(true)
     })
   })

@@ -13,6 +13,6 @@ export const useHighlightedColor = () => {
   return {
     highlightedColor,
     setHighlightedColor,
-    clearHighlightedColor
+    clearHighlightedColor,
   }
 }

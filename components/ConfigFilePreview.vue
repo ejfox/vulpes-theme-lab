@@ -24,7 +24,7 @@ const configFiles = [
     "@types/chroma-js": "^2.4.4",
     "vitest": "^1.6.0"
   }
-}`
+}`,
   },
   {
     name: '.github/workflows/deploy.yml',
@@ -53,8 +53,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/deploy@v3`
-  }
+      - uses: actions/deploy@v3`,
+  },
 ]
 
 const activeTab = ref(0)
@@ -64,19 +64,38 @@ const colorLine = (line: string, lang: string) => {
   if (lang === 'json') {
     // Highlight JSON: keys (property), strings, numbers, booleans, null, punctuation
     return line
-      .replace(/"([^"]+)":/g, `<span style="color: ${colors.value.property}">"$1"</span><span style="color: ${colors.value.punctuation}">:</span>`)
-      .replace(/: "([^"]+)"/g, ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">"$1"</span>`)
+      .replace(
+        /"([^"]+)":/g,
+        `<span style="color: ${colors.value.property}">"$1"</span><span style="color: ${colors.value.punctuation}">:</span>`
+      )
+      .replace(
+        /: "([^"]+)"/g,
+        ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">"$1"</span>`
+      )
       .replace(/: (\d+\.?\d*)/g, ` <span style="color: ${colors.value.number}">$1</span>`)
       .replace(/: (true|false|null)/g, ` <span style="color: ${colors.value.constant}">$1</span>`)
-      .replace(/[{}\[\],]/g, (match) => `<span style="color: ${colors.value.punctuation}">${match}</span>`)
+      .replace(
+        /[{}\[\],]/g,
+        (match) => `<span style="color: ${colors.value.punctuation}">${match}</span>`
+      )
   } else {
     // YAML highlighting: keys (property), strings, numbers, operators, comments
     return line
-      .replace(/^(\s*)([a-zA-Z_-]+):/g, `$1<span style="color: ${colors.value.property}">$2</span><span style="color: ${colors.value.punctuation}">:</span>`)
-      .replace(/: "?([^"\n]+)"?$/g, ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">$1</span>`)
+      .replace(
+        /^(\s*)([a-zA-Z_-]+):/g,
+        `$1<span style="color: ${colors.value.property}">$2</span><span style="color: ${colors.value.punctuation}">:</span>`
+      )
+      .replace(
+        /: "?([^"\n]+)"?$/g,
+        ` <span style="color: ${colors.value.string}; ${options.value.italicStrings ? 'font-style: italic' : ''}">$1</span>`
+      )
       .replace(/: (\d+\.?\d*)$/g, ` <span style="color: ${colors.value.number}">$1</span>`)
       .replace(/- /g, `<span style="color: ${colors.value.punctuation}">-</span> `)
-      .replace(/#.+$/g, (match) => `<span style="color: ${colors.value.comment}; ${options.value.italicComments ? 'font-style: italic' : ''}">${match}</span>`)
+      .replace(
+        /#.+$/g,
+        (match) =>
+          `<span style="color: ${colors.value.comment}; ${options.value.italicComments ? 'font-style: italic' : ''}">${match}</span>`
+      )
   }
 }
 </script>
@@ -92,7 +111,7 @@ const colorLine = (line: string, lang: string) => {
         :style="{
           background: activeTab === i ? colors.base + '20' : 'transparent',
           color: activeTab === i ? colors.base : colors.comment,
-          borderRight: `1px solid ${colors.comment}20`
+          borderRight: `1px solid ${colors.comment}20`,
         }"
         @click="activeTab = i"
       >
@@ -101,12 +120,15 @@ const colorLine = (line: string, lang: string) => {
     </div>
 
     <div class="file-content">
-      <div class="line-numbers" :style="{ background: colors.bg, borderRight: `1px solid ${colors.comment}20`, color: colors.comment }">
-        <div
-          v-for="(_, i) in configFiles[activeTab].content.split('\n')"
-          :key="i"
-          class="line-num"
-        >
+      <div
+        class="line-numbers"
+        :style="{
+          background: colors.bg,
+          borderRight: `1px solid ${colors.comment}20`,
+          color: colors.comment,
+        }"
+      >
+        <div v-for="(_, i) in configFiles[activeTab].content.split('\n')" :key="i" class="line-num">
           {{ i + 1 }}
         </div>
       </div>
@@ -120,8 +142,17 @@ const colorLine = (line: string, lang: string) => {
       </div>
     </div>
 
-    <div class="statusbar" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}30`, color: colors.comment }">
-      <span :style="{ color: colors.function }">{{ configFiles[activeTab].lang.toUpperCase() }}</span>
+    <div
+      class="statusbar"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}30`,
+        color: colors.comment,
+      }"
+    >
+      <span :style="{ color: colors.function }">{{
+        configFiles[activeTab].lang.toUpperCase()
+      }}</span>
       <span>{{ configFiles[activeTab].content.split('\n').length }} lines</span>
       <span :style="{ marginLeft: 'auto', color: colors.string }">UTF-8</span>
     </div>

@@ -18,7 +18,17 @@ live color controls with real-time preview across multiple terminal scenarios:
 - tmux multi-pane layouts with realistic content
 - codemirror-based code editor
 
-export both dark and light theme variants as ghostty config files.
+export both dark and light theme variants for:
+
+- ghostty terminal
+- neovim (100+ highlight groups, LSP support)
+- bat syntax highlighter
+- yazi file manager
+- lazygit git ui
+- zsh (syntax highlighting + fzf colors + powerlevel10k colors)
+
+**[🚀 Quick Start Guide](./QUICKSTART.md)** — 5-minute setup
+**[📘 Complete Installation Guide](./INSTALLATION.md)** — Full setup instructions for all tools
 
 ## usage
 
@@ -38,18 +48,34 @@ themes use precise hue offset mathematics:
 ```javascript
 const error = chroma.hsl(baseHue + 7, 0.85, 0.55)
 const warning = chroma.hsl(baseHue - 7, 0.85, 0.55)
-const base = chroma.hsl(baseHue, 0.85, 0.50)
+const base = chroma.hsl(baseHue, 0.85, 0.5)
 ```
 
 minimal variation. maximum signal.
 
-## ghostty integration
+## installation
 
-exported themes install to `~/.config/ghostty/themes/`
+exported themes work across your entire terminal ecosystem:
 
-```
-theme = theme-lab-dark
-```
+**auto-switching** (with system appearance):
+
+- ghostty: `theme = light:yourtheme-light,dark:yourtheme-dark`
+- neovim: via auto-dark-mode.nvim plugin
+- bat: `--theme=auto:system`
+
+**manual switching** (unified theme switcher):
+
+- yazi file manager
+- lazygit git ui
+- zsh syntax highlighting
+
+see **[INSTALLATION.md](./INSTALLATION.md)** for complete setup guide including:
+
+- file installation locations
+- configuration examples
+- unified theme switcher functions
+- auto-sync with macos appearance
+- troubleshooting guide
 
 ## sample exports
 
@@ -63,17 +89,21 @@ example theme outputs for all supported TUI targets:
 
 these samples show the exact structure and color mappings for each tool format.
 
-## planned: multi-format export
+## multi-format export
 
-next phase: generate all TUI target formats in a single export.
+**status: ✓ implemented**
 
-see **[THEME_EXPORT_FORMATS.md](./THEME_EXPORT_FORMATS.md)** for:
-- comprehensive specification for adding multi-format export
-- color mapping specifications for each tool
-- implementation roadmap (8-12 hours, medium difficulty)
-- challenge solutions and design decisions
+all formats now export in a single download:
 
-current status: planning phase. ready for implementation.
+- ghostty (dark + light .ghostty files)
+- neovim (dark + light .lua colorschemes)
+- bat (dark + light .tmTheme files)
+- yazi (dark + light .toml themes)
+- lazygit (dark + light .yml configs)
+- zsh (dark + light .zsh with syntax highlighting, fzf, and p10k colors)
+- tweak.cc json reference files
+
+see **[THEME_EXPORT_FORMATS.md](./THEME_EXPORT_FORMATS.md)** for implementation details.
 
 ## stack
 

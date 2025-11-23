@@ -110,7 +110,7 @@ export function validateThemeContrast(palette: ThemePalette): ContrastIssue[] {
         bg,
         ratio,
         required,
-        severity: ratio < 3 ? 'critical' : 'warning'
+        severity: ratio < 3 ? 'critical' : 'warning',
       })
     }
   }
@@ -125,8 +125,8 @@ export function validateThemeContrast(palette: ThemePalette): ContrastIssue[] {
  */
 export function getAccessibilitySummary(palette: ThemePalette) {
   const issues = validateThemeContrast(palette)
-  const critical = issues.filter(i => i.severity === 'critical').length
-  const warnings = issues.filter(i => i.severity === 'warning').length
+  const critical = issues.filter((i) => i.severity === 'critical').length
+  const warnings = issues.filter((i) => i.severity === 'warning').length
 
   return {
     passed: issues.length === 0,
@@ -134,7 +134,7 @@ export function getAccessibilitySummary(palette: ThemePalette) {
     failed: issues.length,
     critical,
     warnings,
-    issues
+    issues,
   }
 }
 
@@ -189,7 +189,7 @@ export function applyContrastFixes(palette: ThemePalette): {
         new: fixedColor,
         oldRatio,
         newRatio,
-        reason: `Contrast ${oldRatio.toFixed(2)}:1 < 4.5:1 (WCAG AA minimum)`
+        reason: `Contrast ${oldRatio.toFixed(2)}:1 < 4.5:1 (WCAG AA minimum)`,
       })
     }
   })
@@ -203,10 +203,7 @@ export function applyContrastFixes(palette: ThemePalette): {
  * @param themeName - Name of the theme
  * @returns Markdown accessibility report
  */
-export function generateAccessibilityReport(
-  palette: ThemePalette,
-  themeName: string
-): string {
+export function generateAccessibilityReport(palette: ThemePalette, themeName: string): string {
   const summary = getAccessibilitySummary(palette)
   const themeType = detectThemeType(palette)
 
@@ -231,9 +228,13 @@ ${summary.passed ? '✅ **This theme meets WCAG AA accessibility standards!**' :
 - **AA (Minimum):** 4.5:1 contrast ratio for normal text
 - **AAA (Enhanced):** 7:1 contrast ratio for normal text
 
-${summary.issues.length > 0 ? `## Issues Detected
+${
+  summary.issues.length > 0
+    ? `## Issues Detected
 
-${summary.issues.map(issue => `
+${summary.issues
+  .map(
+    (issue) => `
 ### ${issue.pair}
 
 - **Foreground:** \`${issue.fg}\`
@@ -243,33 +244,51 @@ ${summary.issues.map(issue => `
 - **Severity:** ${issue.severity === 'critical' ? '🔴 CRITICAL' : '🟡 WARNING'}
 - **Gap:** ${(issue.required - issue.ratio).toFixed(2)}:1 below minimum
 
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 ## Recommended Actions
 
-${summary.critical > 0 ? `
+${
+  summary.critical > 0
+    ? `
 ### Critical Fixes Required
 
 The following colors have **critically low contrast** (< 3:1) and are likely unreadable:
 
-${summary.issues.filter(i => i.severity === 'critical').map(issue => `- **${issue.pair}:** Increase contrast by ${(4.5 - issue.ratio).toFixed(2)}:1`).join('\n')}
+${summary.issues
+  .filter((i) => i.severity === 'critical')
+  .map((issue) => `- **${issue.pair}:** Increase contrast by ${(4.5 - issue.ratio).toFixed(2)}:1`)
+  .join('\n')}
 
 **Action:** Use the "Auto-Fix & Export" option to automatically adjust these colors to meet WCAG AA standards.
-` : ''}
+`
+    : ''
+}
 
-${summary.warnings > 0 ? `
+${
+  summary.warnings > 0
+    ? `
 ### Warnings
 
 The following colors have **insufficient contrast** for WCAG AA compliance but are still somewhat readable:
 
-${summary.issues.filter(i => i.severity === 'warning').map(issue => `- **${issue.pair}:** Increase contrast by ${(4.5 - issue.ratio).toFixed(2)}:1`).join('\n')}
+${summary.issues
+  .filter((i) => i.severity === 'warning')
+  .map((issue) => `- **${issue.pair}:** Increase contrast by ${(4.5 - issue.ratio).toFixed(2)}:1`)
+  .join('\n')}
 
 **Action:** Consider adjusting these colors for better accessibility, especially for users with low vision.
-` : ''}
-` : `## ✅ No Issues Found
+`
+    : ''
+}
+`
+    : `## ✅ No Issues Found
 
 All color combinations meet or exceed WCAG AA standards. Great work!
-`}
+`
+}
 
 ## Resources
 

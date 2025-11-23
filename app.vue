@@ -9,7 +9,10 @@
   box-sizing: border-box;
 }
 
-html, body, #__nuxt, #__layout {
+html,
+body,
+#__nuxt,
+#__layout {
   background: #000 !important;
   color: #fff;
   font-family: 'Monaspace Krypton', 'MonaspaceKr Nerd Font', monospace;

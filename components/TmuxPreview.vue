@@ -25,7 +25,7 @@ const panes = [
 642    \${saveData.name || 'save'}_\${new Date().toISOString().split('T')[0]}.json
 643  )
 644  defaultPath: path.join(
-     getSavesDirectory(), defaultFilename),`
+     getSavesDirectory(), defaultFilename),`,
   },
   {
     id: 2,
@@ -45,7 +45,7 @@ export function hasSaveFullData(save: SaveGame) {
  */
 export function isAutosave(save: SaveGame) {
   return save.name.startsWith(searchStr);
-}`
+}`,
   },
   {
     id: 3,
@@ -65,8 +65,8 @@ browser code can use:
 
 ● Write(app/game/helpers/gameSaving/filenameHelpers.ts)
   Wrote 50 lines to
-  app/game/helpers/gameSaving/filenameHelpers.ts`
-  }
+  app/game/helpers/gameSaving/filenameHelpers.ts`,
+  },
 ]
 
 const getPaneIndicator = (paneCount: number) => {
@@ -88,10 +88,14 @@ const getPaneIndicator = (paneCount: number) => {
           :key="w.num"
           class="window-status"
           :class="{ active: w.active }"
-          :style="w.active ? {
-            background: colors.fg,
-            color: colors.bg,
-          } : {}"
+          :style="
+            w.active
+              ? {
+                  background: colors.fg,
+                  color: colors.bg,
+                }
+              : {}
+          "
         >
           {{ w.num }} {{ w.name }}{{ getPaneIndicator(w.panes) }}
         </span>
@@ -112,18 +116,15 @@ const getPaneIndicator = (paneCount: number) => {
       >
         <div v-if="pane.active" class="pane-arrow" :style="{ color: colors.fg }">→</div>
         <div class="pane-content">
-          <pre :style="{
-            color: pane.id === 1 ? colors.keyword :
-                   pane.id === 2 ? colors.string :
-                   colors.fg,
-            fontSize: '9px',
-          }">{{ pane.content }}</pre>
+          <pre
+            :style="{
+              color: pane.id === 1 ? colors.keyword : pane.id === 2 ? colors.string : colors.fg,
+              fontSize: '9px',
+            }"
+            >{{ pane.content }}</pre
+          >
         </div>
-        <div
-          v-if="pane.active"
-          class="pane-cursor"
-          :style="{ background: colors.base }"
-        ></div>
+        <div v-if="pane.active" class="pane-cursor" :style="{ background: colors.base }"></div>
       </div>
     </div>
   </div>
@@ -226,7 +227,13 @@ const getPaneIndicator = (paneCount: number) => {
 }
 
 @keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 </style>

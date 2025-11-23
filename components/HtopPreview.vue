@@ -13,14 +13,126 @@ const cpuBars = [
 ]
 
 const processes = [
-  { pid: 1337, user: 'neo', pri: 20, ni: 0, virt: '12.5g', res: '2.1g', shr: '1.2g', s: 'R', cpu: 89.2, mem: 12.5, time: '45:23', command: 'matrix --follow-white-rabbit', selected: true },
-  { pid: 5678, user: 'hiro', pri: 20, ni: 0, virt: '8.2g', res: '1.8g', shr: '980m', s: 'S', cpu: 45.1, mem: 9.8, time: '12:45', command: 'metaverse-server --black-sun', selected: false },
-  { pid: 9012, user: 'root', pri: -20, ni: -20, virt: '2.1g', res: '456m', shr: '234m', s: 'S', cpu: 23.4, mem: 2.3, time: '89:12', command: 'construct_loader', selected: false },
-  { pid: 3456, user: 'yt', pri: 20, ni: 0, virt: '4.5g', res: '890m', shr: '567m', s: 'S', cpu: 12.1, mem: 4.5, time: '3:34', command: 'pizza-delivery --kourier', selected: false },
-  { pid: 7890, user: 'trinity', pri: 20, ni: 0, virt: '3.2g', res: '678m', shr: '345m', s: 'S', cpu: 8.7, mem: 3.2, time: '1:23', command: 'redpill.bin', selected: false },
-  { pid: 2345, user: 'morpheus', pri: 20, ni: 0, virt: '1.8g', res: '234m', shr: '123m', s: 'S', cpu: 2.3, mem: 1.2, time: '0:45', command: 'oracle --simulation', selected: false },
-  { pid: 6789, user: 'wintermute', pri: 20, ni: 0, virt: '890m', res: '123m', shr: '67m', s: 'S', cpu: 0.7, mem: 0.6, time: '23:45', command: 'neuromancer_ai', selected: false },
-  { pid: 4242, user: 'raven', pri: 20, ni: 0, virt: '567m', res: '89m', shr: '45m', s: 'S', cpu: 0.3, mem: 0.4, time: '0:12', command: 'snow-crash --daemon', selected: false },
+  {
+    pid: 1337,
+    user: 'neo',
+    pri: 20,
+    ni: 0,
+    virt: '12.5g',
+    res: '2.1g',
+    shr: '1.2g',
+    s: 'R',
+    cpu: 89.2,
+    mem: 12.5,
+    time: '45:23',
+    command: 'matrix --follow-white-rabbit',
+    selected: true,
+  },
+  {
+    pid: 5678,
+    user: 'hiro',
+    pri: 20,
+    ni: 0,
+    virt: '8.2g',
+    res: '1.8g',
+    shr: '980m',
+    s: 'S',
+    cpu: 45.1,
+    mem: 9.8,
+    time: '12:45',
+    command: 'metaverse-server --black-sun',
+    selected: false,
+  },
+  {
+    pid: 9012,
+    user: 'root',
+    pri: -20,
+    ni: -20,
+    virt: '2.1g',
+    res: '456m',
+    shr: '234m',
+    s: 'S',
+    cpu: 23.4,
+    mem: 2.3,
+    time: '89:12',
+    command: 'construct_loader',
+    selected: false,
+  },
+  {
+    pid: 3456,
+    user: 'yt',
+    pri: 20,
+    ni: 0,
+    virt: '4.5g',
+    res: '890m',
+    shr: '567m',
+    s: 'S',
+    cpu: 12.1,
+    mem: 4.5,
+    time: '3:34',
+    command: 'pizza-delivery --kourier',
+    selected: false,
+  },
+  {
+    pid: 7890,
+    user: 'trinity',
+    pri: 20,
+    ni: 0,
+    virt: '3.2g',
+    res: '678m',
+    shr: '345m',
+    s: 'S',
+    cpu: 8.7,
+    mem: 3.2,
+    time: '1:23',
+    command: 'redpill.bin',
+    selected: false,
+  },
+  {
+    pid: 2345,
+    user: 'morpheus',
+    pri: 20,
+    ni: 0,
+    virt: '1.8g',
+    res: '234m',
+    shr: '123m',
+    s: 'S',
+    cpu: 2.3,
+    mem: 1.2,
+    time: '0:45',
+    command: 'oracle --simulation',
+    selected: false,
+  },
+  {
+    pid: 6789,
+    user: 'wintermute',
+    pri: 20,
+    ni: 0,
+    virt: '890m',
+    res: '123m',
+    shr: '67m',
+    s: 'S',
+    cpu: 0.7,
+    mem: 0.6,
+    time: '23:45',
+    command: 'neuromancer_ai',
+    selected: false,
+  },
+  {
+    pid: 4242,
+    user: 'raven',
+    pri: 20,
+    ni: 0,
+    virt: '567m',
+    res: '89m',
+    shr: '45m',
+    s: 'S',
+    cpu: 0.3,
+    mem: 0.4,
+    time: '0:12',
+    command: 'snow-crash --daemon',
+    selected: false,
+  },
 ]
 
 const getBarColor = (colorKey: string) => {
@@ -46,7 +158,7 @@ const getBarColor = (colorKey: string) => {
               class="bar-fill"
               :style="{
                 width: cpu.usage + '%',
-                background: getBarColor(cpu.color)
+                background: getBarColor(cpu.color),
               }"
             ></div>
           </div>
@@ -71,15 +183,32 @@ const getBarColor = (colorKey: string) => {
         </div>
       </div>
 
-      <div class="stats-row" :style="{ color: colors.comment, borderTop: `1px solid ${colors.comment}20` }">
-        <span>Tasks: <span :style="{ color: colors.fg }">156</span>, <span :style="{ color: colors.base }">1 running</span></span>
-        <span>Load average: <span :style="{ color: colors.warning }">2.45</span> <span :style="{ color: colors.hint }">2.12</span> <span :style="{ color: colors.hint }">1.98</span></span>
+      <div
+        class="stats-row"
+        :style="{ color: colors.comment, borderTop: `1px solid ${colors.comment}20` }"
+      >
+        <span
+          >Tasks: <span :style="{ color: colors.fg }">156</span>,
+          <span :style="{ color: colors.base }">1 running</span></span
+        >
+        <span
+          >Load average: <span :style="{ color: colors.warning }">2.45</span>
+          <span :style="{ color: colors.hint }">2.12</span>
+          <span :style="{ color: colors.hint }">1.98</span></span
+        >
         <span>Uptime: <span :style="{ color: colors.fg }">3 days, 14:23:45</span></span>
       </div>
     </div>
 
     <!-- Process table header -->
-    <div class="table-header" :style="{ background: colors.base + '20', color: colors.base, borderBottom: `1px solid ${colors.base}` }">
+    <div
+      class="table-header"
+      :style="{
+        background: colors.base + '20',
+        color: colors.base,
+        borderBottom: `1px solid ${colors.base}`,
+      }"
+    >
       <span class="col-pid">PID</span>
       <span class="col-user">USER</span>
       <span class="col-pri">PRI</span>
@@ -104,38 +233,62 @@ const getBarColor = (colorKey: string) => {
           background: proc.selected ? colors.base + '30' : 'transparent',
           color: proc.selected ? colors.base : colors.fg,
           borderLeft: proc.selected ? `2px solid ${colors.base}` : 'none',
-          paddingLeft: proc.selected ? '6px' : '8px'
+          paddingLeft: proc.selected ? '6px' : '8px',
         }"
       >
-        <span class="col-pid" :style="{ color: proc.selected ? colors.base : colors.warning }">{{ proc.pid }}</span>
-        <span class="col-user" :style="{ color: proc.user === 'root' ? colors.error : colors.hint }">{{ proc.user }}</span>
+        <span class="col-pid" :style="{ color: proc.selected ? colors.base : colors.warning }">{{
+          proc.pid
+        }}</span>
+        <span
+          class="col-user"
+          :style="{ color: proc.user === 'root' ? colors.error : colors.hint }"
+          >{{ proc.user }}</span
+        >
         <span class="col-pri">{{ proc.pri }}</span>
         <span class="col-ni">{{ proc.ni }}</span>
         <span class="col-virt" :style="{ color: colors.comment }">{{ proc.virt }}</span>
         <span class="col-res" :style="{ color: colors.comment }">{{ proc.res }}</span>
         <span class="col-shr" :style="{ color: colors.comment }">{{ proc.shr }}</span>
-        <span class="col-s" :style="{
-          color: proc.s === 'R' ? colors.base :
-                 proc.s === 'S' ? colors.hint : colors.comment,
-          fontWeight: proc.s === 'R' ? 'bold' : 'normal'
-        }">{{ proc.s }}</span>
-        <span class="col-cpu" :style="{
-          color: proc.cpu > 80 ? colors.error :
-                 proc.cpu > 50 ? colors.warning :
-                 proc.cpu > 20 ? colors.base : colors.hint,
-          fontWeight: proc.cpu > 50 ? 'bold' : 'normal'
-        }">{{ proc.cpu.toFixed(1) }}</span>
-        <span class="col-mem" :style="{
-          color: proc.mem > 10 ? colors.warning :
-                 proc.mem > 5 ? colors.base : colors.hint
-        }">{{ proc.mem.toFixed(1) }}</span>
+        <span
+          class="col-s"
+          :style="{
+            color: proc.s === 'R' ? colors.base : proc.s === 'S' ? colors.hint : colors.comment,
+            fontWeight: proc.s === 'R' ? 'bold' : 'normal',
+          }"
+          >{{ proc.s }}</span
+        >
+        <span
+          class="col-cpu"
+          :style="{
+            color:
+              proc.cpu > 80
+                ? colors.error
+                : proc.cpu > 50
+                  ? colors.warning
+                  : proc.cpu > 20
+                    ? colors.base
+                    : colors.hint,
+            fontWeight: proc.cpu > 50 ? 'bold' : 'normal',
+          }"
+          >{{ proc.cpu.toFixed(1) }}</span
+        >
+        <span
+          class="col-mem"
+          :style="{
+            color: proc.mem > 10 ? colors.warning : proc.mem > 5 ? colors.base : colors.hint,
+          }"
+          >{{ proc.mem.toFixed(1) }}</span
+        >
         <span class="col-time" :style="{ color: colors.comment }">{{ proc.time }}</span>
         <span class="col-command">{{ proc.command }}</span>
       </div>
     </div>
 
     <!-- Footer with keybindings -->
-    <div class="footer" :style="{ background: colors.base + '10', borderTop: `1px solid ${colors.base}` }">
+    <div
+      class="footer"
+      :style="{ background: colors.base + '10', borderTop: `1px solid ${colors.base}` }"
+    >
       <span :style="{ color: colors.keyword }">F1</span>Help
       <span :style="{ color: colors.keyword }">F2</span>Setup
       <span :style="{ color: colors.keyword }">F3</span>Search
@@ -248,18 +401,51 @@ const getBarColor = (colorKey: string) => {
   line-height: 1.6;
 }
 
-.col-pid { width: 50px; }
-.col-user { width: 60px; }
-.col-pri { width: 35px; text-align: right; }
-.col-ni { width: 35px; text-align: right; }
-.col-virt { width: 50px; text-align: right; }
-.col-res { width: 50px; text-align: right; }
-.col-shr { width: 50px; text-align: right; }
-.col-s { width: 20px; text-align: center; }
-.col-cpu { width: 45px; text-align: right; }
-.col-mem { width: 45px; text-align: right; }
-.col-time { width: 55px; text-align: right; }
-.col-command { flex: 1; }
+.col-pid {
+  width: 50px;
+}
+.col-user {
+  width: 60px;
+}
+.col-pri {
+  width: 35px;
+  text-align: right;
+}
+.col-ni {
+  width: 35px;
+  text-align: right;
+}
+.col-virt {
+  width: 50px;
+  text-align: right;
+}
+.col-res {
+  width: 50px;
+  text-align: right;
+}
+.col-shr {
+  width: 50px;
+  text-align: right;
+}
+.col-s {
+  width: 20px;
+  text-align: center;
+}
+.col-cpu {
+  width: 45px;
+  text-align: right;
+}
+.col-mem {
+  width: 45px;
+  text-align: right;
+}
+.col-time {
+  width: 55px;
+  text-align: right;
+}
+.col-command {
+  flex: 1;
+}
 
 .footer {
   display: flex;

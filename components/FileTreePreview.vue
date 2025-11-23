@@ -48,7 +48,14 @@ const getColor = (item: any) => {
 
 <template>
   <div class="file-tree" :style="{ background: colors.bg, color: colors.fg }">
-    <div class="tree-header" :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30`, color: colors.base }">
+    <div
+      class="tree-header"
+      :style="{
+        background: colors.bg,
+        borderBottom: `1px solid ${colors.comment}30`,
+        color: colors.base,
+      }"
+    >
       <span>📁</span>
       <span>theme-lab</span>
       <span :style="{ marginLeft: 'auto', fontSize: '7px', color: colors.comment }">main</span>
@@ -60,21 +67,41 @@ const getColor = (item: any) => {
         :key="i"
         class="tree-item"
         :style="{
-          paddingLeft: (item.level * 16 + 8) + 'px',
+          paddingLeft: item.level * 16 + 8 + 'px',
           color: getColor(item),
-          fontWeight: item.modified || item.untracked ? 'bold' : 'normal'
+          fontWeight: item.modified || item.untracked ? 'bold' : 'normal',
         }"
       >
-        <span class="icon" :style="{ color: item.type === 'folder' ? colors.function : colors.comment }">
+        <span
+          class="icon"
+          :style="{ color: item.type === 'folder' ? colors.function : colors.comment }"
+        >
           {{ getIcon(item) }}
         </span>
         <span class="name">{{ item.name }}</span>
-        <span v-if="item.untracked" class="badge" :style="{ color: colors.error, fontSize: '7px', marginLeft: '4px' }">U</span>
-        <span v-else-if="item.modified" class="badge" :style="{ color: colors.warning, fontSize: '7px', marginLeft: '4px' }">M</span>
+        <span
+          v-if="item.untracked"
+          class="badge"
+          :style="{ color: colors.error, fontSize: '7px', marginLeft: '4px' }"
+          >U</span
+        >
+        <span
+          v-else-if="item.modified"
+          class="badge"
+          :style="{ color: colors.warning, fontSize: '7px', marginLeft: '4px' }"
+          >M</span
+        >
       </div>
     </div>
 
-    <div class="tree-footer" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}30`, color: colors.comment }">
+    <div
+      class="tree-footer"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}30`,
+        color: colors.comment,
+      }"
+    >
       <span :style="{ color: colors.warning }">5 modified</span>
       <span :style="{ color: colors.error }">2 untracked</span>
       <span :style="{ marginLeft: 'auto' }">24 files</span>

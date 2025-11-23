@@ -39,11 +39,11 @@ export interface ThemeOptions {
 }
 
 interface ThemeState {
-  themeName: string    // Name of the active theme
+  themeName: string // Name of the active theme
   baseHue: number
   hueOffset: number
   saturation: number
-  lightModeSaturation: number  // Independent saturation control for light mode
+  lightModeSaturation: number // Independent saturation control for light mode
   contrast: number
   monochromeMode: boolean
   monochromeIntensity: number
@@ -57,10 +57,10 @@ interface ThemeState {
   // Colorblind simulation
   colorblindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'
   // Visual effects
-  backgroundOpacity: number  // 0-100 (for Ghostty, Neovim, etc)
-  backgroundBlur: number      // 0-100 (Ghostty only, macOS)
-  windowBlend: number         // 0-100 (Neovim winblend)
-  popupBlend: number          // 0-100 (Neovim pumblend)
+  backgroundOpacity: number // 0-100 (for Ghostty, Neovim, etc)
+  backgroundBlur: number // 0-100 (Ghostty only, macOS)
+  windowBlend: number // 0-100 (Neovim winblend)
+  popupBlend: number // 0-100 (Neovim pumblend)
   // Individual color offsets
   errorOffset: number
   warningOffset: number
@@ -164,7 +164,7 @@ const defaultState: ThemeState = {
   baseHue: 309,
   hueOffset: 1,
   saturation: 100,
-  lightModeSaturation: 100,  // Default to same as dark mode
+  lightModeSaturation: 100, // Default to same as dark mode
   contrast: 86,
   monochromeMode: true,
   monochromeIntensity: 100,
@@ -178,10 +178,10 @@ const defaultState: ThemeState = {
   // Colorblind simulation
   colorblindMode: 'none' as 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia',
   // Visual effects defaults
-  backgroundOpacity: 100,     // Fully opaque by default
-  backgroundBlur: 0,          // No blur by default
-  windowBlend: 0,             // No transparency by default
-  popupBlend: 10,             // Slight transparency for popups
+  backgroundOpacity: 100, // Fully opaque by default
+  backgroundBlur: 0, // No blur by default
+  windowBlend: 0, // No transparency by default
+  popupBlend: 10, // Slight transparency for popups
   // Default offsets - now additive to global (0 = use pure multiplier)
   errorOffset: 0,
   warningOffset: 0,
@@ -256,39 +256,39 @@ const defaultState: ThemeState = {
   bgLinked: false,
   // Default multipliers - semantically driven for maximum code legibility
   // High prominence (structural understanding)
-  keywordMultiplier: 3,        // Control flow - most important
-  functionMultiplier: -3,      // Function calls - very visible
-  builtinMultiplier: 2.5,      // Built-in functions/types - distinct from user code
-  typeMultiplier: -2.5,        // Type information - structural
+  keywordMultiplier: 3, // Control flow - most important
+  functionMultiplier: -3, // Function calls - very visible
+  builtinMultiplier: 2.5, // Built-in functions/types - distinct from user code
+  typeMultiplier: -2.5, // Type information - structural
 
   // Medium prominence (common elements)
-  stringMultiplier: 4,         // String literals - stand out
-  numberMultiplier: -4,        // Numeric literals - distinct
-  constantMultiplier: 3.5,     // Constants - important values
-  macroMultiplier: -2,         // Macros/decorators - special behavior
-  tagMultiplier: 2,            // HTML/JSX tags - structural
-  headingMultiplier: 3.5,      // Markdown headings - hierarchy
-  namespaceMultiplier: 1.5,    // Modules/packages - context
+  stringMultiplier: 4, // String literals - stand out
+  numberMultiplier: -4, // Numeric literals - distinct
+  constantMultiplier: 3.5, // Constants - important values
+  macroMultiplier: -2, // Macros/decorators - special behavior
+  tagMultiplier: 2, // HTML/JSX tags - structural
+  headingMultiplier: 3.5, // Markdown headings - hierarchy
+  namespaceMultiplier: 1.5, // Modules/packages - context
 
   // Lower prominence (reduce visual noise)
-  variableMultiplier: -1,      // Variables - too common to be loud
-  propertyMultiplier: -1.5,    // Properties - too common
-  parameterMultiplier: -0.5,   // Parameters - subtle
-  operatorMultiplier: 0.5,     // Operators - very subtle
+  variableMultiplier: -1, // Variables - too common to be loud
+  propertyMultiplier: -1.5, // Properties - too common
+  parameterMultiplier: -0.5, // Parameters - subtle
+  operatorMultiplier: 0.5, // Operators - very subtle
   punctuationMultiplier: 0.25, // Punctuation - barely tinted
 
   // Diagnostics
-  errorMultiplier: 5,          // Errors - maximum visibility
-  warningMultiplier: -5,       // Warnings - high visibility
+  errorMultiplier: 5, // Errors - maximum visibility
+  warningMultiplier: -5, // Warnings - high visibility
 
   // Comments (typically low saturation/desaturated)
-  commentMultiplier: 0,        // Comments - neutral (often desaturated)
+  commentMultiplier: 0, // Comments - neutral (often desaturated)
 
   // Base colors
-  baseMultiplier: 0,           // Base - primary UI color
-  hintMultiplier: 0,           // Hint - subtle UI elements
-  fgMultiplier: 0,             // Foreground - main text color
-  bgMultiplier: 0,             // Background - canvas color
+  baseMultiplier: 0, // Base - primary UI color
+  hintMultiplier: 0, // Hint - subtle UI elements
+  fgMultiplier: 0, // Foreground - main text color
+  bgMultiplier: 0, // Background - canvas color
 }
 
 export const useTheme = () => {
@@ -414,121 +414,125 @@ export const useTheme = () => {
 
   // Watch state and sync to URL
   if (import.meta.client) {
-    watch(state, (newState) => {
-      params.n = newState.themeName
-      params.h = String(newState.baseHue)
-      params.o = String(newState.hueOffset)
-      params.s = String(newState.saturation)
-      params.ls = String(newState.lightModeSaturation)
-      params.c = String(newState.contrast)
-      params.m = newState.monochromeMode ? '1' : '0'
-      params.mi = String(newState.monochromeIntensity)
-      params.ml = String(newState.monochromeLightness)
-      params.b = newState.boldKeywords ? '1' : '0'
-      params.i = newState.italicComments ? '1' : '0'
-      params.bf = newState.boldFunctions ? '1' : '0'
-      params.is = newState.italicStrings ? '1' : '0'
-      params.ue = newState.underlineErrors ? '1' : '0'
-      params.mode = newState.mode
-      params.cbm = newState.colorblindMode
-      params.bgop = String(newState.backgroundOpacity)
-      params.bgbl = String(newState.backgroundBlur)
-      params.wbl = String(newState.windowBlend)
-      params.pbl = String(newState.popupBlend)
-      params.eo = String(newState.errorOffset)
-      params.wo = String(newState.warningOffset)
-      params.ko = String(newState.keywordOffset)
-      params.so = String(newState.stringOffset)
-      params.no = String(newState.numberOffset)
-      params.fo = String(newState.functionOffset)
-      params.el = String(newState.errorLightness)
-      params.wl = String(newState.warningLightness)
-      params.kl = String(newState.keywordLightness)
-      params.sl = String(newState.stringLightness)
-      params.nl = String(newState.numberLightness)
-      params.fl = String(newState.functionLightness)
-      params.co = String(newState.constantOffset)
-      params.to = String(newState.typeOffset)
-      params.vo = String(newState.variableOffset)
-      params.oo = String(newState.operatorOffset)
-      params.cl = String(newState.constantLightness)
-      params.tl = String(newState.typeLightness)
-      params.vl = String(newState.variableLightness)
-      params.ol = String(newState.operatorLightness)
-      params.elink = newState.errorLinked ? '1' : '0'
-      params.wlink = newState.warningLinked ? '1' : '0'
-      params.klink = newState.keywordLinked ? '1' : '0'
-      params.slink = newState.stringLinked ? '1' : '0'
-      params.nlink = newState.numberLinked ? '1' : '0'
-      params.flink = newState.functionLinked ? '1' : '0'
-      params.clink = newState.constantLinked ? '1' : '0'
-      params.tlink = newState.typeLinked ? '1' : '0'
-      params.vlink = newState.variableLinked ? '1' : '0'
-      params.olink = newState.operatorLinked ? '1' : '0'
-      params.em = String(newState.errorMultiplier)
-      params.wm = String(newState.warningMultiplier)
-      params.km = String(newState.keywordMultiplier)
-      params.sm = String(newState.stringMultiplier)
-      params.nm = String(newState.numberMultiplier)
-      params.fm = String(newState.functionMultiplier)
-      params.cm = String(newState.constantMultiplier)
-      params.tm = String(newState.typeMultiplier)
-      params.vm = String(newState.variableMultiplier)
-      params.om = String(newState.operatorMultiplier)
-      // New granular colors
-      params.bio = String(newState.builtinOffset)
-      params.pao = String(newState.parameterOffset)
-      params.pro = String(newState.propertyOffset)
-      params.nso = String(newState.namespaceOffset)
-      params.mao = String(newState.macroOffset)
-      params.tao = String(newState.tagOffset)
-      params.puo = String(newState.punctuationOffset)
-      params.heo = String(newState.headingOffset)
-      params.cmo = String(newState.commentOffset)
-      params.bao = String(newState.baseOffset)
-      params.hio = String(newState.hintOffset)
-      params.fgo = String(newState.fgOffset)
-      params.bgo = String(newState.bgOffset)
-      params.bil = String(newState.builtinLightness)
-      params.pal = String(newState.parameterLightness)
-      params.prl = String(newState.propertyLightness)
-      params.nsl = String(newState.namespaceLightness)
-      params.mal = String(newState.macroLightness)
-      params.tal = String(newState.tagLightness)
-      params.pul = String(newState.punctuationLightness)
-      params.hel = String(newState.headingLightness)
-      params.cml = String(newState.commentLightness)
-      params.bal = String(newState.baseLightness)
-      params.hil = String(newState.hintLightness)
-      params.fgl = String(newState.fgLightness)
-      params.bgl = String(newState.bgLightness)
-      params.bilink = newState.builtinLinked ? '1' : '0'
-      params.palink = newState.parameterLinked ? '1' : '0'
-      params.prlink = newState.propertyLinked ? '1' : '0'
-      params.nslink = newState.namespaceLinked ? '1' : '0'
-      params.malink = newState.macroLinked ? '1' : '0'
-      params.talink = newState.tagLinked ? '1' : '0'
-      params.pulink = newState.punctuationLinked ? '1' : '0'
-      params.helink = newState.headingLinked ? '1' : '0'
-      params.cmlink = newState.commentLinked ? '1' : '0'
-      params.balink = newState.baseLinked ? '1' : '0'
-      params.hilink = newState.hintLinked ? '1' : '0'
-      params.fglink = newState.fgLinked ? '1' : '0'
-      params.bglink = newState.bgLinked ? '1' : '0'
-      params.bim = String(newState.builtinMultiplier)
-      params.pam = String(newState.parameterMultiplier)
-      params.prm = String(newState.propertyMultiplier)
-      params.nsm = String(newState.namespaceMultiplier)
-      params.mam = String(newState.macroMultiplier)
-      params.tam = String(newState.tagMultiplier)
-      params.pum = String(newState.punctuationMultiplier)
-      params.hem = String(newState.headingMultiplier)
-      params.cmm = String(newState.commentMultiplier)
-      params.bam = String(newState.baseMultiplier)
-      params.him = String(newState.hintMultiplier)
-      params.fgm = String(newState.fgMultiplier)
-      params.bgm = String(newState.bgMultiplier)
-    }, { deep: true })
+    watch(
+      state,
+      (newState) => {
+        params.n = newState.themeName
+        params.h = String(newState.baseHue)
+        params.o = String(newState.hueOffset)
+        params.s = String(newState.saturation)
+        params.ls = String(newState.lightModeSaturation)
+        params.c = String(newState.contrast)
+        params.m = newState.monochromeMode ? '1' : '0'
+        params.mi = String(newState.monochromeIntensity)
+        params.ml = String(newState.monochromeLightness)
+        params.b = newState.boldKeywords ? '1' : '0'
+        params.i = newState.italicComments ? '1' : '0'
+        params.bf = newState.boldFunctions ? '1' : '0'
+        params.is = newState.italicStrings ? '1' : '0'
+        params.ue = newState.underlineErrors ? '1' : '0'
+        params.mode = newState.mode
+        params.cbm = newState.colorblindMode
+        params.bgop = String(newState.backgroundOpacity)
+        params.bgbl = String(newState.backgroundBlur)
+        params.wbl = String(newState.windowBlend)
+        params.pbl = String(newState.popupBlend)
+        params.eo = String(newState.errorOffset)
+        params.wo = String(newState.warningOffset)
+        params.ko = String(newState.keywordOffset)
+        params.so = String(newState.stringOffset)
+        params.no = String(newState.numberOffset)
+        params.fo = String(newState.functionOffset)
+        params.el = String(newState.errorLightness)
+        params.wl = String(newState.warningLightness)
+        params.kl = String(newState.keywordLightness)
+        params.sl = String(newState.stringLightness)
+        params.nl = String(newState.numberLightness)
+        params.fl = String(newState.functionLightness)
+        params.co = String(newState.constantOffset)
+        params.to = String(newState.typeOffset)
+        params.vo = String(newState.variableOffset)
+        params.oo = String(newState.operatorOffset)
+        params.cl = String(newState.constantLightness)
+        params.tl = String(newState.typeLightness)
+        params.vl = String(newState.variableLightness)
+        params.ol = String(newState.operatorLightness)
+        params.elink = newState.errorLinked ? '1' : '0'
+        params.wlink = newState.warningLinked ? '1' : '0'
+        params.klink = newState.keywordLinked ? '1' : '0'
+        params.slink = newState.stringLinked ? '1' : '0'
+        params.nlink = newState.numberLinked ? '1' : '0'
+        params.flink = newState.functionLinked ? '1' : '0'
+        params.clink = newState.constantLinked ? '1' : '0'
+        params.tlink = newState.typeLinked ? '1' : '0'
+        params.vlink = newState.variableLinked ? '1' : '0'
+        params.olink = newState.operatorLinked ? '1' : '0'
+        params.em = String(newState.errorMultiplier)
+        params.wm = String(newState.warningMultiplier)
+        params.km = String(newState.keywordMultiplier)
+        params.sm = String(newState.stringMultiplier)
+        params.nm = String(newState.numberMultiplier)
+        params.fm = String(newState.functionMultiplier)
+        params.cm = String(newState.constantMultiplier)
+        params.tm = String(newState.typeMultiplier)
+        params.vm = String(newState.variableMultiplier)
+        params.om = String(newState.operatorMultiplier)
+        // New granular colors
+        params.bio = String(newState.builtinOffset)
+        params.pao = String(newState.parameterOffset)
+        params.pro = String(newState.propertyOffset)
+        params.nso = String(newState.namespaceOffset)
+        params.mao = String(newState.macroOffset)
+        params.tao = String(newState.tagOffset)
+        params.puo = String(newState.punctuationOffset)
+        params.heo = String(newState.headingOffset)
+        params.cmo = String(newState.commentOffset)
+        params.bao = String(newState.baseOffset)
+        params.hio = String(newState.hintOffset)
+        params.fgo = String(newState.fgOffset)
+        params.bgo = String(newState.bgOffset)
+        params.bil = String(newState.builtinLightness)
+        params.pal = String(newState.parameterLightness)
+        params.prl = String(newState.propertyLightness)
+        params.nsl = String(newState.namespaceLightness)
+        params.mal = String(newState.macroLightness)
+        params.tal = String(newState.tagLightness)
+        params.pul = String(newState.punctuationLightness)
+        params.hel = String(newState.headingLightness)
+        params.cml = String(newState.commentLightness)
+        params.bal = String(newState.baseLightness)
+        params.hil = String(newState.hintLightness)
+        params.fgl = String(newState.fgLightness)
+        params.bgl = String(newState.bgLightness)
+        params.bilink = newState.builtinLinked ? '1' : '0'
+        params.palink = newState.parameterLinked ? '1' : '0'
+        params.prlink = newState.propertyLinked ? '1' : '0'
+        params.nslink = newState.namespaceLinked ? '1' : '0'
+        params.malink = newState.macroLinked ? '1' : '0'
+        params.talink = newState.tagLinked ? '1' : '0'
+        params.pulink = newState.punctuationLinked ? '1' : '0'
+        params.helink = newState.headingLinked ? '1' : '0'
+        params.cmlink = newState.commentLinked ? '1' : '0'
+        params.balink = newState.baseLinked ? '1' : '0'
+        params.hilink = newState.hintLinked ? '1' : '0'
+        params.fglink = newState.fgLinked ? '1' : '0'
+        params.bglink = newState.bgLinked ? '1' : '0'
+        params.bim = String(newState.builtinMultiplier)
+        params.pam = String(newState.parameterMultiplier)
+        params.prm = String(newState.propertyMultiplier)
+        params.nsm = String(newState.namespaceMultiplier)
+        params.mam = String(newState.macroMultiplier)
+        params.tam = String(newState.tagMultiplier)
+        params.pum = String(newState.punctuationMultiplier)
+        params.hem = String(newState.headingMultiplier)
+        params.cmm = String(newState.commentMultiplier)
+        params.bam = String(newState.baseMultiplier)
+        params.him = String(newState.hintMultiplier)
+        params.fgm = String(newState.fgMultiplier)
+        params.bgm = String(newState.bgMultiplier)
+      },
+      { deep: true }
+    )
   }
 
   // Generate colors for a specific mode with auto-contrast
@@ -563,7 +567,7 @@ export const useTheme = () => {
       const offset = (adjust - 50) * 0.3 // ±15 range from center
       return {
         dark: baseDark + offset,
-        light: baseLight + offset
+        light: baseLight + offset,
       }
     }
 
@@ -597,7 +601,7 @@ export const useTheme = () => {
       const individualOffset = state.value[`${colorName}Offset` as keyof ThemeState] as number
       if (linked) {
         const multiplier = state.value[`${colorName}Multiplier` as keyof ThemeState] as number
-        return (state.value.hueOffset * multiplier) + individualOffset
+        return state.value.hueOffset * multiplier + individualOffset
       }
       return individualOffset
     }
@@ -636,14 +640,14 @@ export const useTheme = () => {
       punctuation: colorAt(getOffset('punctuation'), punctuationL.dark, punctuationL.light),
       heading: colorAt(getOffset('heading'), headingL.dark, headingL.light),
       palette: {
-        0: chroma.hsl(0, 0, isDark ? 0.10 : 0.90).hex(),
+        0: chroma.hsl(0, 0, isDark ? 0.1 : 0.9).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),
         2: colorAt(state.value.hueOffset * 2, 50, 38),
         3: colorAt(-state.value.hueOffset, 60, 45),
         4: colorAt(-state.value.hueOffset * 2, 55, 40),
         5: colorAt(-state.value.hueOffset * 3, 58, 42),
         6: colorAt(state.value.hueOffset * 3, 55, 40),
-        7: chroma.hsl(0, 0, isDark ? 0.70 : 0.30).hex(),
+        7: chroma.hsl(0, 0, isDark ? 0.7 : 0.3).hex(),
         8: chroma.hsl(0, 0, isDark ? 0.35 : 0.65).hex(),
         9: colorAt(state.value.hueOffset, 65, 42),
         10: colorAt(state.value.hueOffset * 2, 65, 45),
@@ -651,8 +655,8 @@ export const useTheme = () => {
         12: colorAt(-state.value.hueOffset * 2, 70, 48),
         13: colorAt(-state.value.hueOffset * 3, 72, 48),
         14: colorAt(state.value.hueOffset * 3, 70, 45),
-        15: chroma.hsl(0, 0, isDark ? 0.95 : 0.10).hex(),
-      }
+        15: chroma.hsl(0, 0, isDark ? 0.95 : 0.1).hex(),
+      },
     }
   }
 
@@ -746,13 +750,15 @@ export const useTheme = () => {
   }))
 
   // Theme options (font styles, etc)
-  const options = computed((): ThemeOptions => ({
-    boldKeywords: state.value.boldKeywords,
-    italicComments: state.value.italicComments,
-    boldFunctions: state.value.boldFunctions,
-    italicStrings: state.value.italicStrings,
-    underlineErrors: state.value.underlineErrors,
-  }))
+  const options = computed(
+    (): ThemeOptions => ({
+      boldKeywords: state.value.boldKeywords,
+      italicComments: state.value.italicComments,
+      boldFunctions: state.value.boldFunctions,
+      italicStrings: state.value.italicStrings,
+      underlineErrors: state.value.underlineErrors,
+    })
+  )
 
   return {
     state,

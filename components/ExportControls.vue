@@ -17,10 +17,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="export-controls" :style="{ borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }">
+  <div
+    class="export-controls"
+    :style="{
+      borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    }"
+  >
     <!-- Section 1: Export Configuration -->
     <div class="export-config">
-      <h3 class="config-heading" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)' }">
+      <h3
+        class="config-heading"
+        :style="{
+          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+        }"
+      >
         Export Configuration
       </h3>
 
@@ -32,19 +42,25 @@ const emit = defineEmits<{
             { id: 'iterm', label: 'iTerm2' },
             { id: 'tmux', label: 'Tmux' },
             { id: 'neovim', label: 'Neovim' },
-            { id: 'lazygit', label: 'Lazygit' }
+            { id: 'lazygit', label: 'Lazygit' },
           ]"
           :key="format.id"
           class="format-option"
           :class="{ selected: exportFormats.includes(format.id) }"
           :style="{
             background: exportFormats.includes(format.id)
-              ? (state.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
+              ? state.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.12)'
+                : 'rgba(0, 0, 0, 0.08)'
               : 'transparent',
             borderColor: exportFormats.includes(format.id)
-              ? (state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.3)')
-              : (state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'),
-            color: state.mode === 'dark' ? '#fff' : '#000'
+              ? state.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.4)'
+                : 'rgba(0, 0, 0, 0.3)'
+              : state.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.15)'
+                : 'rgba(0, 0, 0, 0.15)',
+            color: state.mode === 'dark' ? '#fff' : '#000',
           }"
         >
           <input
@@ -57,8 +73,11 @@ const emit = defineEmits<{
           <span
             v-if="exportFormats.includes(format.id)"
             class="check-indicator"
-            :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)' }"
-          >✓</span>
+            :style="{
+              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+            }"
+            >✓</span
+          >
         </label>
       </div>
 
@@ -68,7 +87,7 @@ const emit = defineEmits<{
         class="quick-action-btn"
         :style="{
           borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)',
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
         }"
         title="Select all export formats"
       >
@@ -78,7 +97,12 @@ const emit = defineEmits<{
 
     <!-- Section 2: Primary Actions (most important - biggest buttons) -->
     <div class="primary-actions">
-      <h3 class="action-heading" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)' }">
+      <h3
+        class="action-heading"
+        :style="{
+          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+        }"
+      >
         Export Themes
       </h3>
 
@@ -87,14 +111,17 @@ const emit = defineEmits<{
         @click="emit('exportBoth')"
         class="btn-export-primary"
         :style="{
-          background: state.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(100, 150, 255, 0.25), rgba(150, 100, 255, 0.25))'
-            : 'linear-gradient(135deg, rgba(100, 150, 255, 0.15), rgba(150, 100, 255, 0.15))',
-          borderColor: state.mode === 'dark' ? 'rgba(150, 150, 255, 0.5)' : 'rgba(100, 100, 200, 0.5)',
+          background:
+            state.mode === 'dark'
+              ? 'linear-gradient(135deg, rgba(100, 150, 255, 0.25), rgba(150, 100, 255, 0.25))'
+              : 'linear-gradient(135deg, rgba(100, 150, 255, 0.15), rgba(150, 100, 255, 0.15))',
+          borderColor:
+            state.mode === 'dark' ? 'rgba(150, 150, 255, 0.5)' : 'rgba(100, 100, 200, 0.5)',
           color: state.mode === 'dark' ? '#fff' : '#000',
-          boxShadow: state.mode === 'dark'
-            ? '0 4px 12px rgba(100, 150, 255, 0.15)'
-            : '0 4px 12px rgba(100, 150, 255, 0.1)'
+          boxShadow:
+            state.mode === 'dark'
+              ? '0 4px 12px rgba(100, 150, 255, 0.15)'
+              : '0 4px 12px rgba(100, 150, 255, 0.1)',
         }"
         title="Download both dark and light theme files for all selected formats"
       >
@@ -108,8 +135,9 @@ const emit = defineEmits<{
           @click="emit('exportDark')"
           class="btn-export-secondary"
           :style="{
-            borderColor: state.mode === 'dark' ? 'rgba(100, 150, 255, 0.4)' : 'rgba(100, 150, 255, 0.3)',
-            color: state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : 'rgba(80, 120, 200, 1)'
+            borderColor:
+              state.mode === 'dark' ? 'rgba(100, 150, 255, 0.4)' : 'rgba(100, 150, 255, 0.3)',
+            color: state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : 'rgba(80, 120, 200, 1)',
           }"
           title="Download dark theme only"
         >
@@ -120,8 +148,9 @@ const emit = defineEmits<{
           @click="emit('exportLight')"
           class="btn-export-secondary"
           :style="{
-            borderColor: state.mode === 'dark' ? 'rgba(255, 200, 100, 0.4)' : 'rgba(255, 200, 100, 0.3)',
-            color: state.mode === 'dark' ? 'rgba(255, 220, 120, 1)' : 'rgba(200, 160, 60, 1)'
+            borderColor:
+              state.mode === 'dark' ? 'rgba(255, 200, 100, 0.4)' : 'rgba(255, 200, 100, 0.3)',
+            color: state.mode === 'dark' ? 'rgba(255, 220, 120, 1)' : 'rgba(200, 160, 60, 1)',
           }"
           title="Download light theme only"
         >
@@ -133,7 +162,12 @@ const emit = defineEmits<{
 
     <!-- Section 3: Quick Copy Actions -->
     <div class="copy-actions">
-      <h3 class="action-heading" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)' }">
+      <h3
+        class="action-heading"
+        :style="{
+          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+        }"
+      >
         Copy to Clipboard
       </h3>
 
@@ -142,8 +176,9 @@ const emit = defineEmits<{
           @click="emit('copyDark')"
           class="btn-copy"
           :style="{
-            borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)',
-            color: state.mode === 'dark' ? '#fff' : '#000'
+            borderColor:
+              state.mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)',
+            color: state.mode === 'dark' ? '#fff' : '#000',
           }"
           title="Copy dark theme config to clipboard (first selected format)"
         >
@@ -154,8 +189,9 @@ const emit = defineEmits<{
           @click="emit('copyLight')"
           class="btn-copy"
           :style="{
-            borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)',
-            color: state.mode === 'dark' ? '#fff' : '#000'
+            borderColor:
+              state.mode === 'dark' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)',
+            color: state.mode === 'dark' ? '#fff' : '#000',
           }"
           title="Copy light theme config to clipboard (first selected format)"
         >
@@ -172,7 +208,7 @@ const emit = defineEmits<{
         class="btn-reset"
         :style="{
           borderColor: state.mode === 'dark' ? 'rgba(255, 80, 80, 0.4)' : 'rgba(200, 60, 60, 0.4)',
-          color: state.mode === 'dark' ? 'rgba(255, 120, 120, 1)' : 'rgba(200, 60, 60, 1)'
+          color: state.mode === 'dark' ? 'rgba(255, 120, 120, 1)' : 'rgba(200, 60, 60, 1)',
         }"
         title="Reset all theme values to defaults"
       >

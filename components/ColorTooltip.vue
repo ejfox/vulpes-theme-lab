@@ -9,7 +9,7 @@ const showTooltip = computed(() => highlightedColor.value !== null)
 const updatePosition = (e: MouseEvent) => {
   tooltipPosition.value = {
     x: e.clientX,
-    y: e.clientY
+    y: e.clientY,
   }
 }
 
@@ -31,16 +31,14 @@ const colorInfo = computed(() => {
   const linked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
   const multiplier = state.value[`${colorName}Multiplier` as keyof typeof state.value] as number
 
-  const actualOffset = linked
-    ? (state.value.hueOffset * multiplier) + offset
-    : offset
+  const actualOffset = linked ? state.value.hueOffset * multiplier + offset : offset
 
   return {
     name: colorName,
     offset: actualOffset.toFixed(0),
     lightness,
     linked,
-    multiplier: multiplier.toFixed(1)
+    multiplier: multiplier.toFixed(1),
   }
 })
 </script>
@@ -54,33 +52,64 @@ const colorInfo = computed(() => {
         :style="{
           left: `${tooltipPosition.x + 15}px`,
           top: `${tooltipPosition.y + 15}px`,
-          background: state.mode === 'dark' ? 'rgba(20, 20, 25, 0.98)' : 'rgba(250, 250, 255, 0.98)',
+          background:
+            state.mode === 'dark' ? 'rgba(20, 20, 25, 0.98)' : 'rgba(250, 250, 255, 0.98)',
           borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          color: state.mode === 'dark' ? '#fff' : '#000'
+          color: state.mode === 'dark' ? '#fff' : '#000',
         }"
       >
         <div class="tooltip-header">
           <span class="tooltip-color-name">{{ colorInfo.name }}</span>
-          <span class="tooltip-badge" :style="{
-            background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
-            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)'
-          }">color variable</span>
+          <span
+            class="tooltip-badge"
+            :style="{
+              background:
+                state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)',
+              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+            }"
+            >color variable</span
+          >
         </div>
         <div class="tooltip-details">
           <div class="tooltip-row">
-            <span class="tooltip-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">Offset:</span>
+            <span
+              class="tooltip-label"
+              :style="{
+                color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              }"
+              >Offset:</span
+            >
             <span class="tooltip-value">{{ colorInfo.offset }}°</span>
           </div>
           <div class="tooltip-row">
-            <span class="tooltip-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">Lightness:</span>
+            <span
+              class="tooltip-label"
+              :style="{
+                color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              }"
+              >Lightness:</span
+            >
             <span class="tooltip-value">{{ colorInfo.lightness }}</span>
           </div>
           <div class="tooltip-row">
-            <span class="tooltip-label" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)' }">Link:</span>
-            <span class="tooltip-value">{{ colorInfo.linked ? `${colorInfo.multiplier}x` : 'unlinked' }}</span>
+            <span
+              class="tooltip-label"
+              :style="{
+                color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+              }"
+              >Link:</span
+            >
+            <span class="tooltip-value">{{
+              colorInfo.linked ? `${colorInfo.multiplier}x` : 'unlinked'
+            }}</span>
           </div>
         </div>
-        <div class="tooltip-hint" :style="{ color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)' }">
+        <div
+          class="tooltip-hint"
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+          }"
+        >
           Scroll up to adjust
         </div>
       </div>

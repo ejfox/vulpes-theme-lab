@@ -206,7 +206,7 @@ describe('tweakcc Exporter', () => {
     const result = exportTweakcc(palette, 'my-awesome-theme!')
 
     const theme = JSON.parse(result.content)
-    expect(theme.id).toBe('my-awesome-theme-')  // Special chars converted to hyphens
-    expect(theme.name).toBe('my-awesome-theme!')  // Name keeps original
+    expect(theme.id).toBe('my-awesome-theme-') // Special chars converted to hyphens
+    expect(theme.name).toBe('my-awesome-theme!') // Name keeps original
   })
 })

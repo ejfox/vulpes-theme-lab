@@ -16,11 +16,11 @@ function to256(color: string): number {
   }
 
   // Convert to 6x6x6 color cube (16-231)
-  const r6 = Math.round(r / 255 * 5)
-  const g6 = Math.round(g / 255 * 5)
-  const b6 = Math.round(b / 255 * 5)
+  const r6 = Math.round((r / 255) * 5)
+  const g6 = Math.round((g / 255) * 5)
+  const b6 = Math.round((b / 255) * 5)
 
-  return 16 + (36 * r6) + (6 * g6) + b6
+  return 16 + 36 * r6 + 6 * g6 + b6
 }
 
 /**

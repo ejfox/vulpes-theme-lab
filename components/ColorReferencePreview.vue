@@ -4,18 +4,42 @@ const { colors } = useTheme()
 // ANSI colors demo
 const ansiColors = Array.from({ length: 16 }, (_, i) => ({
   index: i,
-  name: ['Black', 'Red', 'Green', 'Yellow', 'Blue', 'Magenta', 'Cyan', 'White',
-         'Bright Black', 'Bright Red', 'Bright Green', 'Bright Yellow',
-         'Bright Blue', 'Bright Magenta', 'Bright Cyan', 'Bright White'][i]
+  name: [
+    'Black',
+    'Red',
+    'Green',
+    'Yellow',
+    'Blue',
+    'Magenta',
+    'Cyan',
+    'White',
+    'Bright Black',
+    'Bright Red',
+    'Bright Green',
+    'Bright Yellow',
+    'Bright Blue',
+    'Bright Magenta',
+    'Bright Cyan',
+    'Bright White',
+  ][i],
 }))
 </script>
 
 <template>
   <div class="color-ref" :style="{ background: colors.bg, color: colors.fg }">
     <!-- Header -->
-    <div class="section-header" :style="{ background: colors.base + '15', borderBottom: `2px solid ${colors.base}`, color: colors.base }">
-      <span style="font-weight: bold;">Color Reference :: Simulacra Palette</span>
-      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.comment }">All 45 hyperreal colors</span>
+    <div
+      class="section-header"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `2px solid ${colors.base}`,
+        color: colors.base,
+      }"
+    >
+      <span style="font-weight: bold">Color Reference :: Simulacra Palette</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.comment }"
+        >All 45 hyperreal colors</span
+      >
     </div>
 
     <div class="content">
@@ -133,13 +157,21 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
         <div class="section-label" :style="{ color: colors.keyword }">UI (3)</div>
         <div class="ui-demo">
           <div class="demo-line" :style="{ background: colors.cursorline }">
-            <span :style="{ background: colors.cursor, color: colors.bg, padding: '0 2px' }">█</span>
+            <span :style="{ background: colors.cursor, color: colors.bg, padding: '0 2px' }"
+              >█</span
+            >
             <span :style="{ color: colors.fg }"> Current line with cursor</span>
-            <span :style="{ marginLeft: '8px', color: colors.comment, fontSize: '8px' }">cursorline + cursor</span>
+            <span :style="{ marginLeft: '8px', color: colors.comment, fontSize: '8px' }"
+              >cursorline + cursor</span
+            >
           </div>
           <div class="demo-line">
-            <span :style="{ background: colors.selection, color: colors.fg, padding: '0 4px' }">Selected text</span>
-            <span :style="{ marginLeft: '8px', color: colors.comment, fontSize: '8px' }">selection</span>
+            <span :style="{ background: colors.selection, color: colors.fg, padding: '0 4px' }"
+              >Selected text</span
+            >
+            <span :style="{ marginLeft: '8px', color: colors.comment, fontSize: '8px' }"
+              >selection</span
+            >
           </div>
         </div>
       </div>
@@ -154,18 +186,25 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
             class="ansi-item"
             :style="{
               background: colors.palette[ansi.index],
-              color: ansi.index < 8 && ansi.index !== 3 && ansi.index !== 6 ? '#ffffff' : '#000000'
+              color: ansi.index < 8 && ansi.index !== 3 && ansi.index !== 6 ? '#ffffff' : '#000000',
             }"
           >
-            <span style="font-weight: bold;">{{ ansi.index }}</span>
-            <span style="font-size: 7px;">{{ ansi.name }}</span>
+            <span style="font-weight: bold">{{ ansi.index }}</span>
+            <span style="font-size: 7px">{{ ansi.name }}</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="footer" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}30`, color: colors.comment }">
+    <div
+      class="footer"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}30`,
+        color: colors.comment,
+      }"
+    >
       <span>The map is not the territory</span>
       <span :style="{ marginLeft: 'auto', color: colors.base }">✓ 45/45 jacked in</span>
     </div>

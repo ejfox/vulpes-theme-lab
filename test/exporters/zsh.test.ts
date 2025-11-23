@@ -44,7 +44,7 @@ describe('ZSH Exporter', () => {
       'redirection',
     ]
 
-    requiredTypes.forEach(type => {
+    requiredTypes.forEach((type) => {
       expect(content).toContain(`ZSH_HIGHLIGHT_STYLES[${type}]`)
     })
   })
@@ -68,7 +68,7 @@ describe('ZSH Exporter', () => {
       'header:',
     ]
 
-    fzfKeys.forEach(key => {
+    fzfKeys.forEach((key) => {
       expect(content).toContain(key)
     })
   })
@@ -85,7 +85,7 @@ describe('ZSH Exporter', () => {
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
-    colorMatches!.forEach(color => {
+    colorMatches!.forEach((color) => {
       expect(isValidHexColor(color)).toBe(true)
     })
   })
@@ -120,12 +120,12 @@ describe('ZSH Exporter', () => {
     expect(content).toMatch(/prompt:#[0-9a-f]{6}/i)
 
     // ZSH_HIGHLIGHT_STYLES should use 256 color codes (numbers only, no # prefix)
-    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[default\]='fg=\d+'/);
-    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[comment\]='fg=\d+'/);
-    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[command\]='fg=\d+'/);
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[default\]='fg=\d+'/)
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[comment\]='fg=\d+'/)
+    expect(content).toMatch(/ZSH_HIGHLIGHT_STYLES\[command\]='fg=\d+'/)
 
     // Powerlevel10k should use 256 color codes without quotes
-    expect(content).toMatch(/POWERLEVEL9K_DIR_BACKGROUND=\d+/);
-    expect(content).toMatch(/POWERLEVEL9K_VCS_CLEAN_BACKGROUND=\d+/);
+    expect(content).toMatch(/POWERLEVEL9K_DIR_BACKGROUND=\d+/)
+    expect(content).toMatch(/POWERLEVEL9K_VCS_CLEAN_BACKGROUND=\d+/)
   })
 })

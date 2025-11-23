@@ -40,7 +40,7 @@ gui:
     - green
   diffDeletedColor:
     - red
-  diffTerminal: true  # Use terminal colors for diff
+  diffTerminal: true # Use terminal colors for diff
 
 # Extended color customization (if supported by your lazygit version)
 colors:

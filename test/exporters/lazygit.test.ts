@@ -42,7 +42,7 @@ describe('Lazygit Exporter', () => {
       'defaultFgColor',
     ]
 
-    requiredColors.forEach(color => {
+    requiredColors.forEach((color) => {
       expect(content).toContain(color)
     })
   })
@@ -55,7 +55,7 @@ describe('Lazygit Exporter', () => {
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
-    colorMatches!.forEach(color => {
+    colorMatches!.forEach((color) => {
       expect(isValidHexColor(color)).toBe(true)
     })
   })

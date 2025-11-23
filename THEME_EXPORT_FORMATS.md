@@ -29,6 +29,7 @@ Color Generation (chroma-js)
 ## Color Space & Mappings
 
 The theme builder uses HSL with hue offset mathematics:
+
 - Base Hue (user controlled)
 - Saturation (user controlled)
 - Lightness (user controlled)
@@ -43,16 +44,16 @@ For each export format, we need to convert HSL → Hex hex values.
 ```typescript
 interface ThemePalette {
   // Core colors (already defined)
-  base: string        // #XXXXXX
-  error: string       // ±7° hue offset
+  base: string // #XXXXXX
+  error: string // ±7° hue offset
   warning: string
   success: string
   info: string
 
   // Extended palette
-  fg: string         // foreground
-  bg: string         // background
-  bg_alt: string     // alternate background (for panels)
+  fg: string // foreground
+  bg: string // background
+  bg_alt: string // alternate background (for panels)
   comment: string
   string: string
   number: string
@@ -79,6 +80,7 @@ function generatePalette(baseHue, saturation, lightness, isDark): ThemePalette {
 **Output file**: `catppuccin-custom.lua` (goes in `~/.config/nvim/lua/colors/`)
 
 **Structure**:
+
 ```lua
 return {
   {
@@ -105,6 +107,7 @@ return {
 ```
 
 **Color mappings needed**:
+
 - 50+ Neovim highlight groups
 - LSP diagnostic colors (error, warning, info, hint)
 - UI elements (statusline, tabline, etc.)
@@ -120,6 +123,7 @@ return {
 **Format**: XML plist (TextMate theme format)
 
 **Structure**:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC ...>
@@ -154,12 +158,14 @@ return {
 ### 3. Yazi (File Manager)
 
 **Output files**:
+
 - `theme.toml` (dark version)
 - `theme-light.toml` (light version)
 
 **Format**: TOML
 
 **Structure**:
+
 ```toml
 # Dark theme
 [colors]
@@ -193,18 +199,19 @@ background = { bg = "<bg_alt>" }
 **Format**: YAML
 
 **Structure**:
+
 ```yaml
 gui:
   theme:
     # Colors are lazygit's internal names (black, red, green, etc.)
-    selectedLineBgColor: ["<selection>"]
-    selectedRangeBgColor: ["<bg_alt>"]
-    inactiveBorderColor: ["<info>"]
-    searchingActiveBorderColor: ["<success>"]
+    selectedLineBgColor: ['<selection>']
+    selectedRangeBgColor: ['<bg_alt>']
+    inactiveBorderColor: ['<info>']
+    searchingActiveBorderColor: ['<success>']
 
 colors:
-  selectedLineBg: ["<selection>"]
-  selectedLineFile: ["<fg>"]
+  selectedLineBg: ['<selection>']
+  selectedLineFile: ['<fg>']
 ```
 
 **Challenge**: Lazygit uses named color slots, not arbitrary hex values. Need to map our palette to lazygit's expected color names.
@@ -220,6 +227,7 @@ colors:
 **Two parts**:
 
 #### A. Syntax Highlighting
+
 ```bash
 ZSH_HIGHLIGHT_STYLES=(
   'alias:fg=<base>'
@@ -232,6 +240,7 @@ ZSH_HIGHLIGHT_STYLES=(
 ```
 
 #### B. FZF Colors
+
 ```bash
 export FZF_DEFAULT_OPTS=$'--color=fg:<fg>,bg:<bg>,hl:<info> \
   --color=fg+:<fg>,bg+:<bg_alt>,hl+:<info> \
@@ -261,12 +270,14 @@ No additional export needed; Ghostty handles this.
 ## Implementation Roadmap
 
 ### Phase 1: Infrastructure (2-3 hours)
+
 - [ ] Create `utils/exporters/` directory
 - [ ] Create `utils/types.ts` with `ThemePalette` interface
 - [ ] Extend `composables/useTheme.ts` to generate full palette
 - [ ] Update `app.vue` to include export format selection UI
 
 ### Phase 2: Individual Exporters (1 hour each)
+
 - [ ] Neovim exporter (`nvim.ts`)
 - [ ] Bat exporter (`bat.ts`) + tmTheme builder
 - [ ] Yazi exporter (`yazi.ts`)
@@ -274,12 +285,14 @@ No additional export needed; Ghostty handles this.
 - [ ] ZSH exporter (`zsh.ts`)
 
 ### Phase 3: UI & Download (1-2 hours)
+
 - [ ] Add checkbox UI to select which formats to export
 - [ ] Create ZIP file downloader
 - [ ] Generate installation instructions per format
 - [ ] Add theme name input field
 
 ### Phase 4: Testing & Documentation (1-2 hours)
+
 - [ ] Test exports with actual tools
 - [ ] Create format-specific installation guides
 - [ ] Document color mapping decisions
@@ -294,14 +307,15 @@ No additional export needed; Ghostty handles this.
 **Problem**: Tools like Lazygit don't accept arbitrary hex colors in all places.
 
 **Solution**: Create a "color slot mapping" that translates our palette to tool-specific names:
+
 ```typescript
 const lazygitColorMap = {
-  error: "red",
-  warning: "yellow",
-  success: "green",
-  info: "blue",
-  base: "white",
-  comment: "gray",
+  error: 'red',
+  warning: 'yellow',
+  success: 'green',
+  info: 'blue',
+  base: 'white',
+  comment: 'gray',
 }
 ```
 
@@ -310,12 +324,13 @@ const lazygitColorMap = {
 **Current approach**: User picks base hue, saturation, lightness
 
 **For export**: Generate both light and dark variants:
+
 ```typescript
 // Dark variant
-const darkPalette = generatePalette(hue, sat, lightness, isDark=true)
+const darkPalette = generatePalette(hue, sat, lightness, (isDark = true))
 
 // Light variant
-const lightPalette = generatePalette(hue, sat, lightness, isDark=false)
+const lightPalette = generatePalette(hue, sat, lightness, (isDark = false))
 ```
 
 This requires adjusting lightness values for light mode (typically L+30-40%).
@@ -325,10 +340,11 @@ This requires adjusting lightness values for light mode (typically L+30-40%).
 **Problem**: 4 diagnostic levels (error, warning, info, hint) need distinct colors
 
 **Solution**: Use hue offset mathematics (already in theme builder):
+
 ```typescript
 const error = chroma.hsl(baseHue + 7, 0.85, 0.55)
 const warning = chroma.hsl(baseHue - 7, 0.85, 0.55)
-const info = chroma.hsl(baseHue + 120, 0.85, 0.55)  // Complementary
+const info = chroma.hsl(baseHue + 120, 0.85, 0.55) // Complementary
 const hint = chroma.hsl(baseHue - 120, 0.85, 0.55)
 ```
 
@@ -370,17 +386,21 @@ function hslToHex(h: number, s: number, l: number): string {
   // h: 0-360, s: 0-100, l: 0-100
   // Returns: "#RRGGBB"
 
-  const c = (1 - Math.abs(2 * l / 100 - 1)) * (s / 100);
-  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-  const m = l / 100 - c / 2;
+  const c = (1 - Math.abs((2 * l) / 100 - 1)) * (s / 100)
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
+  const m = l / 100 - c / 2
 
-  let r = 0, g = 0, b = 0;
+  let r = 0,
+    g = 0,
+    b = 0
 
-  if (h < 60) [r, g, b] = [c, x, 0];
-  else if (h < 120) [r, g, b] = [x, c, 0];
+  if (h < 60) [r, g, b] = [c, x, 0]
+  else if (h < 120) [r, g, b] = [x, c, 0]
   // ... etc
 
-  return `#${Math.round((r + m) * 255).toString(16).padStart(2, '0')}...`
+  return `#${Math.round((r + m) * 255)
+    .toString(16)
+    .padStart(2, '0')}...`
 }
 ```
 

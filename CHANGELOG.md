@@ -1,8 +1,6 @@
 # Changelog
 
-
 ## v0.2.0
-
 
 ### 🚀 Enhancements
 
@@ -13,7 +11,7 @@
 - Add reset buttons to all editable color swatches ([eedcd5e](https://github.com/ejfox/vulpes-theme-lab/commit/eedcd5e))
 - Add theme presets dropdown ([428df4e](https://github.com/ejfox/vulpes-theme-lab/commit/428df4e))
 - Make color swatches sticky on scroll ([637d2f5](https://github.com/ejfox/vulpes-theme-lab/commit/637d2f5))
-- ⚠️  Additive color offsets with global link system ([9a188ff](https://github.com/ejfox/vulpes-theme-lab/commit/9a188ff))
+- ⚠️ Additive color offsets with global link system ([9a188ff](https://github.com/ejfox/vulpes-theme-lab/commit/9a188ff))
 - Bigger color swatches with more slider space ([33f2c73](https://github.com/ejfox/vulpes-theme-lab/commit/33f2c73))
 - Add tooltips to all color control sliders ([e51d02a](https://github.com/ejfox/vulpes-theme-lab/commit/e51d02a))
 - Per-color math presets and colored sliders ([1b1bb98](https://github.com/ejfox/vulpes-theme-lab/commit/1b1bb98))
@@ -56,9 +54,8 @@
 
 #### ⚠️ Breaking Changes
 
-- ⚠️  Additive color offsets with global link system ([9a188ff](https://github.com/ejfox/vulpes-theme-lab/commit/9a188ff))
+- ⚠️ Additive color offsets with global link system ([9a188ff](https://github.com/ejfox/vulpes-theme-lab/commit/9a188ff))
 
 ### ❤️ Contributors
 
 - EJ Fox ([@ejfox](https://github.com/ejfox))
-

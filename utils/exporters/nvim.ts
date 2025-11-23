@@ -18,7 +18,13 @@ import chroma from 'chroma-js'
 export function exportNeovim(
   palette: ThemePalette,
   themeName: string = 'vulpes',
-  options: { boldKeywords?: boolean; italicComments?: boolean; boldFunctions?: boolean; italicStrings?: boolean; underlineErrors?: boolean } = {}
+  options: {
+    boldKeywords?: boolean
+    italicComments?: boolean
+    boldFunctions?: boolean
+    italicStrings?: boolean
+    underlineErrors?: boolean
+  } = {}
 ): ExportResult {
   const { boldKeywords, italicComments, boldFunctions, italicStrings, underlineErrors } = options
 

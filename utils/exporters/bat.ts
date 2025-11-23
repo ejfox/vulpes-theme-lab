@@ -42,12 +42,13 @@ export function exportBat(palette: ThemePalette, themeName: string = 'vulpes'): 
     { scope: 'markup.changed', fg: palette.warning },
   ]
 
-  const scopeItems = scopes.map(({ scope, fg, bg }) => {
-    const settings: string[] = []
-    if (fg) settings.push(`        <key>foreground</key>\n        <string>${fg}</string>`)
-    if (bg) settings.push(`        <key>background</key>\n        <string>${bg}</string>`)
+  const scopeItems = scopes
+    .map(({ scope, fg, bg }) => {
+      const settings: string[] = []
+      if (fg) settings.push(`        <key>foreground</key>\n        <string>${fg}</string>`)
+      if (bg) settings.push(`        <key>background</key>\n        <string>${bg}</string>`)
 
-    return `    <dict>
+      return `    <dict>
       <key>scope</key>
       <string>${scope}</string>
       <key>settings</key>
@@ -55,7 +56,8 @@ export function exportBat(palette: ThemePalette, themeName: string = 'vulpes'): 
 ${settings.join('\n')}
       </dict>
     </dict>`
-  }).join('\n')
+    })
+    .join('\n')
 
   const content = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

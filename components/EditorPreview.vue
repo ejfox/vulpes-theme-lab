@@ -5,35 +5,38 @@ const { colors } = useTheme()
 const tabItems = [
   { name: 'simulacrum.ts', active: true, modified: true },
   { name: 'neo.construct', active: false, modified: false },
-  { name: 'metaverse.vue', active: false, modified: true }
+  { name: 'metaverse.vue', active: false, modified: true },
 ]
 
 const statusLineSegments = {
   left: [
     { text: ' NORMAL', bg: 'base', fg: 'bg' },
     { text: ' main', bg: 'success', fg: 'bg' },
-    { text: ' ~/metaverse/core', bg: 'bg_alt', fg: 'fg' }
+    { text: ' ~/metaverse/core', bg: 'bg_alt', fg: 'fg' },
   ],
   right: [
     { text: 'TypeScript ', bg: 'bg_alt', fg: 'info' },
     { text: ' UTF-8', bg: 'bg_alt', fg: 'fg' },
     { text: ' 42:15', bg: 'bg_alt', fg: 'fg' },
-    { text: ' 100%', bg: 'bg_alt', fg: 'comment' }
-  ]
+    { text: ' 100%', bg: 'bg_alt', fg: 'comment' },
+  ],
 }
 
 const popupMenuItems = [
   { label: 'simulateReality', kind: 'Function', selected: true },
   { label: 'SimulationError', kind: 'Class', selected: false },
   { label: 'simulate', kind: 'Keyword', selected: false },
-  { label: 'SIMULATION_DEPTH', kind: 'Constant', selected: false }
+  { label: 'SIMULATION_DEPTH', kind: 'Constant', selected: false },
 ]
 </script>
 
 <template>
   <div class="editor-preview" :style="{ background: colors.bg, color: colors.fg }">
     <!-- Tab Bar -->
-    <div class="tab-bar" :style="{ background: colors.bg, borderBottom: `1px solid ${colors.bg_alt}` }">
+    <div
+      class="tab-bar"
+      :style="{ background: colors.bg, borderBottom: `1px solid ${colors.bg_alt}` }"
+    >
       <div
         v-for="tab in tabItems"
         :key="tab.name"
@@ -41,7 +44,7 @@ const popupMenuItems = [
         :style="{
           background: tab.active ? colors.bg_alt : colors.bg,
           color: tab.active ? colors.fg : colors.comment,
-          borderRight: `1px solid ${colors.bg_alt}`
+          borderRight: `1px solid ${colors.bg_alt}`,
         }"
       >
         <span>{{ tab.name }}</span>
@@ -77,7 +80,7 @@ const popupMenuItems = [
           <span :style="{ color: colors.punctuation }"> {</span>
         </div>
         <div class="code-line">
-          <span :style="{ color: colors.keyword }">  if</span>
+          <span :style="{ color: colors.keyword }"> if</span>
           <span :style="{ color: colors.punctuation }"> (</span>
           <span :style="{ color: colors.variable }">depth</span>
           <span :style="{ color: colors.operator }"> ></span>
@@ -86,7 +89,7 @@ const popupMenuItems = [
           <span :style="{ color: colors.punctuation }"> {</span>
         </div>
         <div class="code-line">
-          <span :style="{ color: colors.keyword }">    throw</span>
+          <span :style="{ color: colors.keyword }"> throw</span>
           <span :style="{ color: colors.keyword }"> new</span>
           <span :style="{ color: colors.type }"> SimulationError</span>
           <span :style="{ color: colors.punctuation }">(</span>
@@ -95,12 +98,12 @@ const popupMenuItems = [
         </div>
         <!-- Current line with cursor -->
         <div class="code-line current-line" :style="{ background: colors.cursorline }">
-          <span :style="{ color: colors.punctuation }">  }</span>
+          <span :style="{ color: colors.punctuation }"> }</span>
           <span class="cursor" :style="{ background: colors.cursor }"></span>
           <span :style="{ color: colors.comment }"> // The map ≠ territory</span>
         </div>
         <div class="code-line">
-          <span :style="{ color: colors.keyword }">  return</span>
+          <span :style="{ color: colors.keyword }"> return</span>
           <span :style="{ color: colors.variable }"> hyperreal</span>
           <span :style="{ color: colors.punctuation }">.</span>
           <span :style="{ color: colors.property }">construct</span>
@@ -114,7 +117,11 @@ const popupMenuItems = [
         <!-- Diagnostic error line -->
         <div class="code-line">
           <span :style="{ color: colors.comment }">// </span>
-          <span class="error-underline" :style="{ color: colors.error, textDecoration: 'underline wavy' }">hyperreal</span>
+          <span
+            class="error-underline"
+            :style="{ color: colors.error, textDecoration: 'underline wavy' }"
+            >hyperreal</span
+          >
           <span :style="{ color: colors.comment }"> is not defined</span>
         </div>
         <div class="code-line"></div>
@@ -126,7 +133,7 @@ const popupMenuItems = [
         :style="{
           background: colors.bg_alt,
           border: `1px solid ${colors.base}`,
-          boxShadow: `0 4px 12px ${colors.bg}80`
+          boxShadow: `0 4px 12px ${colors.bg}80`,
         }"
       >
         <div
@@ -135,7 +142,7 @@ const popupMenuItems = [
           class="popup-item"
           :style="{
             background: item.selected ? colors.base : 'transparent',
-            color: item.selected ? colors.bg : colors.fg
+            color: item.selected ? colors.bg : colors.fg,
           }"
         >
           <span class="kind-badge" :style="{ color: item.selected ? colors.bg : colors.type }">
@@ -147,7 +154,10 @@ const popupMenuItems = [
     </div>
 
     <!-- Status Line -->
-    <div class="status-line" :style="{ background: colors.bg_alt, borderTop: `1px solid ${colors.bg_alt}` }">
+    <div
+      class="status-line"
+      :style="{ background: colors.bg_alt, borderTop: `1px solid ${colors.bg_alt}` }"
+    >
       <div class="status-left">
         <span
           v-for="(seg, i) in statusLineSegments.left"
@@ -155,7 +165,7 @@ const popupMenuItems = [
           class="status-segment"
           :style="{
             background: colors[seg.bg as keyof typeof colors] as string,
-            color: colors[seg.fg as keyof typeof colors] as string
+            color: colors[seg.fg as keyof typeof colors] as string,
           }"
         >
           {{ seg.text }}
@@ -168,7 +178,7 @@ const popupMenuItems = [
           class="status-segment"
           :style="{
             background: colors[seg.bg as keyof typeof colors] as string,
-            color: colors[seg.fg as keyof typeof colors] as string
+            color: colors[seg.fg as keyof typeof colors] as string,
           }"
         >
           {{ seg.text }}

@@ -120,21 +120,21 @@ const createHighlighting = () => {
       {
         tag: tags.keyword,
         color: currentColors.keyword,
-        fontWeight: currentOptions.boldKeywords ? 'bold' : 'normal'
+        fontWeight: currentOptions.boldKeywords ? 'bold' : 'normal',
       },
 
       // Comments
       {
         tag: tags.comment,
         color: currentColors.comment,
-        fontStyle: currentOptions.italicComments ? 'italic' : 'normal'
+        fontStyle: currentOptions.italicComments ? 'italic' : 'normal',
       },
 
       // Strings & Literals
       {
         tag: tags.string,
         color: currentColors.string,
-        fontStyle: currentOptions.italicStrings ? 'italic' : 'normal'
+        fontStyle: currentOptions.italicStrings ? 'italic' : 'normal',
       },
       { tag: tags.number, color: currentColors.number },
       { tag: tags.bool, color: currentColors.constant },
@@ -144,7 +144,7 @@ const createHighlighting = () => {
       {
         tag: tags.function(tags.variableName),
         color: currentColors.function,
-        fontWeight: currentOptions.boldFunctions ? 'bold' : 'normal'
+        fontWeight: currentOptions.boldFunctions ? 'bold' : 'normal',
       },
       { tag: tags.standard(tags.function(tags.variableName)), color: currentColors.builtin },
 
@@ -215,28 +215,32 @@ onMounted(() => {
 })
 
 // Update theme when state changes
-watch(state, () => {
-  if (!view || !editorRef.value) return
+watch(
+  state,
+  () => {
+    if (!view || !editorRef.value) return
 
-  view.destroy()
+    view.destroy()
 
-  const startState = EditorState.create({
-    doc: demoCode,
-    extensions: [
-      basicSetup,
-      javascript({ typescript: true }),
-      createTheme(),
-      createHighlighting(),
-      EditorView.editable.of(true),
-      EditorView.lineWrapping,
-    ],
-  })
+    const startState = EditorState.create({
+      doc: demoCode,
+      extensions: [
+        basicSetup,
+        javascript({ typescript: true }),
+        createTheme(),
+        createHighlighting(),
+        EditorView.editable.of(true),
+        EditorView.lineWrapping,
+      ],
+    })
 
-  view = new EditorView({
-    state: startState,
-    parent: editorRef.value,
-  })
-}, { deep: true })
+    view = new EditorView({
+      state: startState,
+      parent: editorRef.value,
+    })
+  },
+  { deep: true }
+)
 
 onBeforeUnmount(() => {
   view?.destroy()
@@ -244,11 +248,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="code-preview" :style="{
-    opacity: editorOpacity,
-    backdropFilter: editorBlur,
-    WebkitBackdropFilter: editorBlur
-  }">
+  <div
+    class="code-preview"
+    :style="{
+      opacity: editorOpacity,
+      backdropFilter: editorBlur,
+      WebkitBackdropFilter: editorBlur,
+    }"
+  >
     <div class="preview-label">nvim / code editor preview</div>
     <div ref="editorRef" class="editor-container"></div>
   </div>
@@ -283,7 +290,9 @@ onBeforeUnmount(() => {
 }
 
 .cm-scroller {
-  font-family: Monaspace Krypton, monospace;
+  font-family:
+    Monaspace Krypton,
+    monospace;
   line-height: 1.6;
 }
 </style>

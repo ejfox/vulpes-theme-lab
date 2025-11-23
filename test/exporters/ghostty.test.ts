@@ -39,7 +39,7 @@ describe('Ghostty Exporter', () => {
     expect(colorMatches).toBeTruthy()
     expect(colorMatches!.length).toBeGreaterThan(0)
 
-    colorMatches!.forEach(color => {
+    colorMatches!.forEach((color) => {
       expect(isValidHexColor(color)).toBe(true)
     })
   })
