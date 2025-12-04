@@ -22,6 +22,17 @@ const visualEffectsSliders = [
   { key: 'popupBlend', label: 'popup blend', min: 0, max: 100, step: 1 },
 ]
 
+const maplibreSliders = [
+  { key: 'mapWaterOffset', label: 'water', min: -180, max: 180, step: 1 },
+  { key: 'mapParkOffset', label: 'parks', min: -180, max: 180, step: 1 },
+  { key: 'mapBuildingOffset', label: 'buildings', min: -180, max: 180, step: 1 },
+  { key: 'mapPoiOffset', label: 'poi', min: -180, max: 180, step: 1 },
+  { key: 'mapRoadMotorwayOffset', label: 'motorway', min: -180, max: 180, step: 1 },
+  { key: 'mapRoadTrunkOffset', label: 'trunk road', min: -180, max: 180, step: 1 },
+  { key: 'mapRoadPrimaryOffset', label: 'primary road', min: -180, max: 180, step: 1 },
+  { key: 'mapRoadSecondaryOffset', label: 'secondary road', min: -180, max: 180, step: 1 },
+]
+
 // Programmatically generate all 23 color offset sliders for maximum granular control
 // Ordered by semantic importance for code legibility (matches multiplier importance)
 const colorTypes = [
@@ -500,6 +511,45 @@ const fixAllContrast = async () => {
       </div>
     </div>
 
+    <!-- MapLibre color controls -->
+    <div
+      class="maplibre-section"
+      :style="{
+        borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      }"
+    >
+      <div
+        class="section-header"
+        :style="{
+          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+        }"
+      >
+        MAPLIBRE COLORS
+      </div>
+      <div class="control-group" v-for="slider in maplibreSliders" :key="slider.key">
+        <label>
+          <span
+            class="label"
+            :style="{
+              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+            }"
+            >{{ slider.label }}</span
+          >
+          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
+            state[slider.key as keyof typeof state]
+          }}</span>
+        </label>
+        <input
+          type="range"
+          v-model.number="state[slider.key as keyof typeof state]"
+          :min="slider.min"
+          :max="slider.max"
+          :step="slider.step"
+          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
+        />
+      </div>
+    </div>
+
     <!-- Individual color offset controls -->
     <div
       class="color-offsets-section"
@@ -715,7 +765,16 @@ const fixAllContrast = async () => {
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  padding: 4px 0;
+  transition: all 0.2s ease;
+}
+
+.control-group:hover {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 6px 4px;
+  margin: -2px -4px;
+  border-radius: 4px;
 }
 
 .monochrome-controls {
@@ -745,13 +804,32 @@ const fixAllContrast = async () => {
   gap: 8px;
 }
 
+.maplibre-section {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .section-header {
-  font-size: 7px;
-  font-weight: 600;
+  font-size: 8px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-  padding-bottom: 4px;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.section-header:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-left-color: rgba(255, 255, 255, 0.5);
+  padding-left: 12px;
 }
 
 .advanced-section {
@@ -826,79 +904,157 @@ const fixAllContrast = async () => {
 label {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
 }
 
 .label {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s ease;
+}
+
+.control-group:hover .label {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .value {
   font-variant-numeric: tabular-nums;
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   min-width: 36px;
   width: 36px;
   display: inline-block;
   text-align: right;
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  font-size: 9px;
+  transition: all 0.2s ease;
+}
+
+.control-group:hover .value {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
 }
 
 input[type='range'] {
   width: 100%;
-  height: 2px;
+  height: 3px;
   background: #666;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+input[type='range']:hover {
+  height: 4px;
 }
 
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background: #fff;
   cursor: pointer;
-  border-radius: 0;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+input[type='range']::-webkit-slider-thumb:active {
+  transform: scale(1.1);
 }
 
 input[type='range']::-moz-range-thumb {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   background: #fff;
   cursor: pointer;
-  border-radius: 0;
+  border-radius: 50%;
   border: none;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Base hue slider - RED and prominent like a car shifter */
+input[type='range']::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+input[type='range']::-moz-range-thumb:active {
+  transform: scale(1.1);
+}
+
+/* Base hue slider - Vibrant rainbow with prominent thumb */
 .base-hue-slider {
-  height: 3px !important;
+  height: 6px !important;
   background: linear-gradient(
     to right,
-    hsl(0, 80%, 50%),
-    hsl(60, 80%, 50%),
-    hsl(120, 80%, 50%),
-    hsl(180, 80%, 50%),
-    hsl(240, 80%, 50%),
-    hsl(300, 80%, 50%),
-    hsl(360, 80%, 50%)
+    hsl(0, 85%, 55%),
+    hsl(30, 85%, 55%),
+    hsl(60, 85%, 55%),
+    hsl(90, 85%, 55%),
+    hsl(120, 85%, 55%),
+    hsl(150, 85%, 55%),
+    hsl(180, 85%, 55%),
+    hsl(210, 85%, 55%),
+    hsl(240, 85%, 55%),
+    hsl(270, 85%, 55%),
+    hsl(300, 85%, 55%),
+    hsl(330, 85%, 55%),
+    hsl(360, 85%, 55%)
   ) !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.base-hue-slider:hover {
+  height: 8px !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
 }
 
 .base-hue-slider::-webkit-slider-thumb {
-  width: 12px !important;
-  height: 12px !important;
-  background: #ff0000 !important;
-  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+  width: 16px !important;
+  height: 16px !important;
+  background: #fff !important;
+  border: 2px solid #000 !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.base-hue-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.3) !important;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.6);
 }
 
 .base-hue-slider::-moz-range-thumb {
-  width: 12px !important;
-  height: 12px !important;
-  background: #ff0000 !important;
-  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+  width: 16px !important;
+  height: 16px !important;
+  background: #fff !important;
+  border: 2px solid #000 !important;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.base-hue-slider::-moz-range-thumb:hover {
+  transform: scale(1.3) !important;
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.6);
 }
 </style>

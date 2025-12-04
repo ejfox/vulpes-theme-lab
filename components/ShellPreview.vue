@@ -113,26 +113,15 @@ const getColor = (type: string) => {
 </script>
 
 <template>
-  <div class="shell" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="shell" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
     <div
-      class="shell-header"
-      :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30` }"
+      class="header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
     >
-      <div
-        class="tab"
-        :style="{
-          background: colors.base + '20',
-          color: colors.base,
-          borderRight: `1px solid ${colors.base}40`,
-        }"
-      >
-        zsh
-      </div>
-      <div class="tab-controls" :style="{ color: colors.comment }">
-        <span>1</span>
-        <span :style="{ color: colors.base }">2</span>
-        <span>3</span>
-      </div>
+      <span style="font-weight: bold; font-size: 10px">ZSH TERMINAL</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        powerlevel10k • syntax highlighting
+      </span>
     </div>
 
     <div class="terminal-content">
@@ -222,7 +211,7 @@ const getColor = (type: string) => {
 
 <style scoped>
 .shell {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
@@ -231,31 +220,11 @@ const getColor = (type: string) => {
   max-height: 600px;
 }
 
-.shell-header {
+.header {
   display: flex;
+  padding: 4px 6px;
   align-items: center;
-  padding: 4px 0;
-  gap: 1px;
-}
-
-.tab {
-  padding: 4px 12px;
-  font-size: 9px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.tab-controls {
-  display: flex;
-  gap: 12px;
-  padding: 0 12px;
-  font-size: 9px;
-  margin-left: auto;
-}
-
-.tab-controls span {
-  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .terminal-content {

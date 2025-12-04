@@ -10,51 +10,87 @@ const mapContainer = ref<HTMLDivElement | null>(null)
 let map: maplibregl.Map | null = null
 
 const initMap = () => {
-  if (!mapContainer.value) return
+  if (!mapContainer.value) {
+    console.error('MapPreview: mapContainer ref not available')
+    return
+  }
 
-  // Create semantic palette from current theme
-  const palette = createSemanticPalette(darkColors.value, 'dark')
+  try {
+    // Create semantic palette from current theme
+    const palette = createSemanticPalette(darkColors.value, 'dark')
 
-  // Generate MapLibre style JSON
-  const styleResult = exportMaplibre(palette, 'vulpes')
-  const style = JSON.parse(styleResult.content)
+    // Generate MapLibre style JSON
+    const styleResult = exportMaplibre(palette, 'vulpes')
+    const style = JSON.parse(styleResult.content)
 
-  // Use Maptiler API key from environment variable
-  // Fallback to demo key if not set (limited usage)
-  const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
-  const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
-  const parsedStyle = JSON.parse(styleString)
+    // Use Maptiler API key from environment variable
+    const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
+    console.log('MapPreview: Using Maptiler key:', maptilerKey ? maptilerKey.substring(0, 8) + '...' : 'none')
 
-  // Initialize map
-  map = new maplibregl.Map({
-    container: mapContainer.value,
-    style: parsedStyle,
-    center: [-122.4194, 37.7749], // San Francisco (cyberpunk vibes)
-    zoom: 12,
-    pitch: 45, // 3D tilt for that cyberpunk feel
-    bearing: -17.6,
-    attributionControl: false,
-    interactive: false, // Disable interactions for preview
-  })
+    const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
+    const parsedStyle = JSON.parse(styleString)
 
-  // Add navigation controls (hidden by default but accessible)
-  map.addControl(
-    new maplibregl.NavigationControl({
-      visualizePitch: true,
-    }),
-    'top-right',
-  )
+    console.log('MapPreview: Initializing map with style', parsedStyle)
+
+    // Initialize map
+    map = new maplibregl.Map({
+      container: mapContainer.value,
+      style: parsedStyle,
+      center: [-122.4194, 37.7749], // San Francisco (cyberpunk vibes)
+      zoom: 12,
+      pitch: 45, // 3D tilt for that cyberpunk feel
+      bearing: -17.6,
+      attributionControl: false,
+      interactive: false, // Disable mouse interactions - this is a preview
+      scrollZoom: false,
+      dragPan: false,
+      dragRotate: false,
+      doubleClickZoom: false,
+      touchZoomRotate: false,
+    })
+
+    map.on('load', () => {
+      console.log('MapPreview: Map loaded successfully')
+    })
+
+    map.on('error', (e) => {
+      console.error('MapPreview: Map error:', e)
+    })
+
+    // Add navigation controls (hidden by default but accessible)
+    map.addControl(
+      new maplibregl.NavigationControl({
+        visualizePitch: true,
+      }),
+      'top-right',
+    )
+  } catch (error) {
+    console.error('MapPreview: Error initializing map:', error)
+  }
 }
 
-// Reinitialize map when colors change
+// Update map style when colors change (preserves camera position)
 watch(
   () => colors.value,
   () => {
-    if (map) {
-      map.remove()
-      map = null
+    if (!map) return
+
+    try {
+      // Generate new style with updated colors
+      const palette = createSemanticPalette(darkColors.value, 'dark')
+      const styleResult = exportMaplibre(palette, 'vulpes')
+      const style = JSON.parse(styleResult.content)
+
+      const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
+      const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
+      const parsedStyle = JSON.parse(styleString)
+
+      // Update style without resetting camera
+      map.setStyle(parsedStyle)
+      console.log('MapPreview: Style updated, camera preserved')
+    } catch (error) {
+      console.error('MapPreview: Error updating style:', error)
     }
-    setTimeout(initMap, 100) // Small delay to ensure DOM is ready
   },
   { deep: true },
 )
@@ -107,7 +143,8 @@ onUnmounted(() => {
 
 .map-container {
   flex: 1;
-  min-height: 0;
+  min-height: 400px;
+  height: 400px;
   position: relative;
 }
 

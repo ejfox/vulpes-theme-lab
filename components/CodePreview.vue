@@ -254,30 +254,45 @@ onBeforeUnmount(() => {
       opacity: editorOpacity,
       backdropFilter: editorBlur,
       WebkitBackdropFilter: editorBlur,
+      background: colors.bg,
+      borderColor: colors.base,
     }"
   >
-    <div class="preview-label">nvim / code editor preview</div>
+    <div
+      class="preview-label"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
+    >
+      <span style="font-weight: bold; font-size: 10px">CODE EDITOR</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        nvim • bat • syntax highlighting
+      </span>
+    </div>
     <div ref="editorRef" class="editor-container"></div>
   </div>
 </template>
 
 <style>
 .code-preview {
-  border: 1px solid #333;
-  background: var(--bg, #000);
+  border: 1px solid;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 400px;
+  overflow: hidden;
 }
 
 .preview-label {
-  padding: 8px 12px;
-  border-bottom: 1px solid #333;
+  padding: 4px 6px;
+  border-bottom: 1px solid;
   font-size: 10px;
-  color: #666;
   text-transform: uppercase;
-  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .editor-container {

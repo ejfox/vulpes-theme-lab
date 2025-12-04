@@ -62,19 +62,15 @@ const branches = [
 <template>
   <div
     class="lazygit"
-    :style="{ background: colors.bg, color: colors.fg, borderColor: colors.comment }"
+    :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }"
   >
-    <!-- Branch info header -->
     <div
-      class="branch-header"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}` }"
+      class="header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
     >
-      <span :style="{ color: colors.base, fontWeight: 'bold' }">
-        <span :style="{ fontSize: '10px' }">⎇</span> main
-      </span>
-      <span :style="{ color: colors.hint, fontSize: '8px', marginLeft: '8px' }"> ↑3 ↓0 </span>
-      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.comment }">
-        origin/main
+      <span style="font-weight: bold; font-size: 10px">LAZYGIT TUI</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        git status • commits • branches
       </span>
     </div>
 
@@ -194,11 +190,11 @@ const branches = [
   height: 600px;
 }
 
-.branch-header {
-  padding: 6px 12px;
+.header {
   display: flex;
+  padding: 4px 6px;
   align-items: center;
-  font-size: 9px;
+  flex-shrink: 0;
 }
 
 .panel {

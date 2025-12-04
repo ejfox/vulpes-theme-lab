@@ -31,7 +31,16 @@ const popupMenuItems = [
 </script>
 
 <template>
-  <div class="editor-preview" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="editor-preview" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
+    <div
+      class="header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+    >
+      <span style="font-weight: bold; font-size: 10px">VSCODE EDITOR</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        intellisense • autocomplete • diagnostics
+      </span>
+    </div>
     <!-- Tab Bar -->
     <div
       class="tab-bar"
@@ -190,13 +199,20 @@ const popupMenuItems = [
 
 <style scoped>
 .editor-preview {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
   flex-direction: column;
   height: 400px;
   position: relative;
+}
+
+.header {
+  display: flex;
+  padding: 4px 6px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .tab-bar {

@@ -76,7 +76,16 @@ const getPaneIndicator = (paneCount: number) => {
 </script>
 
 <template>
-  <div class="tmux-preview" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="tmux-preview" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
+    <div
+      class="header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+    >
+      <span style="font-weight: bold; font-size: 10px">TMUX SESSION</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        multi-pane terminal multiplexer
+      </span>
+    </div>
     <!-- Dense status bar like your real setup -->
     <div class="tmux-status-bar">
       <div class="status-left">
@@ -132,13 +141,20 @@ const getPaneIndicator = (paneCount: number) => {
 
 <style scoped>
 .tmux-preview {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 500px;
+}
+
+.header {
+  display: flex;
+  padding: 4px 6px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 /* Ultra-compact status bar */

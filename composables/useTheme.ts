@@ -27,6 +27,15 @@ export interface ThemeColors {
   punctuation: string
   heading: string
   palette: Record<number, string>
+  // MapLibre-specific colors
+  mapWater: string
+  mapPark: string
+  mapRoadMotorway: string
+  mapRoadTrunk: string
+  mapRoadPrimary: string
+  mapRoadSecondary: string
+  mapBuilding: string
+  mapPoi: string
 }
 
 // Theme options interface - font styles and other configurable settings
@@ -157,6 +166,15 @@ interface ThemeState {
   hintMultiplier: number
   fgMultiplier: number
   bgMultiplier: number
+  // MapLibre-specific colors
+  mapWaterOffset: number
+  mapParkOffset: number
+  mapRoadMotorwayOffset: number
+  mapRoadTrunkOffset: number
+  mapRoadPrimaryOffset: number
+  mapRoadSecondaryOffset: number
+  mapBuildingOffset: number
+  mapPoiOffset: number
 }
 
 const defaultState: ThemeState = {
@@ -289,6 +307,15 @@ const defaultState: ThemeState = {
   hintMultiplier: 0, // Hint - subtle UI elements
   fgMultiplier: 0, // Foreground - main text color
   bgMultiplier: 0, // Background - canvas color
+  // MapLibre-specific color offsets (relative to baseHue)
+  mapWaterOffset: 180, // Water bodies - cyan/blue
+  mapParkOffset: 120, // Parks/green spaces - green
+  mapRoadMotorwayOffset: 30, // Major highways - orange/yellow
+  mapRoadTrunkOffset: 20, // Trunk roads - yellow
+  mapRoadPrimaryOffset: 10, // Primary roads - warm
+  mapRoadSecondaryOffset: 0, // Secondary roads - neutral
+  mapBuildingOffset: -30, // Buildings - purple/blue
+  mapPoiOffset: 0, // Points of interest - base color
 }
 
 export const useTheme = () => {
@@ -410,6 +437,15 @@ export const useTheme = () => {
     hintMultiplier: Number(params.him) || defaultState.hintMultiplier,
     fgMultiplier: Number(params.fgm) || defaultState.fgMultiplier,
     bgMultiplier: Number(params.bgm) || defaultState.bgMultiplier,
+    // MapLibre-specific colors
+    mapWaterOffset: Number(params.mwo) || defaultState.mapWaterOffset,
+    mapParkOffset: Number(params.mpo) || defaultState.mapParkOffset,
+    mapRoadMotorwayOffset: Number(params.mrmo) || defaultState.mapRoadMotorwayOffset,
+    mapRoadTrunkOffset: Number(params.mrto) || defaultState.mapRoadTrunkOffset,
+    mapRoadPrimaryOffset: Number(params.mrpro) || defaultState.mapRoadPrimaryOffset,
+    mapRoadSecondaryOffset: Number(params.mrso) || defaultState.mapRoadSecondaryOffset,
+    mapBuildingOffset: Number(params.mbo) || defaultState.mapBuildingOffset,
+    mapPoiOffset: Number(params.mpoi) || defaultState.mapPoiOffset,
   }))
 
   // Watch state and sync to URL
@@ -530,6 +566,15 @@ export const useTheme = () => {
         params.him = String(newState.hintMultiplier)
         params.fgm = String(newState.fgMultiplier)
         params.bgm = String(newState.bgMultiplier)
+        // MapLibre-specific colors
+        params.mwo = String(newState.mapWaterOffset)
+        params.mpo = String(newState.mapParkOffset)
+        params.mrmo = String(newState.mapRoadMotorwayOffset)
+        params.mrto = String(newState.mapRoadTrunkOffset)
+        params.mrpro = String(newState.mapRoadPrimaryOffset)
+        params.mrso = String(newState.mapRoadSecondaryOffset)
+        params.mbo = String(newState.mapBuildingOffset)
+        params.mpoi = String(newState.mapPoiOffset)
       },
       { deep: true }
     )
@@ -657,6 +702,15 @@ export const useTheme = () => {
         14: colorAt(state.value.hueOffset * 3, 70, 45),
         15: chroma.hsl(0, 0, isDark ? 0.95 : 0.1).hex(),
       },
+      // MapLibre-specific colors
+      mapWater: colorAt(state.value.mapWaterOffset, 40, 55),
+      mapPark: colorAt(state.value.mapParkOffset, 50, 45),
+      mapRoadMotorway: colorAt(state.value.mapRoadMotorwayOffset, 60, 42),
+      mapRoadTrunk: colorAt(state.value.mapRoadTrunkOffset, 58, 43),
+      mapRoadPrimary: colorAt(state.value.mapRoadPrimaryOffset, 55, 44),
+      mapRoadSecondary: colorAt(state.value.mapRoadSecondaryOffset, 52, 46),
+      mapBuilding: colorAt(state.value.mapBuildingOffset, 45, 48),
+      mapPoi: colorAt(state.value.mapPoiOffset, 58, 42),
     }
   }
 

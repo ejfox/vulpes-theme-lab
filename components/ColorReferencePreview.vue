@@ -26,19 +26,19 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
 </script>
 
 <template>
-  <div class="color-ref" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="color-ref" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
     <!-- Header -->
     <div
-      class="section-header"
+      class="header"
       :style="{
         background: colors.base + '15',
-        borderBottom: `2px solid ${colors.base}`,
+        borderBottom: `1px solid ${colors.base}`,
         color: colors.base,
       }"
     >
-      <span style="font-weight: bold">Color Reference :: Simulacra Palette</span>
-      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.comment }"
-        >All 45 hyperreal colors</span
+      <span style="font-weight: bold; font-size: 10px">COLOR PALETTE</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }"
+        >45 semantic colors • 16 ANSI</span
       >
     </div>
 
@@ -213,7 +213,7 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
 
 <style scoped>
 .color-ref {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
@@ -222,11 +222,11 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
   max-height: 700px;
 }
 
-.section-header {
+.header {
   display: flex;
+  padding: 4px 6px;
   align-items: center;
-  padding: 8px 12px;
-  font-size: 10px;
+  flex-shrink: 0;
 }
 
 .content {

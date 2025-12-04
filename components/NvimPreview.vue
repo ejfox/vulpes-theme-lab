@@ -223,8 +223,18 @@ const codeLines = [
       opacity: state.backgroundOpacity / 100,
       backdropFilter: `blur(${state.backgroundBlur}px)`,
       WebkitBackdropFilter: `blur(${state.backgroundBlur}px)`,
+      borderColor: colors.base,
     }"
   >
+    <div
+      class="header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+    >
+      <span style="font-weight: bold; font-size: 10px">NEOVIM EDITOR</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        lsp • telescope • diagnostics
+      </span>
+    </div>
     <!-- Tab line -->
     <div
       class="tabline"
@@ -541,13 +551,20 @@ const codeLines = [
 
 <style scoped>
 .nvim {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
   flex-direction: column;
   height: 600px;
   position: relative;
+}
+
+.header {
+  display: flex;
+  padding: 4px 6px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .tabline {

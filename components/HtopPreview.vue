@@ -147,7 +147,16 @@ const getBarColor = (colorKey: string) => {
 </script>
 
 <template>
-  <div class="htop" :style="{ background: colors.bg, color: colors.fg }">
+  <div class="htop" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
+    <div
+      class="header-label"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+    >
+      <span style="font-weight: bold; font-size: 10px">HTOP SYSTEM MONITOR</span>
+      <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
+        real-time process viewer
+      </span>
+    </div>
     <!-- Header with CPU/Memory bars -->
     <div class="header">
       <div class="cpu-grid">
@@ -300,12 +309,19 @@ const getBarColor = (colorKey: string) => {
 
 <style scoped>
 .htop {
-  border: 1px solid #222;
+  border: 1px solid;
   font-family: 'Monaspace Krypton', monospace;
   font-size: 9px;
   display: flex;
   flex-direction: column;
   height: 600px;
+}
+
+.header-label {
+  display: flex;
+  padding: 4px 6px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .header {
