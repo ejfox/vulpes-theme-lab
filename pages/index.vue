@@ -10,6 +10,7 @@ import {
   exportNeomutt,
   exportWezterm,
   exportAlacritty,
+  exportMaplibre,
   createSemanticPalette,
   type ExportResult,
 } from '~/utils/exporters'
@@ -87,6 +88,9 @@ const generateConfig = (format: string, isDark: boolean): string => {
       break
     case 'alacritty':
       result = exportAlacritty(palette, baseThemeName)
+      break
+    case 'maplibre':
+      result = exportMaplibre(palette, baseThemeName)
       break
     case 'iterm':
       // iTerm not yet migrated to new exporter system
@@ -431,6 +435,8 @@ const generateExportFromPalette = (format: string, palette: any, isDark: boolean
       return exportWezterm(palette, themeName)
     case 'alacritty':
       return exportAlacritty(palette, themeName)
+    case 'maplibre':
+      return exportMaplibre(palette, themeName)
     default:
       return exportGhostty(palette, themeName)
   }
@@ -554,6 +560,34 @@ const handleModalExport = (formats: string[], mode: 'both' | 'dark' | 'light') =
   }
 }
 
+// Load preset from Vulpes monthly themes
+const loadPreset = (preset: any) => {
+  state.value.baseHue = preset.baseHue
+  state.value.baseSaturation = preset.baseSaturation
+  state.value.baseLightness = preset.baseLightness
+  state.value.themeName = preset.id
+
+  // Apply all color offsets
+  state.value.errorOffset = preset.errorOffset
+  state.value.warningOffset = preset.warningOffset
+  state.value.keywordOffset = preset.keywordOffset
+  state.value.stringOffset = preset.stringOffset
+  state.value.numberOffset = preset.numberOffset
+  state.value.functionOffset = preset.functionOffset
+  state.value.constantOffset = preset.constantOffset
+  state.value.typeOffset = preset.typeOffset
+  state.value.variableOffset = preset.variableOffset
+  state.value.operatorOffset = preset.operatorOffset
+  state.value.builtinOffset = preset.builtinOffset
+  state.value.parameterOffset = preset.parameterOffset
+  state.value.propertyOffset = preset.propertyOffset
+  state.value.namespaceOffset = preset.namespaceOffset
+  state.value.macroOffset = preset.macroOffset
+  state.value.tagOffset = preset.tagOffset
+  state.value.punctuationOffset = preset.punctuationOffset
+  state.value.headingOffset = preset.headingOffset
+}
+
 // Theme presets - based on real theme color analysis
 interface ThemePreset {
   baseHue: number
@@ -661,7 +695,7 @@ const presets: Record<string, ThemePreset> = {
   },
 }
 
-const loadPreset = (presetName: keyof typeof presets) => {
+const loadOldPreset = (presetName: keyof typeof presets) => {
   const preset = presets[presetName]
 
   // Apply base settings
@@ -1101,7 +1135,7 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
             (e) => {
               const el = e.target as HTMLSelectElement
               if (el.value) {
-                loadPreset(el.value as any)
+                loadOldPreset(el.value as any)
                 el.value = ''
               }
             }
@@ -1120,6 +1154,9 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
           <option value="ayu-light">ayu light</option>
         </select>
       </div>
+
+      <!-- Vulpes Monthly Presets -->
+      <PresetSelector @load-preset="loadPreset" />
 
       <ColorControls />
 
@@ -3552,6 +3589,13 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
       <div class="scenario-section">
         <div class="scenario-label">lazygit - git interface</div>
         <GitPreview />
+      </div>
+
+      <div class="scenario-section">
+        <div class="scenario-label">maplibre - cyberpunk neon cartography</div>
+        <ClientOnly>
+          <MapPreview />
+        </ClientOnly>
       </div>
 
       <div class="scenario-section">

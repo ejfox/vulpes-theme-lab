@@ -13,6 +13,7 @@ export { exportTweakcc } from './tweakcc'
 export { exportNeomutt } from './neomutt'
 export { exportWezterm } from './wezterm'
 export { exportAlacritty } from './alacritty'
+export { exportMaplibre } from './maplibre'
 
 export type { ThemePalette, ExportFormat, ExportResult } from '../types'
 export { createSemanticPalette } from '../types'

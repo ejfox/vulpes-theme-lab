@@ -125,6 +125,7 @@ export type ExportFormat =
   | 'neomutt'
   | 'wezterm'
   | 'alacritty'
+  | 'maplibre'
 
 /**
  * Result of a theme export operation

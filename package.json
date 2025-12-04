@@ -1,6 +1,6 @@
 {
   "name": "theme-lab",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -32,6 +32,7 @@
     "@xterm/xterm": "^5.5.0",
     "chroma-js": "^3.1.2",
     "codemirror": "^6.0.2",
+    "maplibre-gl": "^5.14.0",
     "nuxt": "^4.1.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
