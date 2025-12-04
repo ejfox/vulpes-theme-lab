@@ -21,6 +21,7 @@ import {
   applyContrastFixes,
   generateAccessibilityReport,
 } from '~/utils/contrast'
+import { getImportedPreset, applyImportedPreset } from '~/utils/importedPresets'
 import chroma from 'chroma-js'
 
 const { state, colors, darkColors, lightColors, ghosttyThemeDark, ghosttyThemeLight, options } =
@@ -32,6 +33,9 @@ const exportFormats = ref<string[]>(['ghostty'])
 
 // Export modal state
 const showExportModal = ref(false)
+
+// Import modal state
+const showImportModal = ref(false)
 
 // Contrast warning modal state
 const showContrastWarning = ref(false)
@@ -46,6 +50,25 @@ const pendingExport = ref<{
 // Success toast state
 const showSuccessToast = ref(false)
 const successMessage = ref('')
+
+// Handle imported theme
+function handleThemeImported(presetId: string) {
+  const preset = getImportedPreset(presetId)
+  if (!preset) return
+
+  // Apply the imported preset to the current theme state
+  const applied = applyImportedPreset(preset)
+
+  state.value.themeName = applied.themeName
+  state.value.mode = applied.mode
+
+  // Show success message
+  successMessage.value = `Imported theme "${preset.name}" from ${preset.source}`
+  showSuccessToast.value = true
+  setTimeout(() => {
+    showSuccessToast.value = false
+  }, 3000)
+}
 
 // Helper to generate config for a single format using new exporters
 const generateConfig = (format: string, isDark: boolean): string => {
@@ -1180,21 +1203,36 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
               color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
             }"
           >
-            export theme
+            import / export
           </div>
-          <button
-            @click="showExportModal = true"
-            class="btn btn-primary"
-            :style="{
-              background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-              borderColor:
-                state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-              color: state.mode === 'dark' ? '#fff' : '#000',
-            }"
-            title="Export theme to files"
-          >
-            EXPORT THEME
-          </button>
+          <div style="display: flex; gap: 8px">
+            <button
+              @click="showImportModal = true"
+              class="btn btn-secondary"
+              :style="{
+                background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                borderColor:
+                  state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
+              }"
+              title="Import theme from file"
+            >
+              IMPORT
+            </button>
+            <button
+              @click="showExportModal = true"
+              class="btn btn-primary"
+              :style="{
+                background: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                borderColor:
+                  state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
+                color: state.mode === 'dark' ? '#fff' : '#000',
+              }"
+              title="Export theme to files"
+            >
+              EXPORT
+            </button>
+          </div>
         </div>
 
         <!-- Copy section -->
@@ -3613,6 +3651,13 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
         </div>
       </div>
     </main>
+
+    <!-- Import Modal -->
+    <ImportModal
+      :show="showImportModal"
+      @close="showImportModal = false"
+      @imported="handleThemeImported"
+    />
 
     <!-- Export Modal -->
     <ExportModal
