@@ -8,6 +8,7 @@ const { state } = useTheme()
 
 const props = defineProps<{
   show: boolean
+  droppedFile?: File
 }>()
 
 const emit = defineEmits<{
@@ -135,6 +136,13 @@ const colorPreview = computed(() => {
     string: colors.string || colors.fg || '#fff',
     function: colors.function || colors.fg || '#fff',
     comment: colors.comment || colors.fg || '#fff',
+  }
+})
+
+// Watch for dropped file from parent
+watch(() => props.droppedFile, (file) => {
+  if (file && props.show) {
+    processFile(file)
   }
 })
 

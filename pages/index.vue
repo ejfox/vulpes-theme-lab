@@ -36,6 +36,7 @@ const showExportModal = ref(false)
 
 // Import modal state
 const showImportModal = ref(false)
+const droppedFile = ref<File | undefined>(undefined)
 
 // Contrast warning modal state
 const showContrastWarning = ref(false)
@@ -50,6 +51,9 @@ const pendingExport = ref<{
 // Success toast state
 const showSuccessToast = ref(false)
 const successMessage = ref('')
+
+// Global drop zone state
+const isGlobalDragging = ref(false)
 
 // Handle imported theme
 function handleThemeImported(presetId: string) {
@@ -69,6 +73,60 @@ function handleThemeImported(presetId: string) {
     showSuccessToast.value = false
   }, 3000)
 }
+
+// Global drag and drop handlers
+function handleGlobalDragEnter(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer?.types.includes('Files')) {
+    isGlobalDragging.value = true
+  }
+}
+
+function handleGlobalDragOver(e: DragEvent) {
+  e.preventDefault()
+}
+
+function handleGlobalDragLeave(e: DragEvent) {
+  // Only hide if we're leaving the window entirely
+  if (e.target === document.body || e.target === document.documentElement) {
+    isGlobalDragging.value = false
+  }
+}
+
+function handleGlobalDrop(e: DragEvent) {
+  e.preventDefault()
+  isGlobalDragging.value = false
+
+  const files = e.dataTransfer?.files
+  if (files && files.length > 0) {
+    // Pass the dropped file to the modal
+    droppedFile.value = files[0]
+    // Open import modal automatically
+    showImportModal.value = true
+  }
+}
+
+// Clear dropped file when modal closes
+watch(showImportModal, (isOpen) => {
+  if (!isOpen) {
+    droppedFile.value = undefined
+  }
+})
+
+// Setup global drop zone on mount
+onMounted(() => {
+  document.addEventListener('dragenter', handleGlobalDragEnter)
+  document.addEventListener('dragover', handleGlobalDragOver)
+  document.addEventListener('dragleave', handleGlobalDragLeave)
+  document.addEventListener('drop', handleGlobalDrop)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('dragenter', handleGlobalDragEnter)
+  document.removeEventListener('dragover', handleGlobalDragOver)
+  document.removeEventListener('dragleave', handleGlobalDragLeave)
+  document.removeEventListener('drop', handleGlobalDrop)
+})
 
 // Helper to generate config for a single format using new exporters
 const generateConfig = (format: string, isDark: boolean): string => {
@@ -3652,9 +3710,43 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
       </div>
     </main>
 
+    <!-- Global drop overlay -->
+    <Transition name="fade">
+      <div
+        v-if="isGlobalDragging"
+        class="global-drop-overlay"
+        :style="{
+          background: state.mode === 'dark'
+            ? 'rgba(0, 0, 0, 0.85)'
+            : 'rgba(255, 255, 255, 0.85)',
+          borderColor: state.mode === 'dark'
+            ? 'rgba(100, 150, 255, 0.6)'
+            : 'rgba(100, 150, 255, 0.5)',
+        }"
+      >
+        <div class="drop-prompt">
+          <div class="drop-icon">📁</div>
+          <div class="drop-text" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+            Drop theme file to import
+          </div>
+          <div
+            class="drop-hint"
+            :style="{
+              color: state.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.6)'
+                : 'rgba(0, 0, 0, 0.6)'
+            }"
+          >
+            Supports: Base16, Neovim, Ghostty, VS Code
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Import Modal -->
     <ImportModal
       :show="showImportModal"
+      :droppedFile="droppedFile"
       @close="showImportModal = false"
       @imported="handleThemeImported"
     />
@@ -3698,6 +3790,67 @@ const handleColorPicker = (colorName: string, hexColor: string) => {
   display: flex;
   flex-direction: row;
   overflow: hidden;
+}
+
+/* Global drop overlay */
+.global-drop-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px dashed;
+  pointer-events: none;
+}
+
+.drop-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.drop-icon {
+  font-size: 64px;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.drop-text {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.drop-hint {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Fade transition for overlay */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .sidebar-left {
