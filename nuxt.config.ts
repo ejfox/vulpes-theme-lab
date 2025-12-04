@@ -11,4 +11,10 @@ export default defineNuxtConfig({
   },
   // Enable static site generation
   ssr: false,
+  // Runtime config for environment variables
+  runtimeConfig: {
+    public: {
+      maptilerKey: process.env.NUXT_PUBLIC_MAPTILER_KEY || '',
+    },
+  },
 })

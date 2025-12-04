@@ -34,6 +34,7 @@ jobs:
         run: npm run generate
         env:
           NODE_ENV: production
+          NUXT_PUBLIC_MAPTILER_KEY: ${{ secrets.NUXT_PUBLIC_MAPTILER_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

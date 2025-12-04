@@ -5,6 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { exportMaplibre, createSemanticPalette } from '~/utils/exporters'
 
 const { colors, darkColors } = useTheme()
+const config = useRuntimeConfig()
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: maplibregl.Map | null = null
 
@@ -18,11 +19,10 @@ const initMap = () => {
   const styleResult = exportMaplibre(palette, 'vulpes')
   const style = JSON.parse(styleResult.content)
 
-  // Replace {key} placeholders with demo key or use a free source
-  // For demo purposes, we'll use OpenMapTiles demo tiles (limited usage)
-  // Users should replace with their own Maptiler key
-  const demoKey = 'get_your_own_OpIi9ZULNHzrESv6T2vL' // Maptiler demo key
-  const styleString = JSON.stringify(style).replace(/{key}/g, demoKey)
+  // Use Maptiler API key from environment variable
+  // Fallback to demo key if not set (limited usage)
+  const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
+  const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
   const parsedStyle = JSON.parse(styleString)
 
   // Initialize map
