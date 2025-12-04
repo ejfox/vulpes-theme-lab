@@ -277,7 +277,7 @@ export function parseVSCode(content: string): ParseResult {
     if (!colors.bg || !colors.fg) {
       return {
         success: false,
-        error: 'Invalid VS Code theme: missing editor.background or editor.foreground',
+        error: `Invalid VS Code theme: missing editor.background (${colors.bg}) or editor.foreground (${colors.fg})`,
       }
     }
 

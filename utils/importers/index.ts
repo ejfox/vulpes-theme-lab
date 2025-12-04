@@ -48,9 +48,14 @@ export function parseThemeAuto(content: string): ParseResult {
       const json = JSON.parse(content)
       if (json.colors || json.tokenColors) {
         const result = parseVSCode(content)
+        // Even if parsing failed, return the error so we know what went wrong
         if (result.success) return result
+        // If VS Code parser failed but we detected it as VS Code format, return the error
+        if (!result.success && (json.colors || json.tokenColors)) {
+          return result
+        }
       }
-    } catch {
+    } catch (error: any) {
       // Not JSON or invalid, continue
     }
 
