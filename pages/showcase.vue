@@ -69,6 +69,7 @@ const features = [
   {
     title: 'Semantic Hue Shifts',
     desc: 'Errors shift +7° clockwise. Warnings shift -7° counter-clockwise. Success stays at base hue. Your eyes learn the pattern in minutes, never think about it again. Color becomes meaningful, not decorative.',
+    hasColorDemo: true,
   },
 ]
 
@@ -216,110 +217,28 @@ const themes = [
       </div>
     </section>
 
-    <!-- Features -->
-    <section class="px-8 py-32">
-      <div class="max-w-7xl mx-auto">
-        <h2
-          class="text-5xl font-bold mb-20 transition-colors duration-1000"
-          :style="{ color: colors.fg }"
-        >
-          Why vulpes?
-        </h2>
-        <div class="grid md:grid-cols-3 gap-12">
-          <div v-for="feature in features" :key="feature.title" class="space-y-4">
-            <h3
-              class="text-2xl font-bold transition-colors duration-1000"
-              :style="{ color: colors.fg }"
-            >
-              {{ feature.title }}
-            </h3>
-            <p
-              class="text-lg leading-relaxed transition-colors duration-1000"
-              :style="{ color: colors.comment }"
-            >
-              {{ feature.desc }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Themes Gallery -->
-    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
-      <div class="max-w-7xl mx-auto">
-        <div class="mb-20">
-          <h2
-            class="text-5xl font-bold mb-4 transition-colors duration-1000"
-            :style="{ color: colors.fg }"
-          >
-            From vulpes-month
-          </h2>
-          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            A daily theme experiment. Same system, infinite variations.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div
-            v-for="theme in themes"
-            :key="theme.name"
-            class="group relative p-8 rounded-2xl border transition-all duration-300"
-            :style="{
-              borderColor: `hsl(${theme.hue}, 30%, 30%)`,
-              backgroundColor: `hsl(${theme.hue}, 20%, 10%)`,
-            }"
-          >
-            <div class="space-y-4">
-              <!-- Color palette preview -->
-              <div class="flex gap-2">
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue}, 70%, 60%)` }"
-                  title="base"
-                ></div>
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue + 7}, 70%, 55%)` }"
-                  title="error (+7°)"
-                ></div>
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue - 7}, 70%, 55%)` }"
-                  title="warning (-7°)"
-                ></div>
-              </div>
-              <div>
-                <h3
-                  class="text-xl font-bold mb-2"
-                  :style="{ color: `hsl(${theme.hue}, 60%, 90%)` }"
-                >
-                  {{ theme.name }}
-                </h3>
-                <p class="text-sm" :style="{ color: `hsl(${theme.hue}, 20%, 60%)` }">
-                  {{ theme.desc }}
-                </p>
-                <p class="text-xs font-mono mt-2" :style="{ color: `hsl(${theme.hue}, 20%, 50%)` }">
-                  hue: {{ theme.hue }}°
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Semantic Colors Demo -->
-    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
+    <section class="px-8 py-32" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto">
         <div class="mb-20">
           <h2
             class="text-5xl font-bold mb-4 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
-            Semantic color system
+            How semantic hue shifts work
           </h2>
           <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            Hue offsets create meaning. Your eyes adapt, information density increases.
+            Errors at
+            <span
+              class="font-mono font-bold transition-colors duration-1000"
+              :style="{ color: colors.error }"
+              >+7°</span
+            >, warnings at
+            <span
+              class="font-mono font-bold transition-colors duration-1000"
+              :style="{ color: colors.warning }"
+              >-7°</span
+            >. Your eyes learn the pattern instantly.
           </p>
         </div>
 
@@ -404,17 +323,18 @@ const themes = [
     </section>
 
     <!-- Code Examples -->
-    <section class="px-8 py-32">
+    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto">
         <div class="mb-20">
           <h2
             class="text-5xl font-bold mb-4 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
-            Syntax highlighting
+            Monochrome syntax highlighting
           </h2>
           <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            Monochrome code with semantic hue shifts. All signal, zero noise.
+            Watch how code stays readable with just lightness variation. Colors indicate semantic
+            meaning, not decoration.
           </p>
         </div>
 
@@ -526,6 +446,107 @@ const themes = [
   ],
   <span :style="{ color: colors.property }">"dark"</span>: <span :style="{ color: colors.constant }">true</span>
 }</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="px-8 py-32">
+      <div class="max-w-7xl mx-auto">
+        <h2
+          class="text-5xl font-bold mb-20 transition-colors duration-1000"
+          :style="{ color: colors.fg }"
+        >
+          Why vulpes?
+        </h2>
+        <div class="grid md:grid-cols-3 gap-12">
+          <div v-for="feature in features" :key="feature.title" class="space-y-4">
+            <h3
+              class="text-2xl font-bold transition-colors duration-1000"
+              :style="{ color: colors.fg }"
+            >
+              {{ feature.title }}
+            </h3>
+            <p
+              class="text-lg leading-relaxed transition-colors duration-1000"
+              :style="{ color: colors.comment }"
+              v-html="
+                feature.desc
+                  .replace(
+                    '+7°',
+                    `<span class='font-mono font-bold transition-colors duration-1000' style='color: ${colors.error}'>+7°</span>`
+                  )
+                  .replace(
+                    '-7°',
+                    `<span class='font-mono font-bold transition-colors duration-1000' style='color: ${colors.warning}'>-7°</span>`
+                  )
+              "
+            ></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Themes Gallery -->
+    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20">
+          <h2
+            class="text-5xl font-bold mb-4 transition-colors duration-1000"
+            :style="{ color: colors.fg }"
+          >
+            From vulpes-month
+          </h2>
+          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
+            A daily theme experiment. Same system, infinite variations.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            v-for="theme in themes"
+            :key="theme.name"
+            class="group relative p-8 rounded-2xl border transition-all duration-300"
+            :style="{
+              borderColor: `hsl(${theme.hue}, 30%, 30%)`,
+              backgroundColor: `hsl(${theme.hue}, 20%, 10%)`,
+            }"
+          >
+            <div class="space-y-4">
+              <!-- Color palette preview -->
+              <div class="flex gap-2">
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue}, 70%, 60%)` }"
+                  title="base"
+                ></div>
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue + 7}, 70%, 55%)` }"
+                  title="error (+7°)"
+                ></div>
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue - 7}, 70%, 55%)` }"
+                  title="warning (-7°)"
+                ></div>
+              </div>
+              <div>
+                <h3
+                  class="text-xl font-bold mb-2"
+                  :style="{ color: `hsl(${theme.hue}, 60%, 90%)` }"
+                >
+                  {{ theme.name }}
+                </h3>
+                <p class="text-sm" :style="{ color: `hsl(${theme.hue}, 20%, 60%)` }">
+                  {{ theme.desc }}
+                </p>
+                <p class="text-xs font-mono mt-2" :style="{ color: `hsl(${theme.hue}, 20%, 50%)` }">
+                  hue: {{ theme.hue }}°
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
