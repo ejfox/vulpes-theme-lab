@@ -95,18 +95,36 @@ const themes = [
     :style="{ backgroundColor: colors.bg, color: colors.fg }"
   >
     <!-- Nav -->
-    <nav class="border-b" :style="{ borderColor: `${colors.fg}0d` }">
-      <div class="max-w-7xl mx-auto px-8 py-6 flex items-center justify-between">
-        <div class="flex items-center gap-8">
-          <span class="text-lg font-bold" :style="{ color: colors.fg }">vulpes</span>
-          <span class="text-sm font-mono" :style="{ color: colors.comment }">
+    <nav
+      :style="{
+        borderBottom: `1px solid ${colors.fg}0d`,
+      }"
+    >
+      <div
+        :style="{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '24px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }"
+      >
+        <div :style="{ display: 'flex', alignItems: 'center', gap: '32px' }">
+          <span :style="{ fontSize: '18px', fontWeight: 'bold', color: colors.fg }">vulpes</span>
+          <span :style="{ fontSize: '14px', fontFamily: 'monospace', color: colors.comment }">
             {{ Math.round(state.baseHue) }}°
           </span>
         </div>
         <NuxtLink
           to="/"
-          class="text-sm font-medium transition-colors duration-300"
-          :style="{ color: colors.comment }"
+          :style="{
+            fontSize: '14px',
+            fontWeight: '500',
+            color: colors.comment,
+            textDecoration: 'none',
+            transition: 'color 0.3s',
+          }"
         >
           launch theme lab →
         </NuxtLink>

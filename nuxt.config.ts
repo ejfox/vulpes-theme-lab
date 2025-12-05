@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   },
   // Enable static site generation
   ssr: false,
+  modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
   // Runtime config for environment variables
   runtimeConfig: {
