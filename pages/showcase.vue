@@ -97,7 +97,12 @@ const themes = [
     <!-- Nav -->
     <nav
       :style="{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        backgroundColor: colors.bg,
         borderBottom: `1px solid ${colors.fg}0d`,
+        backdropFilter: 'blur(8px)',
       }"
     >
       <div
@@ -112,7 +117,18 @@ const themes = [
       >
         <div :style="{ display: 'flex', alignItems: 'center', gap: '32px' }">
           <span :style="{ fontSize: '18px', fontWeight: 'bold', color: colors.fg }">vulpes</span>
-          <span :style="{ fontSize: '14px', fontFamily: 'monospace', color: colors.comment }">
+          <span
+            :style="{
+              fontSize: '16px',
+              fontFamily: 'monospace',
+              fontWeight: 'bold',
+              color: colors.bg,
+              backgroundColor: colors.base,
+              padding: '4px 12px',
+              borderRadius: '8px',
+              transition: 'background-color 0.1s',
+            }"
+          >
             {{ Math.round(state.baseHue) }}°
           </span>
         </div>
