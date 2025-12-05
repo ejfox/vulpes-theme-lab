@@ -258,19 +258,13 @@ const toolClusters: ToolCluster[] = [
               },
             ]"
             :key="principle.title"
-            class="group relative p-8 rounded-3xl backdrop-blur-xl border transition-all duration-400 hover:scale-[1.02] hover:shadow-2xl"
+            class="group relative p-8 rounded-3xl backdrop-blur-xl border principle-card"
             :style="{
-              backgroundColor: `${colors.fg}0d`,
-              borderColor: `${colors.fg}1a`,
+              '--bg-base': `${colors.fg}0d`,
+              '--bg-hover': `${colors.fg}1a`,
+              '--border-base': `${colors.fg}1a`,
+              '--border-hover': `${colors.fg}33`,
             }"
-            @mouseenter="
-              $event.currentTarget.style.backgroundColor = `${colors.fg}1a`;
-              $event.currentTarget.style.borderColor = `${colors.fg}33`;
-            "
-            @mouseleave="
-              $event.currentTarget.style.backgroundColor = `${colors.fg}0d`;
-              $event.currentTarget.style.borderColor = `${colors.fg}1a`;
-            "
           >
             <h3
               class="text-2xl font-semibold mb-4 transition-colors duration-500"
@@ -686,6 +680,20 @@ const toolClusters: ToolCluster[] = [
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Principle cards - CSS-only hover (no DOM manipulation) */
+.principle-card {
+  background-color: var(--bg-base);
+  border-color: var(--border-base);
+  transition: all var(--timing-normal) var(--ease-spring);
+}
+
+.principle-card:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-hover);
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 /* 2025 CSS: Squircle corners using mask-image */
