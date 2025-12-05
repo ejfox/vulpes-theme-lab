@@ -256,42 +256,225 @@ const themes = [
       </div>
     </section>
 
-    <!-- Code Example -->
-    <section class="px-8 py-32">
+    <!-- Semantic Colors Demo -->
+    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto">
-        <div class="mb-12">
+        <div class="mb-20">
           <h2
             class="text-5xl font-bold mb-4 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
-            How it works
+            Semantic color system
           </h2>
           <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            Semantic meaning through hue mathematics
+            Hue offsets create meaning. Your eyes adapt, information density increases.
           </p>
         </div>
 
-        <div
-          class="p-8 rounded-2xl border font-mono text-sm leading-loose transition-colors duration-1000"
-          :style="{
-            backgroundColor: colors.bg_alt,
-            borderColor: `${colors.fg}1a`,
-          }"
-        >
-          <pre
-            class="overflow-x-auto"
-          ><code><span :style="{ color: colors.comment }">// Base hue defines your theme</span>
-<span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">baseHue</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.constant }">355</span> <span :style="{ color: colors.comment }">// deep crimson</span>
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- Base -->
+          <div
+            class="p-8 rounded-2xl border transition-colors duration-1000"
+            :style="{
+              backgroundColor: `${colors.base}1a`,
+              borderColor: colors.base,
+            }"
+          >
+            <div
+              class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
+              :style="{ backgroundColor: colors.base, color: colors.bg }"
+            >
+              base ({{ Math.round(state.baseHue) }}°)
+            </div>
+            <p class="text-lg transition-colors duration-1000" :style="{ color: colors.fg }">
+              Primary accent. Buttons, links, highlights. The foundation of your theme.
+            </p>
+          </div>
 
-<span :style="{ color: colors.comment }">// Semantic offsets create meaning</span>
-<span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">error</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.func }">hsl</span>(<span :style="{ color: colors.variable }">baseHue</span> <span :style="{ color: colors.operator }">+</span> <span :style="{ color: colors.constant }">7</span>, <span :style="{ color: colors.constant }">85</span>, <span :style="{ color: colors.constant }">55</span>)
-<span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">warning</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.func }">hsl</span>(<span :style="{ color: colors.variable }">baseHue</span> <span :style="{ color: colors.operator }">-</span> <span :style="{ color: colors.constant }">7</span>, <span :style="{ color: colors.constant }">85</span>, <span :style="{ color: colors.constant }">55</span>)
-<span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">base</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.func }">hsl</span>(<span :style="{ color: colors.variable }">baseHue</span>, <span :style="{ color: colors.constant }">85</span>, <span :style="{ color: colors.constant }">50</span>)
+          <!-- Error -->
+          <div
+            class="p-8 rounded-2xl border transition-colors duration-1000"
+            :style="{
+              backgroundColor: `${colors.error}1a`,
+              borderColor: colors.error,
+            }"
+          >
+            <div
+              class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
+              :style="{ backgroundColor: colors.error, color: colors.bg }"
+            >
+              error (+7°)
+            </div>
+            <p class="text-lg transition-colors duration-1000" :style="{ color: colors.fg }">
+              Failures, deletions, critical states. Shifted 7° clockwise from base.
+            </p>
+          </div>
 
-<span :style="{ color: colors.comment }">// Export to 8 formats</span>
-<span :style="{ color: colors.func }">exportNeovim</span>(<span :style="{ color: colors.variable }">palette</span>)
-<span :style="{ color: colors.func }">exportGhostty</span>(<span :style="{ color: colors.variable }">palette</span>)
-<span :style="{ color: colors.func }">exportBat</span>(<span :style="{ color: colors.variable }">palette</span>)</code></pre>
+          <!-- Warning -->
+          <div
+            class="p-8 rounded-2xl border transition-colors duration-1000"
+            :style="{
+              backgroundColor: `${colors.warning}1a`,
+              borderColor: colors.warning,
+            }"
+          >
+            <div
+              class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
+              :style="{ backgroundColor: colors.warning, color: colors.bg }"
+            >
+              warning (-7°)
+            </div>
+            <p class="text-lg transition-colors duration-1000" :style="{ color: colors.fg }">
+              Cautions, deprecations, modified states. Shifted 7° counter-clockwise.
+            </p>
+          </div>
+
+          <!-- Success -->
+          <div
+            class="p-8 rounded-2xl border transition-colors duration-1000"
+            :style="{
+              backgroundColor: `${colors.success}1a`,
+              borderColor: colors.success,
+            }"
+          >
+            <div
+              class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
+              :style="{ backgroundColor: colors.success, color: colors.bg }"
+            >
+              success (base hue)
+            </div>
+            <p class="text-lg transition-colors duration-1000" :style="{ color: colors.fg }">
+              Completions, additions, confirmations. Same hue as base, different lightness.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code Examples -->
+    <section class="px-8 py-32">
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20">
+          <h2
+            class="text-5xl font-bold mb-4 transition-colors duration-1000"
+            :style="{ color: colors.fg }"
+          >
+            Syntax highlighting
+          </h2>
+          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
+            Monochrome code with semantic hue shifts. All signal, zero noise.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- TypeScript -->
+          <div
+            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
+            :style="{
+              backgroundColor: colors.bg_alt,
+              borderColor: `${colors.fg}1a`,
+            }"
+          >
+            <div
+              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
+              :style="{ color: colors.comment }"
+            >
+              TypeScript
+            </div>
+            <pre
+              class="overflow-x-auto"
+            ><code><span :style="{ color: colors.keyword }">interface</span> <span :style="{ color: colors.type }">User</span> {
+  <span :style="{ color: colors.property }">id</span>: <span :style="{ color: colors.type }">number</span>
+  <span :style="{ color: colors.property }">name</span>: <span :style="{ color: colors.type }">string</span>
+  <span :style="{ color: colors.property }">isActive</span>: <span :style="{ color: colors.type }">boolean</span>
+}
+
+<span :style="{ color: colors.keyword }">async</span> <span :style="{ color: colors.keyword }">function</span> <span :style="{ color: colors.func }">getUser</span>(<span :style="{ color: colors.variable }">id</span>: <span :style="{ color: colors.type }">number</span>) {
+  <span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">response</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.keyword }">await</span> <span :style="{ color: colors.func }">fetch</span>(<span :style="{ color: colors.string }">`/api/users/${<span :style="{ color: colors.variable }">id</span>}`</span>)
+  <span :style="{ color: colors.keyword }">return</span> <span :style="{ color: colors.variable }">response</span>.<span :style="{ color: colors.func }">json</span>()
+}</code></pre>
+          </div>
+
+          <!-- Python -->
+          <div
+            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
+            :style="{
+              backgroundColor: colors.bg_alt,
+              borderColor: `${colors.fg}1a`,
+            }"
+          >
+            <div
+              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
+              :style="{ color: colors.comment }"
+            >
+              Python
+            </div>
+            <pre
+              class="overflow-x-auto"
+            ><code><span :style="{ color: colors.keyword }">class</span> <span :style="{ color: colors.type }">ThemeGenerator</span>:
+    <span :style="{ color: colors.keyword }">def</span> <span :style="{ color: colors.func }">__init__</span>(<span :style="{ color: colors.variable }">self</span>, <span :style="{ color: colors.variable }">base_hue</span>):
+        <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.variable }">base_hue</span>
+        <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">colors</span> <span :style="{ color: colors.operator }">=</span> {}
+
+    <span :style="{ color: colors.keyword }">def</span> <span :style="{ color: colors.func }">generate</span>(<span :style="{ color: colors.variable }">self</span>):
+        <span :style="{ color: colors.comment }"># Create semantic palette</span>
+        <span :style="{ color: colors.keyword }">return</span> {
+            <span :style="{ color: colors.string }">'error'</span>: <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">+</span> <span :style="{ color: colors.constant }">7</span>,
+            <span :style="{ color: colors.string }">'warning'</span>: <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">-</span> <span :style="{ color: colors.constant }">7</span>
+        }</code></pre>
+          </div>
+
+          <!-- Rust -->
+          <div
+            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
+            :style="{
+              backgroundColor: colors.bg_alt,
+              borderColor: `${colors.fg}1a`,
+            }"
+          >
+            <div
+              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
+              :style="{ color: colors.comment }"
+            >
+              Rust
+            </div>
+            <pre
+              class="overflow-x-auto"
+            ><code><span :style="{ color: colors.keyword }">use</span> <span :style="{ color: colors.type }">std</span>::<span :style="{ color: colors.type }">collections</span>::<span :style="{ color: colors.type }">HashMap</span>;
+
+<span :style="{ color: colors.keyword }">fn</span> <span :style="{ color: colors.func }">create_palette</span>(<span :style="{ color: colors.variable }">hue</span>: <span :style="{ color: colors.type }">u16</span>) <span :style="{ color: colors.operator }">-></span> <span :style="{ color: colors.type }">HashMap</span><<span :style="{ color: colors.type }">String</span>, <span :style="{ color: colors.type }">u16</span>> {
+    <span :style="{ color: colors.keyword }">let</span> <span :style="{ color: colors.keyword }">mut</span> <span :style="{ color: colors.variable }">colors</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.type }">HashMap</span>::<span :style="{ color: colors.func }">new</span>();
+    <span :style="{ color: colors.variable }">colors</span>.<span :style="{ color: colors.func }">insert</span>(<span :style="{ color: colors.string }">"error"</span>.<span :style="{ color: colors.func }">to_string</span>(), <span :style="{ color: colors.variable }">hue</span> <span :style="{ color: colors.operator }">+</span> <span :style="{ color: colors.constant }">7</span>);
+    <span :style="{ color: colors.variable }">colors</span>.<span :style="{ color: colors.func }">insert</span>(<span :style="{ color: colors.string }">"warning"</span>.<span :style="{ color: colors.func }">to_string</span>(), <span :style="{ color: colors.variable }">hue</span> <span :style="{ color: colors.operator }">-</span> <span :style="{ color: colors.constant }">7</span>);
+    <span :style="{ color: colors.variable }">colors</span>
+}</code></pre>
+          </div>
+
+          <!-- JSON -->
+          <div
+            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
+            :style="{
+              backgroundColor: colors.bg_alt,
+              borderColor: `${colors.fg}1a`,
+            }"
+          >
+            <div
+              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
+              :style="{ color: colors.comment }"
+            >
+              JSON Config
+            </div>
+            <pre class="overflow-x-auto"><code>{
+  <span :style="{ color: colors.property }">"theme"</span>: <span :style="{ color: colors.string }">"vulpes-reddish"</span>,
+  <span :style="{ color: colors.property }">"baseHue"</span>: <span :style="{ color: colors.constant }">355</span>,
+  <span :style="{ color: colors.property }">"exports"</span>: [
+    <span :style="{ color: colors.string }">"neovim"</span>,
+    <span :style="{ color: colors.string }">"ghostty"</span>,
+    <span :style="{ color: colors.string }">"bat"</span>
+  ],
+  <span :style="{ color: colors.property }">"dark"</span>: <span :style="{ color: colors.constant }">true</span>
+}</code></pre>
+          </div>
         </div>
       </div>
     </section>
