@@ -56,11 +56,11 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
           <div class="color-item" :style="{ background: colors.bg_alt }">
             <span :style="{ color: colors.fg }">bg_alt</span>
           </div>
-          <div class="color-item" :style="{ background: colors.fg }">
+          <div class="color-item" :style="{ background: colors.fg, border: `1px solid ${colors.bg}` }">
             <span :style="{ color: colors.bg }">fg</span>
           </div>
-          <div class="color-item" :style="{ background: colors.base }">
-            <span :style="{ color: colors.bg }">base</span>
+          <div class="color-item" :style="{ background: colors.base, border: `1px solid ${colors.base}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">base</span>
           </div>
         </div>
       </div>
@@ -69,20 +69,20 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
       <div class="color-section">
         <div class="section-label" :style="{ color: colors.keyword }">Status (5)</div>
         <div class="color-grid">
-          <div class="color-item" :style="{ background: colors.error }">
-            <span :style="{ color: colors.bg }">error</span>
+          <div class="color-item" :style="{ background: colors.error, border: `1px solid ${colors.error}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">error</span>
           </div>
-          <div class="color-item" :style="{ background: colors.warning }">
-            <span :style="{ color: colors.bg }">warning</span>
+          <div class="color-item" :style="{ background: colors.warning, border: `1px solid ${colors.warning}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">warning</span>
           </div>
-          <div class="color-item" :style="{ background: colors.success }">
-            <span :style="{ color: colors.bg }">success</span>
+          <div class="color-item" :style="{ background: colors.success, border: `1px solid ${colors.success}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">success</span>
           </div>
-          <div class="color-item" :style="{ background: colors.info }">
-            <span :style="{ color: colors.bg }">info</span>
+          <div class="color-item" :style="{ background: colors.info, border: `1px solid ${colors.info}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">info</span>
           </div>
-          <div class="color-item" :style="{ background: colors.hint }">
-            <span :style="{ color: colors.bg }">hint</span>
+          <div class="color-item" :style="{ background: colors.hint, border: `1px solid ${colors.hint}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">hint</span>
           </div>
         </div>
       </div>
@@ -91,32 +91,32 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
       <div class="color-section">
         <div class="section-label" :style="{ color: colors.keyword }">Syntax 1/2 (9)</div>
         <div class="color-grid">
-          <div class="color-item" :style="{ background: colors.comment }">
-            <span :style="{ color: colors.bg }">comment</span>
+          <div class="color-item" :style="{ background: colors.comment, border: `1px solid ${colors.comment}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">comment</span>
           </div>
-          <div class="color-item" :style="{ background: colors.keyword }">
-            <span :style="{ color: colors.bg }">keyword</span>
+          <div class="color-item" :style="{ background: colors.keyword, border: `1px solid ${colors.keyword}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">keyword</span>
           </div>
-          <div class="color-item" :style="{ background: colors.string }">
-            <span :style="{ color: colors.bg }">string</span>
+          <div class="color-item" :style="{ background: colors.string, border: `1px solid ${colors.string}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">string</span>
           </div>
-          <div class="color-item" :style="{ background: colors.number }">
-            <span :style="{ color: colors.bg }">number</span>
+          <div class="color-item" :style="{ background: colors.number, border: `1px solid ${colors.number}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">number</span>
           </div>
-          <div class="color-item" :style="{ background: colors.boolean }">
-            <span :style="{ color: colors.bg }">boolean</span>
+          <div class="color-item" :style="{ background: colors.boolean, border: `1px solid ${colors.boolean}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">boolean</span>
           </div>
-          <div class="color-item" :style="{ background: colors.function }">
-            <span :style="{ color: colors.bg }">function</span>
+          <div class="color-item" :style="{ background: colors.function, border: `1px solid ${colors.function}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">function</span>
           </div>
-          <div class="color-item" :style="{ background: colors.constant }">
-            <span :style="{ color: colors.bg }">constant</span>
+          <div class="color-item" :style="{ background: colors.constant, border: `1px solid ${colors.constant}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">constant</span>
           </div>
-          <div class="color-item" :style="{ background: colors.type }">
-            <span :style="{ color: colors.bg }">type</span>
+          <div class="color-item" :style="{ background: colors.type, border: `1px solid ${colors.type}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">type</span>
           </div>
-          <div class="color-item" :style="{ background: colors.variable }">
-            <span :style="{ color: colors.bg }">variable</span>
+          <div class="color-item" :style="{ background: colors.variable, border: `1px solid ${colors.variable}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">variable</span>
           </div>
         </div>
       </div>
@@ -125,32 +125,32 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
       <div class="color-section">
         <div class="section-label" :style="{ color: colors.keyword }">Syntax 2/2 (8)</div>
         <div class="color-grid">
-          <div class="color-item" :style="{ background: colors.operator }">
-            <span :style="{ color: colors.bg }">operator</span>
+          <div class="color-item" :style="{ background: colors.operator, border: `1px solid ${colors.operator}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">operator</span>
           </div>
-          <div class="color-item" :style="{ background: colors.builtin }">
-            <span :style="{ color: colors.bg }">builtin</span>
+          <div class="color-item" :style="{ background: colors.builtin, border: `1px solid ${colors.builtin}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">builtin</span>
           </div>
-          <div class="color-item" :style="{ background: colors.parameter }">
-            <span :style="{ color: colors.bg }">parameter</span>
+          <div class="color-item" :style="{ background: colors.parameter, border: `1px solid ${colors.parameter}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">parameter</span>
           </div>
-          <div class="color-item" :style="{ background: colors.property }">
-            <span :style="{ color: colors.bg }">property</span>
+          <div class="color-item" :style="{ background: colors.property, border: `1px solid ${colors.property}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">property</span>
           </div>
-          <div class="color-item" :style="{ background: colors.namespace }">
-            <span :style="{ color: colors.bg }">namespace</span>
+          <div class="color-item" :style="{ background: colors.namespace, border: `1px solid ${colors.namespace}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">namespace</span>
           </div>
-          <div class="color-item" :style="{ background: colors.macro }">
-            <span :style="{ color: colors.bg }">macro</span>
+          <div class="color-item" :style="{ background: colors.macro, border: `1px solid ${colors.macro}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">macro</span>
           </div>
-          <div class="color-item" :style="{ background: colors.tag }">
-            <span :style="{ color: colors.bg }">tag</span>
+          <div class="color-item" :style="{ background: colors.tag, border: `1px solid ${colors.tag}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">tag</span>
           </div>
-          <div class="color-item" :style="{ background: colors.punctuation }">
-            <span :style="{ color: colors.bg }">punctuation</span>
+          <div class="color-item" :style="{ background: colors.punctuation, border: `1px solid ${colors.punctuation}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">punctuation</span>
           </div>
-          <div class="color-item" :style="{ background: colors.heading }">
-            <span :style="{ color: colors.bg }">heading</span>
+          <div class="color-item" :style="{ background: colors.heading, border: `1px solid ${colors.heading}` }">
+            <span :style="{ color: colors.fg, fontWeight: 'bold' }">heading</span>
           </div>
         </div>
       </div>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { VULPES_MONTHLY_PRESETS } from '~/utils/presets'
+import { useRafFn, useWindowFocus } from '@vueuse/core'
+
 useHead({
   title: 'vulpes — monochrome themes for terminal aesthetes',
   meta: [
@@ -12,27 +15,72 @@ useHead({
 
 const { state, colors } = useTheme()
 
-// Smooth hue rotation over 45 seconds with throttled state updates
-onMounted(() => {
-  let lastTime = Date.now()
-  let lastStateUpdate = Date.now()
-  const animationSpeed = 45000 // 45 seconds for full rotation
-  const stateUpdateInterval = 100 // Update state max 10 times per second
+// Use actual vulpes-month themes
+const themes = VULPES_MONTHLY_PRESETS
 
-  const animate = () => {
-    const now = Date.now()
-    const delta = now - lastTime
-    lastTime = now
+// Speed multiplier for animation (1x or 4x)
+const speedMultiplier = ref(1)
 
-    // Only update reactive state every 100ms to avoid router history spam
-    if (now - lastStateUpdate >= stateUpdateInterval) {
-      state.value.baseHue = (state.value.baseHue + (360 / animationSpeed) * delta) % 360
-      lastStateUpdate = now
-    }
+const toggleSpeed = () => {
+  speedMultiplier.value = speedMultiplier.value === 1 ? 4 : 1
+}
 
-    requestAnimationFrame(animate)
+// Apply a preset theme to the page
+const applyPreset = (preset: typeof VULPES_MONTHLY_PRESETS[0]) => {
+  state.value.themeName = preset.name
+  state.value.baseHue = preset.baseHue
+  state.value.saturation = preset.baseSaturation
+  state.value.mode = preset.isDark ? 'dark' : 'light'
+
+  // Apply all offset properties
+  state.value.errorOffset = preset.errorOffset
+  state.value.warningOffset = preset.warningOffset
+  state.value.keywordOffset = preset.keywordOffset
+  state.value.stringOffset = preset.stringOffset
+  state.value.numberOffset = preset.numberOffset
+  state.value.functionOffset = preset.functionOffset
+  state.value.constantOffset = preset.constantOffset
+  state.value.typeOffset = preset.typeOffset
+  state.value.variableOffset = preset.variableOffset
+  state.value.operatorOffset = preset.operatorOffset
+  state.value.builtinOffset = preset.builtinOffset
+  state.value.parameterOffset = preset.parameterOffset
+  state.value.propertyOffset = preset.propertyOffset
+  state.value.namespaceOffset = preset.namespaceOffset
+  state.value.macroOffset = preset.macroOffset
+  state.value.tagOffset = preset.tagOffset
+  state.value.punctuationOffset = preset.punctuationOffset
+  state.value.headingOffset = preset.headingOffset
+}
+
+// Smooth hue rotation over 45 seconds with throttled state updates using VueUse
+const lastTime = ref(Date.now())
+const lastStateUpdate = ref(Date.now())
+const baseAnimationSpeed = 45000 // 45 seconds for full rotation at 1x speed
+const stateUpdateInterval = 100 // Update state max 10 times per second
+
+const { pause, resume } = useRafFn(() => {
+  const now = Date.now()
+  const delta = now - lastTime.value
+  lastTime.value = now
+
+  // Only update reactive state every 100ms to avoid router history spam
+  if (now - lastStateUpdate.value >= stateUpdateInterval) {
+    const animationSpeed = baseAnimationSpeed / speedMultiplier.value
+    state.value.baseHue = (state.value.baseHue + (360 / animationSpeed) * delta) % 360
+    lastStateUpdate.value = now
   }
-  animate()
+})
+
+// Pause animation when window loses focus
+const windowFocused = useWindowFocus()
+watch(windowFocused, (focused) => {
+  if (focused) {
+    lastTime.value = Date.now() // Reset time to avoid huge delta jump
+    resume()
+  } else {
+    pause()
+  }
 })
 
 // Dynamic selection color
@@ -78,16 +126,6 @@ const stats = [
   { label: 'Semantic Offset', value: '±7°' },
   { label: 'Config Files', value: '1' },
 ]
-
-// Example themes from vulpes-month
-const themes = [
-  { name: 'reddish-november', hue: 355, desc: 'deep crimson workspace' },
-  { name: 'electric-lime', hue: 75, desc: 'acid green terminals' },
-  { name: 'arctic-blue', hue: 195, desc: 'frozen tundra coding' },
-  { name: 'sunset-orange', hue: 25, desc: 'warm canyon vibes' },
-  { name: 'violet-dreams', hue: 270, desc: 'purple twilight aesthetic' },
-  { name: 'miami-pink', hue: 330, desc: 'neon synthwave nights' },
-]
 </script>
 
 <template>
@@ -119,18 +157,23 @@ const themes = [
         <div :style="{ display: 'flex', alignItems: 'center', gap: '32px' }">
           <span :style="{ fontSize: '18px', fontWeight: 'bold', color: colors.fg }">vulpes</span>
           <span
+            @click="toggleSpeed"
             :style="{
               fontSize: '16px',
               fontFamily: 'monospace',
               fontWeight: 'bold',
-              color: colors.bg,
-              backgroundColor: colors.base,
+              color: colors.fg,
+              backgroundColor: `${colors.base}33`,
+              border: `1px solid ${colors.base}`,
               padding: '4px 12px',
               borderRadius: '8px',
-              transition: 'background-color 0.1s',
+              transition: 'all 0.1s',
+              cursor: 'pointer',
+              transform: speedMultiplier === 4 ? 'scale(1.1)' : 'scale(1)',
             }"
+            :title="speedMultiplier === 4 ? 'Click to slow down (4x)' : 'Click to speed up (4x)'"
           >
-            {{ Math.round(state.baseHue) }}°
+            {{ Math.round(state.baseHue) }}°{{ speedMultiplier === 4 ? ' ⚡' : '' }}
           </span>
         </div>
         <NuxtLink
@@ -173,8 +216,9 @@ const themes = [
               to="/"
               class="px-8 py-4 rounded-xl font-medium transition-all duration-300"
               :style="{
-                backgroundColor: colors.base,
-                color: colors.bg,
+                backgroundColor: `${colors.base}33`,
+                border: `2px solid ${colors.base}`,
+                color: colors.fg,
               }"
             >
               Try it now
@@ -253,7 +297,11 @@ const themes = [
           >
             <div
               class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
-              :style="{ backgroundColor: colors.base, color: colors.bg }"
+              :style="{
+                backgroundColor: `${colors.base}33`,
+                border: `1px solid ${colors.base}`,
+                color: colors.fg
+              }"
             >
               base ({{ Math.round(state.baseHue) }}°)
             </div>
@@ -272,7 +320,11 @@ const themes = [
           >
             <div
               class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
-              :style="{ backgroundColor: colors.error, color: colors.bg }"
+              :style="{
+                backgroundColor: `${colors.error}33`,
+                border: `1px solid ${colors.error}`,
+                color: colors.fg
+              }"
             >
               error (+7°)
             </div>
@@ -291,7 +343,11 @@ const themes = [
           >
             <div
               class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
-              :style="{ backgroundColor: colors.warning, color: colors.bg }"
+              :style="{
+                backgroundColor: `${colors.warning}33`,
+                border: `1px solid ${colors.warning}`,
+                color: colors.fg
+              }"
             >
               warning (-7°)
             </div>
@@ -304,13 +360,17 @@ const themes = [
           <div
             class="p-8 rounded-2xl border transition-colors duration-1000"
             :style="{
-              backgroundColor: `${colors.success}1a`,
-              borderColor: colors.success,
+              backgroundColor: `${colors.base}1a`,
+              borderColor: colors.base,
             }"
           >
             <div
               class="inline-block px-4 py-2 rounded-lg mb-4 font-mono text-sm transition-colors duration-1000"
-              :style="{ backgroundColor: colors.success, color: colors.bg }"
+              :style="{
+                backgroundColor: `${colors.base}33`,
+                border: `1px solid ${colors.base}`,
+                color: colors.fg
+              }"
             >
               success (base hue)
             </div>
@@ -338,115 +398,9 @@ const themes = [
           </p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-8">
-          <!-- TypeScript -->
-          <div
-            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
-            :style="{
-              backgroundColor: colors.bg_alt,
-              borderColor: `${colors.fg}1a`,
-            }"
-          >
-            <div
-              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
-              :style="{ color: colors.comment }"
-            >
-              TypeScript
-            </div>
-            <pre
-              class="overflow-x-auto"
-            ><code><span :style="{ color: colors.keyword }">interface</span> <span :style="{ color: colors.type }">User</span> {
-  <span :style="{ color: colors.property }">id</span>: <span :style="{ color: colors.type }">number</span>
-  <span :style="{ color: colors.property }">name</span>: <span :style="{ color: colors.type }">string</span>
-  <span :style="{ color: colors.property }">isActive</span>: <span :style="{ color: colors.type }">boolean</span>
-}
-
-<span :style="{ color: colors.keyword }">async</span> <span :style="{ color: colors.keyword }">function</span> <span :style="{ color: colors.func }">getUser</span>(<span :style="{ color: colors.variable }">id</span>: <span :style="{ color: colors.type }">number</span>) {
-  <span :style="{ color: colors.keyword }">const</span> <span :style="{ color: colors.variable }">response</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.keyword }">await</span> <span :style="{ color: colors.func }">fetch</span>(<span :style="{ color: colors.string }">`/api/users/${<span :style="{ color: colors.variable }">id</span>}`</span>)
-  <span :style="{ color: colors.keyword }">return</span> <span :style="{ color: colors.variable }">response</span>.<span :style="{ color: colors.func }">json</span>()
-}</code></pre>
-          </div>
-
-          <!-- Python -->
-          <div
-            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
-            :style="{
-              backgroundColor: colors.bg_alt,
-              borderColor: `${colors.fg}1a`,
-            }"
-          >
-            <div
-              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
-              :style="{ color: colors.comment }"
-            >
-              Python
-            </div>
-            <pre
-              class="overflow-x-auto"
-            ><code><span :style="{ color: colors.keyword }">class</span> <span :style="{ color: colors.type }">ThemeGenerator</span>:
-    <span :style="{ color: colors.keyword }">def</span> <span :style="{ color: colors.func }">__init__</span>(<span :style="{ color: colors.variable }">self</span>, <span :style="{ color: colors.variable }">base_hue</span>):
-        <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.variable }">base_hue</span>
-        <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">colors</span> <span :style="{ color: colors.operator }">=</span> {}
-
-    <span :style="{ color: colors.keyword }">def</span> <span :style="{ color: colors.func }">generate</span>(<span :style="{ color: colors.variable }">self</span>):
-        <span :style="{ color: colors.comment }"># Create semantic palette</span>
-        <span :style="{ color: colors.keyword }">return</span> {
-            <span :style="{ color: colors.string }">'error'</span>: <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">+</span> <span :style="{ color: colors.constant }">7</span>,
-            <span :style="{ color: colors.string }">'warning'</span>: <span :style="{ color: colors.variable }">self</span>.<span :style="{ color: colors.property }">hue</span> <span :style="{ color: colors.operator }">-</span> <span :style="{ color: colors.constant }">7</span>
-        }</code></pre>
-          </div>
-
-          <!-- Rust -->
-          <div
-            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
-            :style="{
-              backgroundColor: colors.bg_alt,
-              borderColor: `${colors.fg}1a`,
-            }"
-          >
-            <div
-              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
-              :style="{ color: colors.comment }"
-            >
-              Rust
-            </div>
-            <pre
-              class="overflow-x-auto"
-            ><code><span :style="{ color: colors.keyword }">use</span> <span :style="{ color: colors.type }">std</span>::<span :style="{ color: colors.type }">collections</span>::<span :style="{ color: colors.type }">HashMap</span>;
-
-<span :style="{ color: colors.keyword }">fn</span> <span :style="{ color: colors.func }">create_palette</span>(<span :style="{ color: colors.variable }">hue</span>: <span :style="{ color: colors.type }">u16</span>) <span :style="{ color: colors.operator }">-></span> <span :style="{ color: colors.type }">HashMap</span><<span :style="{ color: colors.type }">String</span>, <span :style="{ color: colors.type }">u16</span>> {
-    <span :style="{ color: colors.keyword }">let</span> <span :style="{ color: colors.keyword }">mut</span> <span :style="{ color: colors.variable }">colors</span> <span :style="{ color: colors.operator }">=</span> <span :style="{ color: colors.type }">HashMap</span>::<span :style="{ color: colors.func }">new</span>();
-    <span :style="{ color: colors.variable }">colors</span>.<span :style="{ color: colors.func }">insert</span>(<span :style="{ color: colors.string }">"error"</span>.<span :style="{ color: colors.func }">to_string</span>(), <span :style="{ color: colors.variable }">hue</span> <span :style="{ color: colors.operator }">+</span> <span :style="{ color: colors.constant }">7</span>);
-    <span :style="{ color: colors.variable }">colors</span>.<span :style="{ color: colors.func }">insert</span>(<span :style="{ color: colors.string }">"warning"</span>.<span :style="{ color: colors.func }">to_string</span>(), <span :style="{ color: colors.variable }">hue</span> <span :style="{ color: colors.operator }">-</span> <span :style="{ color: colors.constant }">7</span>);
-    <span :style="{ color: colors.variable }">colors</span>
-}</code></pre>
-          </div>
-
-          <!-- JSON -->
-          <div
-            class="p-6 rounded-2xl border font-mono text-sm leading-relaxed transition-colors duration-1000"
-            :style="{
-              backgroundColor: colors.bg_alt,
-              borderColor: `${colors.fg}1a`,
-            }"
-          >
-            <div
-              class="text-xs mb-4 uppercase tracking-wider transition-colors duration-1000"
-              :style="{ color: colors.comment }"
-            >
-              JSON Config
-            </div>
-            <pre class="overflow-x-auto"><code>{
-  <span :style="{ color: colors.property }">"theme"</span>: <span :style="{ color: colors.string }">"vulpes-reddish"</span>,
-  <span :style="{ color: colors.property }">"baseHue"</span>: <span :style="{ color: colors.constant }">355</span>,
-  <span :style="{ color: colors.property }">"exports"</span>: [
-    <span :style="{ color: colors.string }">"neovim"</span>,
-    <span :style="{ color: colors.string }">"ghostty"</span>,
-    <span :style="{ color: colors.string }">"bat"</span>
-  ],
-  <span :style="{ color: colors.property }">"dark"</span>: <span :style="{ color: colors.constant }">true</span>
-}</code></pre>
-          </div>
+        <!-- One killer example showing all syntax types -->
+        <div class="max-w-5xl mx-auto" style="height: 600px">
+          <CodePreview />
         </div>
       </div>
     </section>
@@ -488,70 +442,6 @@ const themes = [
       </div>
     </section>
 
-    <!-- Themes Gallery -->
-    <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
-      <div class="max-w-7xl mx-auto">
-        <div class="mb-20">
-          <h2
-            class="text-5xl font-bold mb-4 transition-colors duration-1000"
-            :style="{ color: colors.fg }"
-          >
-            From vulpes-month
-          </h2>
-          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            A daily theme experiment. Same system, infinite variations.
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div
-            v-for="theme in themes"
-            :key="theme.name"
-            class="group relative p-8 rounded-2xl border transition-all duration-300"
-            :style="{
-              borderColor: `hsl(${theme.hue}, 30%, 30%)`,
-              backgroundColor: `hsl(${theme.hue}, 20%, 10%)`,
-            }"
-          >
-            <div class="space-y-4">
-              <!-- Color palette preview -->
-              <div class="flex gap-2">
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue}, 70%, 60%)` }"
-                  title="base"
-                ></div>
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue + 7}, 70%, 55%)` }"
-                  title="error (+7°)"
-                ></div>
-                <div
-                  class="w-12 h-12 rounded-lg"
-                  :style="{ backgroundColor: `hsl(${theme.hue - 7}, 70%, 55%)` }"
-                  title="warning (-7°)"
-                ></div>
-              </div>
-              <div>
-                <h3
-                  class="text-xl font-bold mb-2"
-                  :style="{ color: `hsl(${theme.hue}, 60%, 90%)` }"
-                >
-                  {{ theme.name }}
-                </h3>
-                <p class="text-sm" :style="{ color: `hsl(${theme.hue}, 20%, 60%)` }">
-                  {{ theme.desc }}
-                </p>
-                <p class="text-xs font-mono mt-2" :style="{ color: `hsl(${theme.hue}, 20%, 50%)` }">
-                  hue: {{ theme.hue }}°
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA -->
     <section class="px-8 py-32 border-t" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto text-center">
@@ -571,12 +461,166 @@ const themes = [
           to="/"
           class="inline-block px-12 py-5 rounded-xl text-lg font-medium transition-all duration-300"
           :style="{
-            backgroundColor: colors.base,
-            color: colors.bg,
+            backgroundColor: `${colors.base}33`,
+            border: `2px solid ${colors.base}`,
+            color: colors.fg,
           }"
         >
           Launch theme lab
         </NuxtLink>
+      </div>
+    </section>
+
+    <!-- Themes Data Table (Brutalist) -->
+    <section class="border-t" :style="{ borderColor: `${colors.fg}33` }">
+      <div class="max-w-7xl mx-auto px-8 py-16">
+        <div class="mb-8">
+          <h3
+            class="text-xs font-mono uppercase tracking-wider mb-2"
+            :style="{ color: colors.comment }"
+          >
+            vulpes-month
+          </h3>
+          <p class="text-sm font-mono" :style="{ color: colors.fg }">
+            Daily theme experiments / {{ themes.length }} variations
+          </p>
+        </div>
+
+        <!-- Brutalist data table -->
+        <div
+          class="border font-mono text-xs"
+          :style="{
+            borderColor: `${colors.fg}33`,
+            backgroundColor: colors.bg,
+          }"
+        >
+          <!-- Table header -->
+          <div
+            class="grid grid-cols-12 border-b font-bold"
+            :style="{
+              borderColor: `${colors.fg}33`,
+              backgroundColor: `${colors.fg}0d`,
+              color: colors.fg,
+            }"
+          >
+            <div class="col-span-4 p-2 border-r" :style="{ borderColor: `${colors.fg}33` }">
+              NAME
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{ borderColor: `${colors.fg}33` }"
+            >
+              HUE
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{ borderColor: `${colors.fg}33` }"
+            >
+              ERROR
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{ borderColor: `${colors.fg}33` }"
+            >
+              WARN
+            </div>
+            <div class="col-span-2 p-2">PALETTE</div>
+          </div>
+
+          <!-- Table rows -->
+          <div
+            v-for="(theme, idx) in themes"
+            :key="theme.name"
+            class="grid grid-cols-12 border-b"
+            :style="{
+              borderColor: `${colors.fg}1a`,
+              color: colors.fg,
+              cursor: 'pointer',
+              transition: 'all 0.1s',
+            }"
+            @click="applyPreset(theme)"
+            @mouseenter="(e) => { e.currentTarget.style.backgroundColor = `${colors.fg}0d` }"
+            @mouseleave="(e) => { e.currentTarget.style.backgroundColor = 'transparent' }"
+          >
+            <div class="col-span-4 p-2 border-r" :style="{ borderColor: `${colors.fg}1a` }">
+              {{ theme.name }}
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{
+                borderColor: `${colors.fg}1a`,
+                color: `hsl(${theme.baseHue}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+              }"
+            >
+              {{ theme.baseHue }}°
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{
+                borderColor: `${colors.fg}1a`,
+                color: `hsl(${(theme.baseHue + theme.errorOffset) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+              }"
+            >
+              {{ (theme.baseHue + theme.errorOffset) % 360 }}°
+            </div>
+            <div
+              class="col-span-2 p-2 border-r text-right"
+              :style="{
+                borderColor: `${colors.fg}1a`,
+                color: `hsl(${(theme.baseHue + theme.warningOffset) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+              }"
+            >
+              {{ (theme.baseHue + theme.warningOffset) % 360 }}°
+            </div>
+            <div class="col-span-2 p-2 flex gap-1">
+              <!-- Base -->
+              <div
+                class="w-4 h-4 border"
+                :style="{
+                  backgroundColor: `hsl(${theme.baseHue}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+                  borderColor: `${colors.fg}33`,
+                }"
+                :title="`base ${theme.baseHue}°`"
+              ></div>
+              <!-- Error offset -->
+              <div
+                class="w-4 h-4 border"
+                :style="{
+                  backgroundColor: `hsl(${(theme.baseHue + theme.errorOffset) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+                  borderColor: `${colors.fg}33`,
+                }"
+                :title="`error +${theme.errorOffset}°`"
+              ></div>
+              <!-- Warning offset -->
+              <div
+                class="w-4 h-4 border"
+                :style="{
+                  backgroundColor: `hsl(${(theme.baseHue + theme.warningOffset) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+                  borderColor: `${colors.fg}33`,
+                }"
+                :title="`warning +${theme.warningOffset}°`"
+              ></div>
+              <!-- Keyword offset -->
+              <div
+                class="w-4 h-4 border"
+                :style="{
+                  backgroundColor: `hsl(${(theme.baseHue + theme.keywordOffset) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+                  borderColor: `${colors.fg}33`,
+                }"
+                :title="`keyword +${theme.keywordOffset}°`"
+              ></div>
+              <!-- String offset -->
+              <div
+                class="w-4 h-4 border"
+                :style="{
+                  backgroundColor: `hsl(${(theme.baseHue + theme.stringOffset + 360) % 360}, ${theme.baseSaturation}%, ${theme.baseLightness}%)`,
+                  borderColor: `${colors.fg}33`,
+                }"
+                :title="`string ${theme.stringOffset}°`"
+              ></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
