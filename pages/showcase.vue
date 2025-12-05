@@ -59,23 +59,23 @@ watch(
 
 const features = [
   {
-    title: 'Monochrome Precision',
-    desc: 'Single base hue. Semantic meaning through ±7° shifts. All signal, zero noise.',
+    title: 'Monochrome > Rainbow',
+    desc: 'Traditional syntax highlighting uses 10+ colors fighting for attention. Vulpes uses one hue with ±7° semantic shifts. Your brain stops parsing colors and starts reading code. Information density goes up, cognitive load goes down.',
   },
   {
-    title: 'Eight Export Formats',
-    desc: 'Neovim, Ghostty, Bat, Yazi, Lazygit, ZSH, Alacritty, Wezterm. One source of truth.',
+    title: 'Eight Formats, Zero Lock-In',
+    desc: 'Export to Neovim, Ghostty, Bat, Yazi, Lazygit, ZSH, Alacritty, Wezterm. Change your hue at 2am? Every tool updates. No more maintaining 8 different theme files that drift out of sync.',
   },
   {
-    title: 'Hue Science',
-    desc: 'Color theory baked in. Error at +7°, warning at -7°. Your eyes adapt, density increases.',
+    title: 'Semantic Hue Shifts',
+    desc: 'Errors shift +7° clockwise. Warnings shift -7° counter-clockwise. Success stays at base hue. Your eyes learn the pattern in minutes, never think about it again. Color becomes meaningful, not decorative.',
   },
 ]
 
 const stats = [
   { label: 'Export Formats', value: '8' },
-  { label: 'Hue Offset', value: '±7°' },
-  { label: 'Base Colors', value: '16' },
+  { label: 'Semantic Offset', value: '±7°' },
+  { label: 'Config Files', value: '1' },
 ]
 
 // Example themes from vulpes-month
@@ -155,14 +155,17 @@ const themes = [
             class="text-7xl md:text-8xl font-bold leading-tight mb-8 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
-            Monochrome themes for terminal aesthetes
+            Stop maintaining 8 theme files
           </h1>
           <p
             class="text-2xl leading-relaxed mb-12 transition-colors duration-1000"
             :style="{ color: colors.comment }"
           >
-            One base hue. Eight export formats. Maximum signal, minimal variation.
-            <span :style="{ color: colors.fg }">Watch the colors shift.</span>
+            Pick one hue. Generate themes for Neovim, Ghostty, Bat, Yazi, Lazygit, ZSH, Alacritty,
+            and Wezterm.
+            <span :style="{ color: colors.fg }"
+              >Monochrome syntax highlighting that actually makes code more readable.</span
+            >
           </p>
           <div class="flex gap-4">
             <NuxtLink
