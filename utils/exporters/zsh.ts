@@ -30,9 +30,6 @@ function to256(color: string): number {
  * @returns ZSH config snippet
  */
 export function exportZsh(palette: ThemePalette, themeName: string = 'vulpes'): ExportResult {
-  // Detect if this is a dark or light theme based on background luminance
-  const isDark = chroma(palette.bg).luminance() < 0.5
-
   // Normalize all colors to hex format using chroma-js
   // This ensures consistent format regardless of input (rgb, hsl, etc.)
   const hex = {

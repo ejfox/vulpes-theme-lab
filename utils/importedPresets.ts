@@ -3,7 +3,6 @@
  * Stores user-imported themes as presets alongside monthly themes
  */
 
-import chroma from 'chroma-js'
 import type { ThemeImport } from './importers/types'
 import type { ThemePalette } from './types'
 import { mapThemeToSemanticPalette } from './semanticMapper'
@@ -111,69 +110,18 @@ export function clearImportedPresets(): void {
 
 /**
  * Apply imported preset to theme state
- * Converts stored palette back to theme state values
+ * Returns the full theme palette for direct application
  */
 export function applyImportedPreset(preset: ImportedPreset): {
   themeName: string
   mode: 'dark' | 'light'
-  // Core colors that can be directly set
-  colors: {
-    bg: string
-    fg: string
-    base: string
-    error: string
-    warning: string
-    hint: string
-    comment: string
-    keyword: string
-    string: string
-    number: string
-    function: string
-    constant: string
-    type: string
-    variable: string
-    operator: string
-    builtin: string
-    parameter: string
-    property: string
-    namespace: string
-    macro: string
-    tag: string
-    punctuation: string
-    heading: string
-    palette: Record<number, string>
-  }
+  colors: ThemePalette
 } {
   const { palette, name, isDark } = preset
 
   return {
     themeName: name,
     mode: isDark ? 'dark' : 'light',
-    colors: {
-      bg: palette.bg,
-      fg: palette.fg,
-      base: palette.base,
-      error: palette.error,
-      warning: palette.warning,
-      hint: palette.hint,
-      comment: palette.comment,
-      keyword: palette.keyword,
-      string: palette.string,
-      number: palette.number,
-      function: palette.function,
-      constant: palette.constant,
-      type: palette.type,
-      variable: palette.variable,
-      operator: palette.operator,
-      builtin: palette.builtin,
-      parameter: palette.parameter,
-      property: palette.property,
-      namespace: palette.namespace,
-      macro: palette.macro,
-      tag: palette.tag,
-      punctuation: palette.punctuation,
-      heading: palette.heading,
-      palette: palette.palette,
-    },
+    colors: palette, // Return the full palette directly
   }
 }

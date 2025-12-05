@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors, options } = useTheme()
+const { colors } = useTheme()
 
 const commits = [
   {
@@ -51,12 +51,6 @@ const stashes = [
   { id: 'stash@{0}', msg: 'WIP: jack into Sense/Net mainframe', branch: 'feature/gibson' },
   { id: 'stash@{1}', msg: 'WIP: enhance hypercard protocol', branch: 'main' },
 ]
-
-const branches = [
-  { name: 'main', current: true, ahead: 3, behind: 0 },
-  { name: 'feature/telescope', current: false, ahead: 5, behind: 2 },
-  { name: 'fix/lsp-diagnostics', current: false, ahead: 1, behind: 0 },
-]
 </script>
 
 <template>
@@ -66,7 +60,11 @@ const branches = [
   >
     <div
       class="header"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
     >
       <span style="font-weight: bold; font-size: 10px">LAZYGIT TUI</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">

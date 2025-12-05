@@ -26,7 +26,10 @@ const ansiColors = Array.from({ length: 16 }, (_, i) => ({
 </script>
 
 <template>
-  <div class="color-ref" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
+  <div
+    class="color-ref"
+    :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }"
+  >
     <!-- Header -->
     <div
       class="header"

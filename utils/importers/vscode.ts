@@ -95,15 +95,11 @@ export function parseVSCode(content: string): ParseResult {
     // Extract editor colors from colors object
     if (theme.colors) {
       colors.bg = normalizeHex(
-        theme.colors['editor.background'] ||
-          theme.colors['background'] ||
-          theme.colors['editor.bg']
+        theme.colors['editor.background'] || theme.colors['background'] || theme.colors['editor.bg']
       )
 
       colors.fg = normalizeHex(
-        theme.colors['editor.foreground'] ||
-          theme.colors['foreground'] ||
-          theme.colors['editor.fg']
+        theme.colors['editor.foreground'] || theme.colors['foreground'] || theme.colors['editor.fg']
       )
 
       colors.selection = normalizeHex(
@@ -245,8 +241,11 @@ export function parseVSCode(content: string): ParseResult {
       )
 
       colors.macro = normalizeHex(
-        findScopeColor(theme.tokenColors, 'entity.name.function.preprocessor', 'meta.preprocessor') ||
-          colors.macro
+        findScopeColor(
+          theme.tokenColors,
+          'entity.name.function.preprocessor',
+          'meta.preprocessor'
+        ) || colors.macro
       )
 
       colors.tag = normalizeHex(

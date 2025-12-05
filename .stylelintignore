@@ -1,0 +1,12 @@
+node_modules
+dist
+.output
+.nuxt
+*.js
+*.ts
+*.mjs
+*.cjs
+*.json
+*.md
+*.txt
+*.log

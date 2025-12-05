@@ -4,7 +4,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { exportMaplibre, createSemanticPalette } from '~/utils/exporters'
 
-const { colors, darkColors } = useTheme()
+const { colors, darkColors, lightColors, state } = useTheme()
 const config = useRuntimeConfig()
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: maplibregl.Map | null = null
@@ -16,8 +16,9 @@ const initMap = () => {
   }
 
   try {
-    // Create semantic palette from current theme
-    const palette = createSemanticPalette(darkColors.value, 'dark')
+    // Create semantic palette from current theme mode
+    const currentColors = state.value.mode === 'dark' ? darkColors.value : lightColors.value
+    const palette = createSemanticPalette(currentColors, state.value.mode)
 
     // Generate MapLibre style JSON
     const styleResult = exportMaplibre(palette, 'vulpes')
@@ -25,7 +26,10 @@ const initMap = () => {
 
     // Use Maptiler API key from environment variable
     const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
-    console.log('MapPreview: Using Maptiler key:', maptilerKey ? maptilerKey.substring(0, 8) + '...' : 'none')
+    console.log(
+      'MapPreview: Using Maptiler key:',
+      maptilerKey ? maptilerKey.substring(0, 8) + '...' : 'none'
+    )
 
     const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
     const parsedStyle = JSON.parse(styleString)
@@ -62,22 +66,23 @@ const initMap = () => {
       new maplibregl.NavigationControl({
         visualizePitch: true,
       }),
-      'top-right',
+      'top-right'
     )
   } catch (error) {
     console.error('MapPreview: Error initializing map:', error)
   }
 }
 
-// Update map style when colors change (preserves camera position)
+// Update map style when colors or mode change (preserves camera position)
 watch(
-  () => colors.value,
+  () => [colors.value, state.value.mode],
   () => {
     if (!map) return
 
     try {
-      // Generate new style with updated colors
-      const palette = createSemanticPalette(darkColors.value, 'dark')
+      // Generate new style with updated colors for current mode
+      const currentColors = state.value.mode === 'dark' ? darkColors.value : lightColors.value
+      const palette = createSemanticPalette(currentColors, state.value.mode)
       const styleResult = exportMaplibre(palette, 'vulpes')
       const style = JSON.parse(styleResult.content)
 
@@ -87,12 +92,12 @@ watch(
 
       // Update style without resetting camera
       map.setStyle(parsedStyle)
-      console.log('MapPreview: Style updated, camera preserved')
+      console.log('MapPreview: Style updated for', state.value.mode, 'mode, camera preserved')
     } catch (error) {
       console.error('MapPreview: Error updating style:', error)
     }
   },
-  { deep: true },
+  { deep: true }
 )
 
 onMounted(() => {
@@ -109,7 +114,10 @@ onUnmounted(() => {
 
 <template>
   <div class="map-preview-container" :style="{ background: colors.bg }">
-    <div class="map-header" :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}` }">
+    <div
+      class="map-header"
+      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}` }"
+    >
       <span :style="{ color: colors.base, fontWeight: 'bold', fontSize: '10px' }">
         CYBERPUNK MAP THEME
       </span>
@@ -118,7 +126,16 @@ onUnmounted(() => {
       </span>
     </div>
     <div ref="mapContainer" class="map-container"></div>
-    <div class="map-footer" :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}`, color: colors.hint, fontSize: '7px', padding: '2px 4px' }">
+    <div
+      class="map-footer"
+      :style="{
+        background: colors.bg,
+        borderTop: `1px solid ${colors.comment}`,
+        color: colors.hint,
+        fontSize: '7px',
+        padding: '2px 4px',
+      }"
+    >
       Neon cartography • Replace {'{key}'} with your Maptiler API key
     </div>
   </div>

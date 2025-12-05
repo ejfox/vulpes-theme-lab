@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors, options } = useTheme()
+const { colors } = useTheme()
 
 const cpuBars = [
   { id: 1, usage: 45, color: 'base' },
@@ -150,7 +150,11 @@ const getBarColor = (colorKey: string) => {
   <div class="htop" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
     <div
       class="header-label"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
     >
       <span style="font-weight: bold; font-size: 10px">HTOP SYSTEM MONITOR</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">

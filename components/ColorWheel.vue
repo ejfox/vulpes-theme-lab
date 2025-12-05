@@ -75,7 +75,7 @@ const colorPoints = computed(() => {
         x,
         y,
       })
-    } catch (e) {
+    } catch {
       // Skip invalid colors
     }
   })

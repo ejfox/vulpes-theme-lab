@@ -63,6 +63,8 @@ interface ThemeState {
   italicStrings: boolean
   underlineErrors: boolean
   mode: 'dark' | 'light'
+  // Imported theme palette (when set, overrides generated colors)
+  importedPalette?: ThemeColors | null
   // Colorblind simulation
   colorblindMode: 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'
   // Visual effects
@@ -175,6 +177,11 @@ interface ThemeState {
   mapRoadSecondaryOffset: number
   mapBuildingOffset: number
   mapPoiOffset: number
+  // Cartographic saturation controls
+  mapWaterSaturation: number // 0-100
+  mapParkSaturation: number // 0-100
+  mapRoadSaturation: number // 0-100
+  mapBuildingSaturation: number // 0-100
 }
 
 const defaultState: ThemeState = {
@@ -193,6 +200,7 @@ const defaultState: ThemeState = {
   italicStrings: true,
   underlineErrors: true,
   mode: 'dark' as 'dark' | 'light',
+  importedPalette: null,
   // Colorblind simulation
   colorblindMode: 'none' as 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia',
   // Visual effects defaults
@@ -316,6 +324,11 @@ const defaultState: ThemeState = {
   mapRoadSecondaryOffset: 0, // Secondary roads - neutral
   mapBuildingOffset: -30, // Buildings - purple/blue
   mapPoiOffset: 0, // Points of interest - base color
+  // Cartographic saturation controls (0-100)
+  mapWaterSaturation: 15, // How blue the water is
+  mapParkSaturation: 50, // How green the parks are
+  mapRoadSaturation: 60, // How colorful the roads are
+  mapBuildingSaturation: 30, // How colorful the buildings are
 }
 
 export const useTheme = () => {
@@ -446,6 +459,10 @@ export const useTheme = () => {
     mapRoadSecondaryOffset: Number(params.mrso) || defaultState.mapRoadSecondaryOffset,
     mapBuildingOffset: Number(params.mbo) || defaultState.mapBuildingOffset,
     mapPoiOffset: Number(params.mpoi) || defaultState.mapPoiOffset,
+    mapWaterSaturation: Number(params.mws) || defaultState.mapWaterSaturation,
+    mapParkSaturation: Number(params.mps) || defaultState.mapParkSaturation,
+    mapRoadSaturation: Number(params.mrs) || defaultState.mapRoadSaturation,
+    mapBuildingSaturation: Number(params.mbs) || defaultState.mapBuildingSaturation,
   }))
 
   // Watch state and sync to URL
@@ -575,6 +592,10 @@ export const useTheme = () => {
         params.mrso = String(newState.mapRoadSecondaryOffset)
         params.mbo = String(newState.mapBuildingOffset)
         params.mpoi = String(newState.mapPoiOffset)
+        params.mws = String(newState.mapWaterSaturation)
+        params.mps = String(newState.mapParkSaturation)
+        params.mrs = String(newState.mapRoadSaturation)
+        params.mbs = String(newState.mapBuildingSaturation)
       },
       { deep: true }
     )
@@ -589,7 +610,6 @@ export const useTheme = () => {
 
     // Monochrome intensity for foreground
     const monoIntensity = state.value.monochromeIntensity / 100
-    const monoLightness = state.value.monochromeLightness / 100
 
     // Helper to generate color at hue offset with mode-appropriate lightness
     // Uses perceptual lightness adjustments for better consistency
@@ -660,6 +680,70 @@ export const useTheme = () => {
       ? chroma.hsl(fgHue, sat * monoIntensity, fgL.dark / 100).hex()
       : chroma.hsl(fgHue, 0, fgL.dark / 100).hex()
 
+    // Cartographic wisdom: semantic hues for map features
+    // Water is blue, parks are green - absolute hues, not theme-relative
+    const CARTOGRAPHIC_HUES = {
+      water: 200, // Blue
+      park: 120, // Green
+      motorway: 20, // Orange
+      trunk: 40, // Yellow
+      primary: 50, // Warm yellow
+      secondary: 60, // Yellow-green
+      building: 280, // Purple
+      poi: 0, // Red
+    }
+
+    // Lightness values for map features based on theme mode
+    const getMapLightness = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+      const lightness = {
+        dark: {
+          water: 15,
+          park: 45,
+          motorway: 60,
+          trunk: 58,
+          primary: 55,
+          secondary: 52,
+          building: 35,
+          poi: 58,
+        },
+        light: {
+          water: 85,
+          park: 40,
+          motorway: 42,
+          trunk: 43,
+          primary: 44,
+          secondary: 46,
+          building: 50,
+          poi: 42,
+        },
+      }
+      const base = isDark ? lightness.dark[feature] : lightness.light[feature]
+      // Apply contrast adjustments
+      return base + (contrastFactor - 0.5) * (isDark ? 15 : -12)
+    }
+
+    // Saturation values for map features (user-adjustable)
+    const getMapSaturation = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+      const baseSaturation = {
+        water: state.value.mapWaterSaturation / 100,
+        park: state.value.mapParkSaturation / 100,
+        motorway: state.value.mapRoadSaturation / 100,
+        trunk: state.value.mapRoadSaturation / 100,
+        primary: state.value.mapRoadSaturation / 100,
+        secondary: (state.value.mapRoadSaturation / 100) * 0.7, // Roads use shared saturation
+        building: state.value.mapBuildingSaturation / 100,
+        poi: state.value.mapRoadSaturation / 100, // POIs use road saturation
+      }
+      return baseSaturation[feature]
+    }
+
+    const mapColorAt = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+      const hue = CARTOGRAPHIC_HUES[feature]
+      const lightness = getMapLightness(feature) / 100
+      const saturation = getMapSaturation(feature)
+      return chroma.hsl(hue, saturation, lightness).hex()
+    }
+
     return {
       bg,
       fg,
@@ -702,15 +786,16 @@ export const useTheme = () => {
         14: colorAt(state.value.hueOffset * 3, 70, 45),
         15: chroma.hsl(0, 0, isDark ? 0.95 : 0.1).hex(),
       },
-      // MapLibre-specific colors
-      mapWater: colorAt(state.value.mapWaterOffset, 40, 55),
-      mapPark: colorAt(state.value.mapParkOffset, 50, 45),
-      mapRoadMotorway: colorAt(state.value.mapRoadMotorwayOffset, 60, 42),
-      mapRoadTrunk: colorAt(state.value.mapRoadTrunkOffset, 58, 43),
-      mapRoadPrimary: colorAt(state.value.mapRoadPrimaryOffset, 55, 44),
-      mapRoadSecondary: colorAt(state.value.mapRoadSecondaryOffset, 52, 46),
-      mapBuilding: colorAt(state.value.mapBuildingOffset, 45, 48),
-      mapPoi: colorAt(state.value.mapPoiOffset, 58, 42),
+      // MapLibre-specific colors using cartographic wisdom
+      // Absolute semantic hues: water is blue, parks are green
+      mapWater: mapColorAt('water'),
+      mapPark: mapColorAt('park'),
+      mapRoadMotorway: mapColorAt('motorway'),
+      mapRoadTrunk: mapColorAt('trunk'),
+      mapRoadPrimary: mapColorAt('primary'),
+      mapRoadSecondary: mapColorAt('secondary'),
+      mapBuilding: mapColorAt('building'),
+      mapPoi: mapColorAt('poi'),
     }
   }
 
@@ -770,7 +855,13 @@ export const useTheme = () => {
   }
 
   // Current mode colors with colorblind simulation
-  const colors = computed(() => applyColorblindSim(generateThemeVariant(state.value.mode)))
+  // If imported palette exists, use it directly instead of generating
+  const colors = computed(() => {
+    if (state.value.importedPalette) {
+      return applyColorblindSim(state.value.importedPalette)
+    }
+    return applyColorblindSim(generateThemeVariant(state.value.mode))
+  })
 
   // Both variants with colorblind simulation
   const darkColors = computed(() => applyColorblindSim(generateThemeVariant('dark')))

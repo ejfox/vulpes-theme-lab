@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { VULPES_MONTHLY_PRESETS, getCurrentMonthPreset, type ThemePreset } from '~/utils/presets'
+import { VULPES_MONTHLY_PRESETS, type ThemePreset } from '~/utils/presets'
 
-const { colors, state } = useTheme()
+const { colors } = useTheme()
 
 const emit = defineEmits<{
   loadPreset: [preset: ThemePreset]
@@ -15,7 +15,20 @@ const loadPreset = (preset: ThemePreset) => {
 
 // Get month abbreviation
 const getMonthAbbr = (month: number): string => {
-  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+  const months = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MAY',
+    'JUN',
+    'JUL',
+    'AUG',
+    'SEP',
+    'OCT',
+    'NOV',
+    'DEC',
+  ]
   return months[month - 1]
 }
 
@@ -48,13 +61,20 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
         }"
         @click="loadPreset(preset)"
       >
-        <div class="preset-month" :style="{ color: colors.base, fontSize: '9px', fontWeight: 'bold' }">
+        <div
+          class="preset-month"
+          :style="{ color: colors.base, fontSize: '9px', fontWeight: 'bold' }"
+        >
           {{ getMonthAbbr(preset.month) }}
         </div>
         <div
           class="preset-color-preview"
           :style="{
-            background: getPreviewColor(preset.baseHue, preset.baseSaturation, preset.baseLightness),
+            background: getPreviewColor(
+              preset.baseHue,
+              preset.baseSaturation,
+              preset.baseLightness
+            ),
             boxShadow: `0 0 8px ${getPreviewColor(preset.baseHue, preset.baseSaturation, preset.baseLightness)}40`,
           }"
         ></div>
@@ -64,7 +84,15 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
       </button>
     </div>
 
-    <div class="preset-footer" :style="{ borderTop: `1px solid ${colors.comment}40`, color: colors.hint, fontSize: '7px', padding: '4px 6px' }">
+    <div
+      class="preset-footer"
+      :style="{
+        borderTop: `1px solid ${colors.comment}40`,
+        color: colors.hint,
+        fontSize: '7px',
+        padding: '4px 6px',
+      }"
+    >
       Click a month to load its theme • Current: {{ getMonthAbbr(currentMonth) }}
     </div>
   </div>

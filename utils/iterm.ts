@@ -1,6 +1,6 @@
 import type { ThemeColors } from '~/composables/useTheme'
 
-export function serializeItermTheme(colors: ThemeColors, name: string): string {
+export function serializeItermTheme(colors: ThemeColors, _name: string): string {
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result

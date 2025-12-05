@@ -4,8 +4,6 @@ const { colors } = useTheme()
 
 // Calculate perceptual distance - computed so it updates when colors change
 const fidelityData = computed(() => {
-  const palette = Object.values(colors.value.palette)
-
   // sRGB gamut can't reproduce all colors perfectly
   // Terminal emulators quantize to nearest displayable color
   // This is the gap between ideal and real
@@ -31,7 +29,7 @@ const fidelityData = computed(() => {
       const distance = chroma.deltaE(intended, quantized)
       totalDistance += distance
       count++
-    } catch (e) {
+    } catch {
       // Color parsing failed
     }
   })

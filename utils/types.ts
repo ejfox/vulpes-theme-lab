@@ -47,6 +47,16 @@ export interface ThemePalette {
 
   // ANSI palette (0-15)
   palette: Record<number, string>
+
+  // MapLibre-specific colors
+  mapWater: string
+  mapPark: string
+  mapRoadMotorway: string
+  mapRoadTrunk: string
+  mapRoadPrimary: string
+  mapRoadSecondary: string
+  mapBuilding: string
+  mapPoi: string
 }
 
 /**
@@ -108,6 +118,16 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
 
     // ANSI palette (direct passthrough)
     palette: colors.palette,
+
+    // MapLibre-specific colors (direct passthrough)
+    mapWater: colors.mapWater,
+    mapPark: colors.mapPark,
+    mapRoadMotorway: colors.mapRoadMotorway,
+    mapRoadTrunk: colors.mapRoadTrunk,
+    mapRoadPrimary: colors.mapRoadPrimary,
+    mapRoadSecondary: colors.mapRoadSecondary,
+    mapBuilding: colors.mapBuilding,
+    mapPoi: colors.mapPoi,
   }
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors, options } = useTheme()
+const { colors } = useTheme()
 
 // Powerlevel10k-style prompt segments with git status
 const p10kPrompt = {
@@ -116,7 +116,11 @@ const getColor = (type: string) => {
   <div class="shell" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
     <div
       class="header"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
     >
       <span style="font-weight: bold; font-size: 10px">ZSH TERMINAL</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">

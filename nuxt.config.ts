@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   },
   // Enable static site generation
   ssr: false,
+  css: ['~/assets/css/main.css'],
   // Runtime config for environment variables
   runtimeConfig: {
     public: {

@@ -16,7 +16,7 @@ export function getContrastRatio(fg: string, bg: string): number {
     const darker = Math.min(fgLum, bgLum)
 
     return (lighter + 0.05) / (darker + 0.05)
-  } catch (e) {
+  } catch {
     return 1
   }
 }
@@ -41,7 +41,7 @@ export function detectThemeType(palette: ThemePalette): 'light' | 'dark' {
     const bgLuminance = chroma(palette.bg).luminance()
     // Threshold: 0.5 is middle gray (sRGB ~188)
     return bgLuminance > 0.5 ? 'light' : 'dark'
-  } catch (e) {
+  } catch {
     return 'dark'
   }
 }
@@ -65,7 +65,7 @@ export function ensureContrast(bg: string, preferredFg: string): string {
     // Otherwise, use pure black or white based on background luminance
     const bgLum = chroma(bg).luminance()
     return bgLum > 0.5 ? '#000000' : '#ffffff'
-  } catch (e) {
+  } catch {
     return '#ffffff'
   }
 }

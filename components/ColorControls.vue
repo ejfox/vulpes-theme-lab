@@ -1,9 +1,35 @@
 <script setup lang="ts">
 const { state } = useTheme()
 
+// Rainbow gradient for base hue slider
+const baseHueGradient = `linear-gradient(
+  to right,
+  hsl(0, 85%, 55%),
+  hsl(30, 85%, 55%),
+  hsl(60, 85%, 55%),
+  hsl(90, 85%, 55%),
+  hsl(120, 85%, 55%),
+  hsl(150, 85%, 55%),
+  hsl(180, 85%, 55%),
+  hsl(210, 85%, 55%),
+  hsl(240, 85%, 55%),
+  hsl(270, 85%, 55%),
+  hsl(300, 85%, 55%),
+  hsl(330, 85%, 55%),
+  hsl(360, 85%, 55%)
+)`
+
 // Ordered by importance: base hue first, offset second (most impactful controls)
 const sliders = [
-  { key: 'baseHue', label: 'base hue', min: 0, max: 360, step: 1 },
+  {
+    key: 'baseHue',
+    label: 'base hue',
+    min: 0,
+    max: 360,
+    step: 1,
+    variant: 'primary' as const,
+    gradient: baseHueGradient,
+  },
   { key: 'hueOffset', label: 'offset ±', min: 1, max: 45, step: 1 },
   { key: 'saturation', label: 'dark sat', min: 0, max: 100, step: 1 },
   { key: 'lightModeSaturation', label: 'light sat', min: 0, max: 100, step: 1 },
@@ -22,15 +48,68 @@ const visualEffectsSliders = [
   { key: 'popupBlend', label: 'popup blend', min: 0, max: 100, step: 1 },
 ]
 
-const maplibreSliders = [
-  { key: 'mapWaterOffset', label: 'water', min: -180, max: 180, step: 1 },
-  { key: 'mapParkOffset', label: 'parks', min: -180, max: 180, step: 1 },
-  { key: 'mapBuildingOffset', label: 'buildings', min: -180, max: 180, step: 1 },
-  { key: 'mapPoiOffset', label: 'poi', min: -180, max: 180, step: 1 },
-  { key: 'mapRoadMotorwayOffset', label: 'motorway', min: -180, max: 180, step: 1 },
-  { key: 'mapRoadTrunkOffset', label: 'trunk road', min: -180, max: 180, step: 1 },
-  { key: 'mapRoadPrimaryOffset', label: 'primary road', min: -180, max: 180, step: 1 },
-  { key: 'mapRoadSecondaryOffset', label: 'secondary road', min: -180, max: 180, step: 1 },
+// Map color intensity controls - how vivid each map feature is
+const mapColorIntensity = [
+  {
+    key: 'mapWaterSaturation',
+    label: 'water blue',
+    min: 0,
+    max: 100,
+    step: 1,
+    tooltip: 'How blue is the water? 0 = gray like background, 100 = vivid blue ocean',
+  },
+  {
+    key: 'mapParkSaturation',
+    label: 'park green',
+    min: 0,
+    max: 100,
+    step: 1,
+    tooltip: 'How green are parks? 0 = gray, 100 = bright grass green',
+  },
+  {
+    key: 'mapRoadSaturation',
+    label: 'road color',
+    min: 0,
+    max: 100,
+    step: 1,
+    tooltip: 'How colorful are roads? 0 = all gray, 100 = orange/yellow highways',
+  },
+  {
+    key: 'mapBuildingSaturation',
+    label: 'building color',
+    min: 0,
+    max: 100,
+    step: 1,
+    tooltip: 'How colorful are buildings? 0 = gray structures, 100 = colorful',
+  },
+]
+
+// Advanced: Fine-tune map feature hues (optional tweaking)
+const mapAdvancedHues = [
+  {
+    key: 'mapWaterOffset',
+    label: 'water shift',
+    min: -180,
+    max: 180,
+    step: 1,
+    tooltip: 'Shift water hue. Blue is 200°. Try 180° for cyan, 220° for purple-blue',
+  },
+  {
+    key: 'mapParkOffset',
+    label: 'park shift',
+    min: -180,
+    max: 180,
+    step: 1,
+    tooltip: 'Shift park hue. Green is 120°. Try 100° for yellow-green, 140° for blue-green',
+  },
+  {
+    key: 'mapRoadMotorwayOffset',
+    label: 'highway shift',
+    min: -180,
+    max: 180,
+    step: 1,
+    tooltip: 'Shift highway hue. Orange is 20°. Try 40° for yellow, 0° for red',
+  },
 ]
 
 // Programmatically generate all 23 color offset sliders for maximum granular control
@@ -413,32 +492,17 @@ const fixAllContrast = async () => {
       </label>
     </div>
 
-    <div class="control-group" v-for="slider in sliders" :key="slider.key">
-      <label>
-        <span
-          class="label"
-          :style="{
-            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-          }"
-          >{{ slider.label }}</span
-        >
-        <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
-          state[slider.key as keyof typeof state]
-        }}</span>
-      </label>
-      <input
-        type="range"
-        v-model.number="state[slider.key as keyof typeof state]"
-        :min="slider.min"
-        :max="slider.max"
-        :step="slider.step"
-        :class="{ 'base-hue-slider': slider.key === 'baseHue' }"
-        :style="{
-          background:
-            slider.key === 'baseHue' ? undefined : state.mode === 'dark' ? '#666' : '#ccc',
-        }"
-      />
-    </div>
+    <BaseSlider
+      v-for="slider in sliders"
+      :key="slider.key"
+      v-model="state[slider.key as keyof typeof state]"
+      :label="slider.label"
+      :min="slider.min"
+      :max="slider.max"
+      :step="slider.step"
+      :variant="slider.variant"
+      :gradient="slider.gradient"
+    />
 
     <!-- Monochrome-specific controls -->
     <div
@@ -448,28 +512,15 @@ const fixAllContrast = async () => {
         borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
       }"
     >
-      <div class="control-group" v-for="slider in monochromeSliders" :key="slider.key">
-        <label>
-          <span
-            class="label"
-            :style="{
-              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-            }"
-            >{{ slider.label }}</span
-          >
-          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
-            state[slider.key as keyof typeof state]
-          }}</span>
-        </label>
-        <input
-          type="range"
-          v-model.number="state[slider.key as keyof typeof state]"
-          :min="slider.min"
-          :max="slider.max"
-          :step="slider.step"
-          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
-        />
-      </div>
+      <BaseSlider
+        v-for="slider in monochromeSliders"
+        :key="slider.key"
+        v-model="state[slider.key as keyof typeof state]"
+        :label="slider.label"
+        :min="slider.min"
+        :max="slider.max"
+        :step="slider.step"
+      />
     </div>
 
     <!-- Visual effects controls -->
@@ -487,28 +538,15 @@ const fixAllContrast = async () => {
       >
         VISUAL EFFECTS
       </div>
-      <div class="control-group" v-for="slider in visualEffectsSliders" :key="slider.key">
-        <label>
-          <span
-            class="label"
-            :style="{
-              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-            }"
-            >{{ slider.label }}</span
-          >
-          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
-            state[slider.key as keyof typeof state]
-          }}</span>
-        </label>
-        <input
-          type="range"
-          v-model.number="state[slider.key as keyof typeof state]"
-          :min="slider.min"
-          :max="slider.max"
-          :step="slider.step"
-          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
-        />
-      </div>
+      <BaseSlider
+        v-for="slider in visualEffectsSliders"
+        :key="slider.key"
+        v-model="state[slider.key as keyof typeof state]"
+        :label="slider.label"
+        :min="slider.min"
+        :max="slider.max"
+        :step="slider.step"
+      />
     </div>
 
     <!-- MapLibre color controls -->
@@ -524,30 +562,42 @@ const fixAllContrast = async () => {
           color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
         }"
       >
-        MAPLIBRE COLORS
+        MAP COLORS
       </div>
-      <div class="control-group" v-for="slider in maplibreSliders" :key="slider.key">
-        <label>
-          <span
-            class="label"
-            :style="{
-              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-            }"
-            >{{ slider.label }}</span
-          >
-          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
-            state[slider.key as keyof typeof state]
-          }}</span>
-        </label>
-        <input
-          type="range"
-          v-model.number="state[slider.key as keyof typeof state]"
+
+      <!-- Main map color intensity controls -->
+      <BaseSlider
+        v-for="slider in mapColorIntensity"
+        :key="slider.key"
+        v-model="state[slider.key as keyof typeof state]"
+        :label="slider.label"
+        :min="slider.min"
+        :max="slider.max"
+        :step="slider.step"
+        :tooltip="slider.tooltip"
+      />
+
+      <!-- Advanced hue controls (optional) -->
+      <details class="advanced-controls">
+        <summary
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+          }"
+        >
+          advanced hue shifts
+        </summary>
+        <BaseSlider
+          v-for="slider in mapAdvancedHues"
+          :key="slider.key"
+          v-model="state[slider.key as keyof typeof state]"
+          :label="slider.label"
           :min="slider.min"
           :max="slider.max"
           :step="slider.step"
-          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
+          :tooltip="slider.tooltip"
+          variant="compact"
         />
-      </div>
+      </details>
     </div>
 
     <!-- Individual color offset controls -->
@@ -565,28 +615,16 @@ const fixAllContrast = async () => {
       >
         INDIVIDUAL COLORS
       </div>
-      <div class="control-group" v-for="slider in offsetSliders" :key="slider.key">
-        <label>
-          <span
-            class="label"
-            :style="{
-              color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-            }"
-            >{{ slider.label }}</span
-          >
-          <span class="value" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">{{
-            state[slider.key as keyof typeof state]
-          }}</span>
-        </label>
-        <input
-          type="range"
-          v-model.number="state[slider.key as keyof typeof state]"
-          :min="slider.min"
-          :max="slider.max"
-          :step="slider.step"
-          :style="{ background: state.mode === 'dark' ? '#666' : '#ccc' }"
-        />
-      </div>
+      <BaseSlider
+        v-for="slider in offsetSliders"
+        :key="slider.key"
+        v-model="state[slider.key as keyof typeof state]"
+        :label="slider.label"
+        :min="slider.min"
+        :max="slider.max"
+        :step="slider.step"
+        variant="compact"
+      />
     </div>
   </div>
 </template>
@@ -813,6 +851,32 @@ const fixAllContrast = async () => {
   gap: 8px;
 }
 
+.advanced-controls {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.advanced-controls summary {
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.advanced-controls summary:hover {
+  opacity: 1;
+}
+
+.advanced-controls[open] summary {
+  opacity: 1;
+  margin-bottom: 8px;
+}
+
 .section-header {
   font-size: 8px;
   font-weight: 700;
@@ -935,126 +999,5 @@ label {
   transition: all 0.2s ease;
 }
 
-.control-group:hover .value {
-  background: rgba(255, 255, 255, 0.1);
-  transform: scale(1.05);
-}
-
-input[type='range'] {
-  width: 100%;
-  height: 3px;
-  background: #666;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-input[type='range']:hover {
-  height: 4px;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-input[type='range']::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-
-input[type='range']::-webkit-slider-thumb:active {
-  transform: scale(1.1);
-}
-
-input[type='range']::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  cursor: pointer;
-  border-radius: 50%;
-  border: none;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-input[type='range']::-moz-range-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-
-input[type='range']::-moz-range-thumb:active {
-  transform: scale(1.1);
-}
-
-/* Base hue slider - Vibrant rainbow with prominent thumb */
-.base-hue-slider {
-  height: 6px !important;
-  background: linear-gradient(
-    to right,
-    hsl(0, 85%, 55%),
-    hsl(30, 85%, 55%),
-    hsl(60, 85%, 55%),
-    hsl(90, 85%, 55%),
-    hsl(120, 85%, 55%),
-    hsl(150, 85%, 55%),
-    hsl(180, 85%, 55%),
-    hsl(210, 85%, 55%),
-    hsl(240, 85%, 55%),
-    hsl(270, 85%, 55%),
-    hsl(300, 85%, 55%),
-    hsl(330, 85%, 55%),
-    hsl(360, 85%, 55%)
-  ) !important;
-  border-radius: 3px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.base-hue-slider:hover {
-  height: 8px !important;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
-}
-
-.base-hue-slider::-webkit-slider-thumb {
-  width: 16px !important;
-  height: 16px !important;
-  background: #fff !important;
-  border: 2px solid #000 !important;
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.base-hue-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.3) !important;
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.4),
-    0 6px 16px rgba(0, 0, 0, 0.6);
-}
-
-.base-hue-slider::-moz-range-thumb {
-  width: 16px !important;
-  height: 16px !important;
-  background: #fff !important;
-  border: 2px solid #000 !important;
-  box-shadow:
-    0 0 0 3px rgba(255, 255, 255, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.base-hue-slider::-moz-range-thumb:hover {
-  transform: scale(1.3) !important;
-  box-shadow:
-    0 0 0 4px rgba(255, 255, 255, 0.4),
-    0 6px 16px rgba(0, 0, 0, 0.6);
-}
+/* Note: Slider styles now in BaseSlider.vue component */
 </style>

@@ -1,5 +1,5 @@
 import type { ThemePalette, ExportResult } from '../types'
-import { detectThemeType, ensureContrast } from '../contrast'
+import { ensureContrast } from '../contrast'
 
 /**
  * Generates a Yazi file manager theme in TOML format

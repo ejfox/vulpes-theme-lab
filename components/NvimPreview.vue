@@ -228,7 +228,11 @@ const codeLines = [
   >
     <div
       class="header"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
     >
       <span style="font-weight: bold; font-size: 10px">NEOVIM EDITOR</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">

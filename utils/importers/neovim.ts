@@ -44,7 +44,8 @@ function extractColors(content: string): Map<string, string> {
   }
 
   // Pattern 2: ['@scope.key'] = { fg = '#hex' }
-  const treesitterPattern = /\['@?(\w+)(?:\.(\w+))?\'\]\s*=\s*\{[^}]*fg\s*=\s*['"]?(#[0-9a-fA-F]{6})['"]?/g
+  const treesitterPattern =
+    /\['@?(\w+)(?:\.(\w+))?\'\]\s*=\s*\{[^}]*fg\s*=\s*['"]?(#[0-9a-fA-F]{6})['"]?/g
   while ((match = treesitterPattern.exec(content)) !== null) {
     const scope = match[1].toLowerCase()
     const subscope = match[2]?.toLowerCase()
@@ -120,7 +121,13 @@ export function parseNeovim(content: string): ParseResult {
     colors.namespace = findColor(colorMap, 'namespace', 'module', 'purple', 'namespace_builtin')
     colors.macro = findColor(colorMap, 'macro', 'macros', 'purple', 'constant_macro')
     colors.tag = findColor(colorMap, 'tag', 'tags', 'red', 'tag_attribute')
-    colors.punctuation = findColor(colorMap, 'punctuation', 'delimiter', 'fg', 'punctuation_delimiter')
+    colors.punctuation = findColor(
+      colorMap,
+      'punctuation',
+      'delimiter',
+      'fg',
+      'punctuation_delimiter'
+    )
     colors.heading = findColor(colorMap, 'heading', 'title', 'blue', 'markup_heading')
 
     // Status/diagnostic colors

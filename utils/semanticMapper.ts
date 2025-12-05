@@ -91,6 +91,70 @@ export function mapThemeToSemanticPalette(imported: ThemeImport): ThemePalette {
   const bgColor = chroma(bg)
   const bg_alt = isDark ? bgColor.brighten(0.3).hex() : bgColor.darken(0.15).hex()
 
+  // Cartographic color rules (absolute hues, not theme-relative)
+  // These preserve the semantic meaning of map features across all themes
+  const CARTOGRAPHIC_HUES = {
+    water: 200, // Blue (cyan-blue for water bodies)
+    park: 120, // Green (grass/vegetation)
+    motorway: 20, // Orange-yellow (high-traffic roads)
+    trunk: 40, // Yellow (major roads)
+    primary: 50, // Warm yellow (primary roads)
+    secondary: 60, // Muted yellow-green (secondary roads)
+    building: 280, // Purple-blue (structures)
+    poi: 0, // Red (points of interest - landmarks)
+  }
+
+  // Lightness values for map features based on theme mode
+  const getMapLightness = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+    const lightness = {
+      dark: {
+        water: 15, // Subtle, close to bg
+        park: 45,
+        motorway: 60,
+        trunk: 58,
+        primary: 55,
+        secondary: 52,
+        building: 35,
+        poi: 58,
+      },
+      light: {
+        water: 85, // Subtle, close to bg
+        park: 40,
+        motorway: 42,
+        trunk: 43,
+        primary: 44,
+        secondary: 46,
+        building: 50,
+        poi: 42,
+      },
+    }
+    return isDark ? lightness.dark[feature] : lightness.light[feature]
+  }
+
+  // Saturation values for map features (consistent across modes)
+  const getMapSaturation = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+    const saturation = {
+      water: 0.15, // Subtle hint of blue, close to bg
+      park: 0.5, // Natural green
+      motorway: 0.7, // High-visibility highways
+      trunk: 0.6, // Major roads
+      primary: 0.5, // Standard roads
+      secondary: 0.4, // Muted roads
+      building: 0.3, // Subtle structures
+      poi: 0.6, // Noticeable landmarks
+    }
+    return saturation[feature]
+  }
+
+  // Generate MapLibre-specific colors using cartographic wisdom
+  // Parks are green, water is blue - these are SEMANTIC constants, not relative
+  const generateMapColor = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
+    const hue = CARTOGRAPHIC_HUES[feature]
+    const lightness = getMapLightness(feature) / 100
+    const saturation = getMapSaturation(feature)
+    return chroma.hsl(hue, saturation, lightness).hex()
+  }
+
   // Map all semantic roles with intelligent fallbacks
   const mappedPalette: ThemePalette = {
     // Core
@@ -101,27 +165,16 @@ export function mapThemeToSemanticPalette(imported: ThemeImport): ThemePalette {
 
     // Status colors
     error: getColor(colors.error, palette[1], undefined, () => generateMissingColor(fg, 'error')),
-    warning: getColor(
-      colors.warning,
-      palette[3],
-      undefined,
-      () => generateMissingColor(fg, 'warning')
+    warning: getColor(colors.warning, palette[3], undefined, () =>
+      generateMissingColor(fg, 'warning')
     ),
-    success: getColor(
-      colors.success,
-      palette[2],
-      colors.string,
-      () => generateMissingColor(fg, 'success')
+    success: getColor(colors.success, palette[2], colors.string, () =>
+      generateMissingColor(fg, 'success')
     ),
-    info: getColor(
-      colors.info,
-      palette[4],
-      colors.function,
-      () => generateMissingColor(fg, 'info')
+    info: getColor(colors.info, palette[4], colors.function, () =>
+      generateMissingColor(fg, 'info')
     ),
-    hint: getColor(colors.hint, palette[8], colors.comment, () =>
-      chroma(fg).alpha(0.5).hex()
-    ),
+    hint: getColor(colors.hint, palette[8], colors.comment, () => chroma(fg).alpha(0.5).hex()),
 
     // Syntax highlighting
     comment: getColor(colors.comment, palette[8], undefined, () =>
@@ -178,6 +231,17 @@ export function mapThemeToSemanticPalette(imported: ThemeImport): ThemePalette {
 
     // ANSI palette
     palette,
+
+    // MapLibre-specific colors using cartographic wisdom
+    // Absolute semantic hues: water is blue, parks are green, regardless of theme
+    mapWater: generateMapColor('water'),
+    mapPark: generateMapColor('park'),
+    mapRoadMotorway: generateMapColor('motorway'),
+    mapRoadTrunk: generateMapColor('trunk'),
+    mapRoadPrimary: generateMapColor('primary'),
+    mapRoadSecondary: generateMapColor('secondary'),
+    mapBuilding: generateMapColor('building'),
+    mapPoi: generateMapColor('poi'),
   }
 
   return mappedPalette
@@ -189,8 +253,8 @@ export function mapThemeToSemanticPalette(imported: ThemeImport): ThemePalette {
  */
 export function paletteToPreset(
   palette: ThemePalette,
-  name: string,
-  isDark: boolean
+  _name: string,
+  _isDark: boolean
 ): {
   baseHue: number
   saturation: number
@@ -198,7 +262,7 @@ export function paletteToPreset(
 } {
   // Analyze base color to extract hue/saturation
   const baseColor = chroma(palette.base)
-  const [h, s, l] = baseColor.hsl()
+  const [h, s] = baseColor.hsl()
 
   // Calculate contrast from bg/fg luminance difference
   const bgLum = chroma(palette.bg).luminance()

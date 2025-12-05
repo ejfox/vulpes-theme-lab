@@ -55,7 +55,7 @@ export function parseThemeAuto(content: string): ParseResult {
           return result
         }
       }
-    } catch (error: any) {
+    } catch {
       // Not JSON or invalid, continue
     }
 
@@ -105,7 +105,7 @@ export function parseThemeAuto(content: string): ParseResult {
     { name: 'neovim', parser: parseNeovim },
   ]
 
-  for (const { name, parser } of parsers) {
+  for (const { name: _name, parser } of parsers) {
     const result = parser(content)
     if (result.success) {
       return result
@@ -134,6 +134,18 @@ export function detectFormatFromFilename(filename: string): ThemeFormat {
 }
 
 /**
+ * Extract clean theme name from filename
+ * Examples: "ayu-dark.json" -> "ayu-dark", "Tokyo Night.yml" -> "tokyo-night"
+ */
+function cleanFilename(filename: string): string {
+  return filename
+    .replace(/\.(json|yml|yaml|lua|ghostty|txt)$/i, '') // Remove extension
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-') // Replace spaces/underscores with hyphens
+    .replace(/[^a-z0-9-]/g, '') // Remove special chars
+}
+
+/**
  * Parse theme from file content with optional filename hint
  */
 export function parseThemeFromFile(content: string, filename?: string): ParseResult {
@@ -142,8 +154,9 @@ export function parseThemeFromFile(content: string, filename?: string): ParseRes
     if (format !== 'auto') {
       const result = parseTheme(content, format)
       if (result.success) {
-        // Add filename to metadata
+        // Override theme name with cleaned filename
         if (result.theme) {
+          result.theme.name = cleanFilename(filename)
           result.theme.metadata.filename = filename
         }
         return result
@@ -152,5 +165,13 @@ export function parseThemeFromFile(content: string, filename?: string): ParseRes
   }
 
   // Fall back to auto-detection
-  return parseThemeAuto(content)
+  const result = parseThemeAuto(content)
+
+  // If we have a filename, use it for the theme name
+  if (result.success && result.theme && filename) {
+    result.theme.name = cleanFilename(filename)
+    result.theme.metadata.filename = filename
+  }
+
+  return result
 }

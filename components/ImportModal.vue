@@ -140,11 +140,14 @@ const colorPreview = computed(() => {
 })
 
 // Watch for dropped file from parent
-watch(() => props.droppedFile, (file) => {
-  if (file && props.show) {
-    processFile(file)
+watch(
+  () => props.droppedFile,
+  (file) => {
+    if (file && props.show) {
+      processFile(file)
+    }
   }
-})
+)
 
 // Close on escape
 onMounted(() => {
@@ -254,7 +257,8 @@ onMounted(() => {
                         state.mode === 'dark'
                           ? 'rgba(100, 150, 255, 0.4)'
                           : 'rgba(100, 150, 255, 0.3)',
-                      color: state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : 'rgba(80, 120, 200, 1)',
+                      color:
+                        state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : 'rgba(80, 120, 200, 1)',
                     }"
                   >
                     Browse Files
@@ -275,7 +279,9 @@ onMounted(() => {
                 class="error-message"
                 :style="{
                   background:
-                    state.mode === 'dark' ? 'rgba(255, 100, 100, 0.1)' : 'rgba(255, 100, 100, 0.05)',
+                    state.mode === 'dark'
+                      ? 'rgba(255, 100, 100, 0.1)'
+                      : 'rgba(255, 100, 100, 0.05)',
                   borderColor:
                     state.mode === 'dark' ? 'rgba(255, 100, 100, 0.4)' : 'rgba(255, 100, 100, 0.3)',
                   color: state.mode === 'dark' ? '#ff6b6b' : '#d63031',
@@ -300,7 +306,9 @@ onMounted(() => {
                     }"
                   >
                     Source: {{ importedTheme.metadata.source }}
-                    <span v-if="importedTheme.metadata.author"> by {{ importedTheme.metadata.author }}</span>
+                    <span v-if="importedTheme.metadata.author">
+                      by {{ importedTheme.metadata.author }}</span
+                    >
                     • {{ importedTheme.metadata.isDark ? 'Dark' : 'Light' }} theme
                   </p>
                 </div>

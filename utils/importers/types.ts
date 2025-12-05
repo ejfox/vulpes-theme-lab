@@ -6,7 +6,14 @@
 /**
  * Supported theme import formats
  */
-export type ThemeFormat = 'base16' | 'neovim' | 'ghostty' | 'vscode' | 'iterm' | 'alacritty' | 'auto'
+export type ThemeFormat =
+  | 'base16'
+  | 'neovim'
+  | 'ghostty'
+  | 'vscode'
+  | 'iterm'
+  | 'alacritty'
+  | 'auto'
 
 /**
  * Imported theme structure

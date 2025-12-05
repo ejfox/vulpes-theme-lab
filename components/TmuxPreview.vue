@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { colors, options } = useTheme()
+const { colors } = useTheme()
 
 // Your actual dense window setup
 const windows = [
@@ -76,10 +76,17 @@ const getPaneIndicator = (paneCount: number) => {
 </script>
 
 <template>
-  <div class="tmux-preview" :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }">
+  <div
+    class="tmux-preview"
+    :style="{ background: colors.bg, color: colors.fg, borderColor: colors.base }"
+  >
     <div
       class="header"
-      :style="{ background: colors.base + '15', borderBottom: `1px solid ${colors.base}`, color: colors.base }"
+      :style="{
+        background: colors.base + '15',
+        borderBottom: `1px solid ${colors.base}`,
+        color: colors.base,
+      }"
     >
       <span style="font-weight: bold; font-size: 10px">TMUX SESSION</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
