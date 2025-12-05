@@ -246,32 +246,40 @@ const themes = [
             :key="theme.name"
             class="group relative p-8 rounded-2xl border transition-all duration-300"
             :style="{
-              borderColor: `${colors.fg}1a`,
-              backgroundColor: `${colors.fg}05`,
+              borderColor: `hsl(${theme.hue}, 30%, 30%)`,
+              backgroundColor: `hsl(${theme.hue}, 20%, 10%)`,
             }"
           >
             <div class="space-y-4">
-              <div
-                class="w-16 h-16 rounded-xl transition-colors duration-1000"
-                :style="{ backgroundColor: colors.base }"
-              ></div>
+              <!-- Color palette preview -->
+              <div class="flex gap-2">
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue}, 70%, 60%)` }"
+                  title="base"
+                ></div>
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue + 7}, 70%, 55%)` }"
+                  title="error (+7°)"
+                ></div>
+                <div
+                  class="w-12 h-12 rounded-lg"
+                  :style="{ backgroundColor: `hsl(${theme.hue - 7}, 70%, 55%)` }"
+                  title="warning (-7°)"
+                ></div>
+              </div>
               <div>
                 <h3
-                  class="text-xl font-bold mb-2 transition-colors duration-1000"
-                  :style="{ color: colors.fg }"
+                  class="text-xl font-bold mb-2"
+                  :style="{ color: `hsl(${theme.hue}, 60%, 90%)` }"
                 >
                   {{ theme.name }}
                 </h3>
-                <p
-                  class="text-sm transition-colors duration-1000"
-                  :style="{ color: colors.comment }"
-                >
+                <p class="text-sm" :style="{ color: `hsl(${theme.hue}, 20%, 60%)` }">
                   {{ theme.desc }}
                 </p>
-                <p
-                  class="text-xs font-mono mt-2 transition-colors duration-1000"
-                  :style="{ color: colors.comment }"
-                >
+                <p class="text-xs font-mono mt-2" :style="{ color: `hsl(${theme.hue}, 20%, 50%)` }">
                   hue: {{ theme.hue }}°
                 </p>
               </div>
