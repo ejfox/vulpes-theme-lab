@@ -627,7 +627,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['hospital', 'doctor', 'dentist', 'pharmacy']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['hospital', 'doctor', 'dentist', 'pharmacy']],
+        ],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
@@ -647,7 +651,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['school', 'college', 'university', 'library']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['school', 'college', 'university', 'library']],
+        ],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
@@ -715,7 +723,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['museum', 'theatre', 'cinema', 'monument', 'artwork']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['museum', 'theatre', 'cinema', 'monument', 'artwork']],
+        ],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
@@ -735,7 +747,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['shop', 'supermarket', 'mall', 'department_store']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['shop', 'supermarket', 'mall', 'department_store']],
+        ],
         minzoom: 15,
         layout: {
           'text-field': '{name}',
@@ -775,7 +791,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['place_of_worship', 'church', 'mosque', 'temple', 'synagogue']]],
+        filter: [
+          'in',
+          ['get', 'class'],
+          ['literal', ['place_of_worship', 'church', 'mosque', 'temple', 'synagogue']],
+        ],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
