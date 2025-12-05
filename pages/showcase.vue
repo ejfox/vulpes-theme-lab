@@ -12,17 +12,24 @@ useHead({
 
 const { state, colors } = useTheme()
 
-// Smooth hue rotation over 45 seconds
+// Smooth hue rotation over 45 seconds with throttled state updates
 onMounted(() => {
   let lastTime = Date.now()
+  let lastStateUpdate = Date.now()
   const animationSpeed = 45000 // 45 seconds for full rotation
+  const stateUpdateInterval = 100 // Update state max 10 times per second
 
   const animate = () => {
     const now = Date.now()
     const delta = now - lastTime
     lastTime = now
 
-    state.value.baseHue = (state.value.baseHue + (360 / animationSpeed) * delta) % 360
+    // Only update reactive state every 100ms to avoid router history spam
+    if (now - lastStateUpdate >= stateUpdateInterval) {
+      state.value.baseHue = (state.value.baseHue + (360 / animationSpeed) * delta) % 360
+      lastStateUpdate = now
+    }
+
     requestAnimationFrame(animate)
   }
   animate()
