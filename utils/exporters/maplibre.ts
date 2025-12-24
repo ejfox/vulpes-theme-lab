@@ -225,7 +225,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'fill',
         source: 'openmaptiles',
         'source-layer': 'landuse',
-        filter: ['in', ['get', 'class'], ['literal', ['stadium', 'pitch', 'track']]],
+        filter: ['any', ['==', ['get', 'class'], 'stadium'], ['==', ['get', 'class'], 'pitch'], ['==', ['get', 'class'], 'track']],
         minzoom: 13,
         paint: {
           'fill-color': landuseSports,
@@ -261,7 +261,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'fill',
         source: 'openmaptiles',
         'source-layer': 'landuse',
-        filter: ['in', ['get', 'class'], ['literal', ['wood', 'forest']]],
+        filter: ['any', ['==', ['get', 'class'], 'wood'], ['==', ['get', 'class'], 'forest']],
         minzoom: 10,
         paint: {
           'fill-color': forestFill,
@@ -446,7 +446,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'line',
         source: 'openmaptiles',
         'source-layer': 'transportation',
-        filter: ['in', ['get', 'class'], ['literal', ['tertiary', 'minor']]],
+        filter: ['any', ['==', ['get', 'class'], 'tertiary'], ['==', ['get', 'class'], 'minor']],
         paint: {
           'line-color': roadTertiary,
           'line-width': ['interpolate', ['exponential', 1.5], ['zoom'], 10, 0.5, 18, 8],
@@ -458,7 +458,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'line',
         source: 'openmaptiles',
         'source-layer': 'transportation',
-        filter: ['in', ['get', 'class'], ['literal', ['service', 'street']]],
+        filter: ['any', ['==', ['get', 'class'], 'service'], ['==', ['get', 'class'], 'street']],
         minzoom: 14,
         paint: {
           'line-color': roadMinor,
@@ -473,7 +473,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'line',
         source: 'openmaptiles',
         'source-layer': 'transportation',
-        filter: ['in', ['get', 'class'], ['literal', ['path', 'pedestrian']]],
+        filter: ['any', ['==', ['get', 'class'], 'path'], ['==', ['get', 'class'], 'pedestrian']],
         minzoom: 14,
         paint: {
           'line-color': roadPedestrian,
@@ -503,8 +503,8 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         'source-layer': 'transportation',
         filter: [
           'all',
-          ['in', ['get', 'class'], ['literal', ['trunk', 'primary', 'secondary']]],
-          ['==', 'brunnel', 'bridge'],
+          ['any', ['==', ['get', 'class'], 'trunk'], ['==', ['get', 'class'], 'primary'], ['==', ['get', 'class'], 'secondary']],
+          ['==', ['get', 'brunnel'], 'bridge'],
         ],
         paint: {
           'line-color': bridge,
@@ -628,9 +628,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          ['get', 'class'],
-          ['literal', ['hospital', 'doctor', 'dentist', 'pharmacy']],
+          'any',
+          ['==', ['get', 'class'], 'hospital'],
+          ['==', ['get', 'class'], 'doctor'],
+          ['==', ['get', 'class'], 'dentist'],
+          ['==', ['get', 'class'], 'pharmacy'],
         ],
         minzoom: 14,
         layout: {
@@ -652,9 +654,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          ['get', 'class'],
-          ['literal', ['school', 'college', 'university', 'library']],
+          'any',
+          ['==', ['get', 'class'], 'school'],
+          ['==', ['get', 'class'], 'college'],
+          ['==', ['get', 'class'], 'university'],
+          ['==', ['get', 'class'], 'library'],
         ],
         minzoom: 14,
         layout: {
@@ -676,13 +680,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          'class',
-          'bus_stop',
-          'bus_station',
-          'subway_entrance',
-          'train_station',
-          'airport',
+          'any',
+          ['==', ['get', 'class'], 'bus_stop'],
+          ['==', ['get', 'class'], 'bus_station'],
+          ['==', ['get', 'class'], 'subway_entrance'],
+          ['==', ['get', 'class'], 'train_station'],
+          ['==', ['get', 'class'], 'airport'],
         ],
         minzoom: 13,
         layout: {
@@ -703,7 +706,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['restaurant', 'cafe', 'bar', 'fast_food']]],
+        filter: ['any', ['==', ['get', 'class'], 'restaurant'], ['==', ['get', 'class'], 'cafe'], ['==', ['get', 'class'], 'bar'], ['==', ['get', 'class'], 'fast_food']],
         minzoom: 15,
         layout: {
           'text-field': '{name}',
@@ -724,9 +727,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          ['get', 'class'],
-          ['literal', ['museum', 'theatre', 'cinema', 'monument', 'artwork']],
+          'any',
+          ['==', ['get', 'class'], 'museum'],
+          ['==', ['get', 'class'], 'theatre'],
+          ['==', ['get', 'class'], 'cinema'],
+          ['==', ['get', 'class'], 'monument'],
+          ['==', ['get', 'class'], 'artwork'],
         ],
         minzoom: 14,
         layout: {
@@ -748,9 +754,11 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          ['get', 'class'],
-          ['literal', ['shop', 'supermarket', 'mall', 'department_store']],
+          'any',
+          ['==', ['get', 'class'], 'shop'],
+          ['==', ['get', 'class'], 'supermarket'],
+          ['==', ['get', 'class'], 'mall'],
+          ['==', ['get', 'class'], 'department_store'],
         ],
         minzoom: 15,
         layout: {
@@ -771,7 +779,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['in', ['get', 'class'], ['literal', ['park', 'playground', 'garden']]],
+        filter: ['any', ['==', ['get', 'class'], 'park'], ['==', ['get', 'class'], 'playground'], ['==', ['get', 'class'], 'garden']],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
@@ -792,9 +800,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         source: 'openmaptiles',
         'source-layer': 'poi',
         filter: [
-          'in',
-          ['get', 'class'],
-          ['literal', ['place_of_worship', 'church', 'mosque', 'temple', 'synagogue']],
+          'any',
+          ['==', ['get', 'class'], 'place_of_worship'],
+          ['==', ['get', 'class'], 'church'],
+          ['==', ['get', 'class'], 'mosque'],
+          ['==', ['get', 'class'], 'temple'],
+          ['==', ['get', 'class'], 'synagogue'],
         ],
         minzoom: 14,
         layout: {

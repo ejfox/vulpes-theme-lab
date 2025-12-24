@@ -55,6 +55,10 @@ const initMap = () => {
 
     map.on('load', () => {
       console.log('MapPreview: Map loaded successfully')
+      // Force resize after load to ensure tiles render
+      setTimeout(() => {
+        map?.resize()
+      }, 100)
     })
 
     map.on('error', (e) => {
