@@ -277,26 +277,22 @@ h1 {
 
 /* Swatches */
 .swatches-float {
-  position: absolute;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 100;
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  overflow-x: auto;
-  overflow-y: hidden;
+  max-height: 45vh;
+  overflow-y: auto;
 }
 
 .swatches {
   display: grid;
-  grid-template-columns: repeat(18, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
   gap: 4px;
-  width: max-content;
-  min-width: 100%;
 }
 
 .swatches-float::-webkit-scrollbar {
@@ -317,18 +313,20 @@ h1 {
 }
 
 .swatch {
-  padding: 12px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-size: 10px;
+  min-width: 0;
 }
 
 .swatch.editable {
-  gap: 6px;
-  padding: 12px;
+  gap: 5px;
+  padding: 8px;
   min-height: 180px;
   transition: all 0.2s ease;
+  min-width: 0;
 }
 
 .swatch.highlighted {
@@ -355,38 +353,41 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .color-name {
   font-weight: bold;
   text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 0.5px;
+  font-size: 9px;
+  letter-spacing: 0.3px;
 }
 
 .color-hex {
-  font-size: 8px;
+  font-size: 7px;
   opacity: 0.7;
 }
 
 .color-picker-wrapper {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
-  padding: 4px;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 3px;
   background: rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .color-picker {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .color-picker:hover {
@@ -395,27 +396,27 @@ h1 {
 }
 
 .picker-label {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   opacity: 0.7;
 }
 
 .contrast-info {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   align-items: center;
-  padding: 4px 6px;
+  padding: 3px 5px;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  font-size: 9px;
-  margin-bottom: 8px;
+  border-radius: 2px;
+  font-size: 8px;
+  margin-bottom: 6px;
   cursor: help;
 }
 
 .contrast-icon {
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .contrast-ratio {
@@ -433,22 +434,23 @@ h1 {
 .wcag-locks {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 3px;
+  margin-bottom: 6px;
 }
 
 .lock-btn {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid currentColor;
   color: inherit;
-  padding: 6px 8px;
-  font-size: 9px;
+  padding: 4px 4px;
+  font-size: 8px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
-  border-radius: 3px;
+  border-radius: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .lock-btn:hover {
@@ -462,8 +464,9 @@ h1 {
 }
 
 .swatch-tools {
-  display: flex;
-  gap: 3px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
   margin-bottom: 6px;
 }
 
@@ -471,12 +474,13 @@ h1 {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: inherit;
-  padding: 4px 6px;
-  font-size: 12px;
+  padding: 3px 2px;
+  font-size: 8px;
   cursor: pointer;
   transition: all 0.15s;
   border-radius: 2px;
-  flex: 0 0 auto;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .tool-btn:hover {
@@ -492,12 +496,13 @@ h1 {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: inherit;
-  padding: 4px 6px;
+  padding: 3px 2px;
   font-size: 8px;
   cursor: pointer;
-  flex: 1;
   border-radius: 2px;
   text-transform: uppercase;
+  text-align: center;
+  width: 100%;
 }
 
 .tool-select:hover {
@@ -505,21 +510,23 @@ h1 {
 }
 
 .value-display {
-  font-size: 8px;
+  font-size: 7px;
   opacity: 0.7;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .offset-slider {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
   border-radius: 3px;
   outline: none;
-  margin: 4px 0;
+  margin: 3px 0;
 }
 
 .offset-slider::-webkit-slider-thumb {
@@ -543,12 +550,14 @@ h1 {
 
 .lightness-slider {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
   border-radius: 3px;
   outline: none;
-  margin: 4px 0;
+  margin: 3px 0;
 }
 
 .lightness-slider::-webkit-slider-thumb {
@@ -569,11 +578,10 @@ h1 {
   gap: 2px;
   margin-bottom: 4px;
   min-height: 500px;
-  margin-top: 220px;
 }
 
 .previews:first-of-type {
-  margin-top: 220px;
+  margin-top: 0;
 }
 
 .configs {
@@ -660,11 +668,7 @@ h1 {
   }
 
   .swatches {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .previews:first-of-type {
-    margin-top: 280px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
 
   .sidebar-left {
@@ -679,26 +683,27 @@ h1 {
 
 @media (max-width: 768px) {
   .swatches {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 2px;
   }
 
   .swatches-float {
     padding: 4px;
+    max-height: 40vh;
   }
 
   .swatch {
-    padding: 8px;
+    padding: 6px;
     font-size: 8px;
+  }
+
+  .swatch.editable {
+    padding: 5px;
+    min-height: 150px;
   }
 
   .previews {
     grid-template-columns: 1fr;
-    margin-top: 320px;
-  }
-
-  .previews:first-of-type {
-    margin-top: 320px;
   }
 
   .configs {
@@ -713,7 +718,7 @@ h1 {
 
 @media (max-width: 480px) {
   .swatches {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 
   .sidebar-left {
@@ -722,9 +727,5 @@ h1 {
 
   h1 {
     font-size: 8px;
-  }
-
-  .previews:first-of-type {
-    margin-top: 400px;
   }
 }

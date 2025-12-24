@@ -110,11 +110,13 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
   display: flex;
   padding: 6px 8px;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .presets-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 4px;
   padding: 6px;
 }
@@ -123,13 +125,15 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 6px 4px;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
   border: 1px solid;
   cursor: pointer;
   transition: all 0.2s;
   background: none;
   position: relative;
+  min-width: 0;
 }
 
 .preset-button:hover {
@@ -141,28 +145,33 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
   border-width: 2px;
 }
 
-.preset-button.is-current-month::before {
+.preset-button.is-current-month::after {
   content: '•';
   position: absolute;
-  top: 2px;
+  top: 1px;
   right: 2px;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .preset-color-preview {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .preset-month {
-  letter-spacing: 0.5px;
+  font-size: 8px;
+  letter-spacing: 0.3px;
 }
 
 .preset-name {
+  font-size: 6px;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.1;
   text-transform: capitalize;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .preset-footer {
