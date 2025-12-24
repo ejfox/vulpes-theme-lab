@@ -53,6 +53,7 @@ const orderedSwatches = [
 ]
 
 const editableSwatches = new Set([
+  'base',
   'error',
   'warning',
   'keyword',
@@ -72,6 +73,8 @@ const editableSwatches = new Set([
   'punctuation',
   'heading',
   'comment',
+  'fg',
+  'bg',
 ])
 
 const swatchesWithColorPicker = new Set(['error'])
