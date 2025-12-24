@@ -8,6 +8,14 @@ export default defineNuxtConfig({
   // GitHub Pages deployment
   app: {
     baseURL: process.env.NODE_ENV === 'production' ? '/vulpes-theme-lab/' : '/',
+    head: {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=VT323&display=swap',
+        },
+      ],
+    },
   },
   // Enable static site generation
   ssr: false,
