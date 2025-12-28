@@ -636,29 +636,23 @@ export const useTheme = () => {
       }
     }
 
-    const errorL = applyLightnessAdjust(55, 40, state.value.errorLightness)
-    const warningL = applyLightnessAdjust(55, 40, state.value.warningLightness)
-    const keywordL = applyLightnessAdjust(60, 38, state.value.keywordLightness)
-    const stringL = applyLightnessAdjust(60, 42, state.value.stringLightness)
-    const numberL = applyLightnessAdjust(65, 45, state.value.numberLightness)
-    const functionL = applyLightnessAdjust(55, 40, state.value.functionLightness)
-    const constantL = applyLightnessAdjust(58, 43, state.value.constantLightness)
-    const typeL = applyLightnessAdjust(62, 41, state.value.typeLightness)
-    const variableL = applyLightnessAdjust(57, 44, state.value.variableLightness)
-    const operatorL = applyLightnessAdjust(60, 40, state.value.operatorLightness)
-    const builtinL = applyLightnessAdjust(58, 42, state.value.builtinLightness)
-    const parameterL = applyLightnessAdjust(56, 43, state.value.parameterLightness)
-    const propertyL = applyLightnessAdjust(57, 44, state.value.propertyLightness)
-    const namespaceL = applyLightnessAdjust(61, 40, state.value.namespaceLightness)
-    const macroL = applyLightnessAdjust(59, 41, state.value.macroLightness)
-    const tagL = applyLightnessAdjust(60, 39, state.value.tagLightness)
-    const punctuationL = applyLightnessAdjust(55, 45, state.value.punctuationLightness)
-    const headingL = applyLightnessAdjust(62, 38, state.value.headingLightness)
-    const commentL = applyLightnessAdjust(45, 55, state.value.commentLightness)
-    const baseL = applyLightnessAdjust(50, 45, state.value.baseLightness)
-    const hintL = applyLightnessAdjust(70, 55, state.value.hintLightness)
-    const fgL = applyLightnessAdjust(isDark ? 88 : 20, isDark ? 20 : 88, state.value.fgLightness)
-    const bgL = applyLightnessAdjust(isDark ? 5 : 97, isDark ? 97 : 5, state.value.bgLightness)
+    // Base lightness values [dark, light] for each color type
+    // Dark mode: high lightness (55-65%) for bright colors on dark bg
+    // Light mode: LOW lightness (25-35%) for dark colors on white bg (AAA contrast)
+    const LIGHTNESS_BASES: Record<string, [number, number]> = {
+      error: [55, 28], warning: [55, 30], keyword: [60, 25], string: [60, 32],
+      number: [65, 35], function: [55, 28], constant: [58, 30], type: [62, 27],
+      variable: [57, 33], operator: [60, 30], builtin: [58, 29], parameter: [56, 32],
+      property: [57, 31], namespace: [61, 28], macro: [59, 29], tag: [60, 26],
+      punctuation: [55, 35], heading: [62, 25], comment: [45, 50], base: [50, 30],
+      hint: [70, 45], fg: [88, 15], bg: [5, 97],  // fg: bright on dark, dark on light; bg: dark on dark, light on light
+    }
+
+    const L: Record<string, { dark: number; light: number }> = {}
+    for (const [name, [dark, light]] of Object.entries(LIGHTNESS_BASES)) {
+      const adjust = (state.value as Record<string, any>)[`${name}Lightness`] as number
+      L[name] = applyLightnessAdjust(dark, light, adjust)
+    }
 
     // Helper to get actual offset (linked = hueOffset * multiplier + individual offset, unlinked = fixed offset)
     const getOffset = (colorName: string): number => {
@@ -674,11 +668,15 @@ export const useTheme = () => {
     // Generate bg and fg with special handling for monochrome mode
     const bgHue = (state.value.baseHue + getOffset('bg') + 360) % 360
     const fgHue = (state.value.baseHue + getOffset('fg') + 360) % 360
+    const bgL = isDark ? L.bg.dark : L.bg.light
+    const fgL = isDark ? L.fg.dark : L.fg.light
 
-    const bg = chroma.hsl(bgHue, sat * 0, bgL.dark / 100).hex() // bg is always grayscale (sat=0)
+    // Light mode gets a subtle hue tint for easier on eyes, dark mode stays pure dark
+    const bgSat = isDark ? 0 : sat * 0.08
+    const bg = chroma.hsl(bgHue, bgSat, bgL / 100).hex()
     const fg = state.value.monochromeMode
-      ? chroma.hsl(fgHue, sat * monoIntensity, fgL.dark / 100).hex()
-      : chroma.hsl(fgHue, 0, fgL.dark / 100).hex()
+      ? chroma.hsl(fgHue, sat * monoIntensity, fgL / 100).hex()
+      : chroma.hsl(fgHue, 0, fgL / 100).hex()
 
     // Cartographic wisdom: semantic hues for map features
     // Water is blue, parks are green - absolute hues, not theme-relative
@@ -744,30 +742,33 @@ export const useTheme = () => {
       return chroma.hsl(hue, saturation, lightness).hex()
     }
 
+    // Generate semantic colors using offset and lightness values
+    const semanticColor = (name: string) => colorAt(getOffset(name), L[name].dark, L[name].light)
+
     return {
       bg,
       fg,
-      base: colorAt(getOffset('base'), baseL.dark, baseL.light),
-      error: colorAt(getOffset('error'), errorL.dark, errorL.light),
-      warning: colorAt(getOffset('warning'), warningL.dark, warningL.light),
-      hint: colorAt(getOffset('hint'), hintL.dark, hintL.light),
-      comment: colorAt(getOffset('comment'), commentL.dark, commentL.light),
-      keyword: colorAt(getOffset('keyword'), keywordL.dark, keywordL.light),
-      string: colorAt(getOffset('string'), stringL.dark, stringL.light),
-      number: colorAt(getOffset('number'), numberL.dark, numberL.light),
-      function: colorAt(getOffset('function'), functionL.dark, functionL.light),
-      constant: colorAt(getOffset('constant'), constantL.dark, constantL.light),
-      type: colorAt(getOffset('type'), typeL.dark, typeL.light),
-      variable: colorAt(getOffset('variable'), variableL.dark, variableL.light),
-      operator: colorAt(getOffset('operator'), operatorL.dark, operatorL.light),
-      builtin: colorAt(getOffset('builtin'), builtinL.dark, builtinL.light),
-      parameter: colorAt(getOffset('parameter'), parameterL.dark, parameterL.light),
-      property: colorAt(getOffset('property'), propertyL.dark, propertyL.light),
-      namespace: colorAt(getOffset('namespace'), namespaceL.dark, namespaceL.light),
-      macro: colorAt(getOffset('macro'), macroL.dark, macroL.light),
-      tag: colorAt(getOffset('tag'), tagL.dark, tagL.light),
-      punctuation: colorAt(getOffset('punctuation'), punctuationL.dark, punctuationL.light),
-      heading: colorAt(getOffset('heading'), headingL.dark, headingL.light),
+      base: semanticColor('base'),
+      error: semanticColor('error'),
+      warning: semanticColor('warning'),
+      hint: semanticColor('hint'),
+      comment: semanticColor('comment'),
+      keyword: semanticColor('keyword'),
+      string: semanticColor('string'),
+      number: semanticColor('number'),
+      function: semanticColor('function'),
+      constant: semanticColor('constant'),
+      type: semanticColor('type'),
+      variable: semanticColor('variable'),
+      operator: semanticColor('operator'),
+      builtin: semanticColor('builtin'),
+      parameter: semanticColor('parameter'),
+      property: semanticColor('property'),
+      namespace: semanticColor('namespace'),
+      macro: semanticColor('macro'),
+      tag: semanticColor('tag'),
+      punctuation: semanticColor('punctuation'),
+      heading: semanticColor('heading'),
       palette: {
         0: chroma.hsl(0, 0, isDark ? 0.1 : 0.9).hex(),
         1: colorAt(state.value.hueOffset, 50, 35),

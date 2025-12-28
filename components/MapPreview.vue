@@ -5,6 +5,11 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { exportMaplibre, createSemanticPalette } from '~/utils/exporters'
 
 const { colors, darkColors, lightColors, state } = useTheme()
+
+// Throttle helper to prevent excessive style updates during animation
+let styleUpdateTimeout: ReturnType<typeof setTimeout> | null = null
+let lastStyleUpdate = 0
+const THROTTLE_MS = 500 // Only update map style every 500ms max
 const config = useRuntimeConfig()
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: maplibregl.Map | null = null
@@ -26,15 +31,8 @@ const initMap = () => {
 
     // Use Maptiler API key from environment variable
     const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
-    console.log(
-      'MapPreview: Using Maptiler key:',
-      maptilerKey ? maptilerKey.substring(0, 8) + '...' : 'none'
-    )
-
     const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
     const parsedStyle = JSON.parse(styleString)
-
-    console.log('MapPreview: Initializing map with style', parsedStyle)
 
     // Initialize map
     map = new maplibregl.Map({
@@ -54,11 +52,8 @@ const initMap = () => {
     })
 
     map.on('load', () => {
-      console.log('MapPreview: Map loaded successfully')
       // Force resize after load to ensure tiles render
-      setTimeout(() => {
-        map?.resize()
-      }, 100)
+      setTimeout(() => map?.resize(), 100)
     })
 
     map.on('error', (e) => {
@@ -77,28 +72,49 @@ const initMap = () => {
   }
 }
 
-// Update map style when colors or mode change (preserves camera position)
+// Throttled style update function
+const updateMapStyle = () => {
+  if (!map) return
+
+  try {
+    // Generate new style with updated colors for current mode
+    const currentColors = state.value.mode === 'dark' ? darkColors.value : lightColors.value
+    const palette = createSemanticPalette(currentColors, state.value.mode)
+    const styleResult = exportMaplibre(palette, 'vulpes')
+    const style = JSON.parse(styleResult.content)
+
+    const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
+    const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
+    const parsedStyle = JSON.parse(styleString)
+
+    map.setStyle(parsedStyle)
+    lastStyleUpdate = Date.now()
+  } catch (error) {
+    console.error('MapPreview: Error updating style:', error)
+  }
+}
+
+// Update map style when colors or mode change (throttled to prevent fan spin)
 watch(
   () => [colors.value, state.value.mode],
   () => {
     if (!map) return
 
-    try {
-      // Generate new style with updated colors for current mode
-      const currentColors = state.value.mode === 'dark' ? darkColors.value : lightColors.value
-      const palette = createSemanticPalette(currentColors, state.value.mode)
-      const styleResult = exportMaplibre(palette, 'vulpes')
-      const style = JSON.parse(styleResult.content)
+    const now = Date.now()
+    const timeSinceLastUpdate = now - lastStyleUpdate
 
-      const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
-      const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
-      const parsedStyle = JSON.parse(styleString)
+    // Clear any pending update
+    if (styleUpdateTimeout) {
+      clearTimeout(styleUpdateTimeout)
+      styleUpdateTimeout = null
+    }
 
-      // Update style without resetting camera
-      map.setStyle(parsedStyle)
-      console.log('MapPreview: Style updated for', state.value.mode, 'mode, camera preserved')
-    } catch (error) {
-      console.error('MapPreview: Error updating style:', error)
+    // If enough time has passed, update immediately
+    if (timeSinceLastUpdate >= THROTTLE_MS) {
+      updateMapStyle()
+    } else {
+      // Otherwise, schedule an update for later
+      styleUpdateTimeout = setTimeout(updateMapStyle, THROTTLE_MS - timeSinceLastUpdate)
     }
   },
   { deep: true }
@@ -109,6 +125,11 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // Clean up throttle timeout
+  if (styleUpdateTimeout) {
+    clearTimeout(styleUpdateTimeout)
+    styleUpdateTimeout = null
+  }
   if (map) {
     map.remove()
     map = null

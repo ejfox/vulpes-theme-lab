@@ -1,23 +1,10 @@
 <script setup lang="ts">
 const { state } = useTheme()
 
-// Rainbow gradient for base hue slider
-const baseHueGradient = `linear-gradient(
-  to right,
-  hsl(0, 85%, 55%),
-  hsl(30, 85%, 55%),
-  hsl(60, 85%, 55%),
-  hsl(90, 85%, 55%),
-  hsl(120, 85%, 55%),
-  hsl(150, 85%, 55%),
-  hsl(180, 85%, 55%),
-  hsl(210, 85%, 55%),
-  hsl(240, 85%, 55%),
-  hsl(270, 85%, 55%),
-  hsl(300, 85%, 55%),
-  hsl(330, 85%, 55%),
-  hsl(360, 85%, 55%)
-)`
+// Generate rainbow gradient programmatically
+const baseHueGradient = `linear-gradient(to right, ${
+  Array.from({ length: 13 }, (_, i) => `hsl(${i * 30}, 85%, 55%)`).join(', ')
+})`
 
 // Ordered by importance: base hue first, offset second (most impactful controls)
 const sliders = [
@@ -112,37 +99,18 @@ const mapAdvancedHues = [
   },
 ]
 
-// Programmatically generate all 23 color offset sliders for maximum granular control
-// Ordered by semantic importance for code legibility (matches multiplier importance)
+// Color types ordered by semantic importance for code legibility
 const colorTypes = [
-  // Row 1: Core structural elements (most important)
-  'keyword',
-  'function',
-  'builtin',
-  'type',
-  'string',
-  'number',
-  // Row 2: Medium importance
-  'constant',
-  'macro',
-  'tag',
-  'heading',
-  'namespace',
-  'property',
-  // Row 3: Lower prominence + diagnostics
-  'variable',
-  'parameter',
-  'operator',
-  'punctuation',
-  'comment',
-  'error',
-  'warning',
-  // Row 4: Base colors
-  'base',
-  'hint',
-  'fg',
-  'bg',
+  // Core structural elements
+  'keyword', 'function', 'builtin', 'type', 'string', 'number',
+  // Medium importance
+  'constant', 'macro', 'tag', 'heading', 'namespace', 'property',
+  // Lower prominence + diagnostics
+  'variable', 'parameter', 'operator', 'punctuation', 'comment', 'error', 'warning',
+  // Base colors
+  'base', 'hint', 'fg', 'bg',
 ]
+
 const offsetSliders = colorTypes.map((type) => ({
   key: `${type}Offset`,
   label: type,
@@ -150,6 +118,23 @@ const offsetSliders = colorTypes.map((type) => ({
   max: 180,
   step: 1,
 }))
+
+// Style toggles
+const styleToggles = [
+  { key: 'monochromeMode', label: 'monochrome fg' },
+  { key: 'boldKeywords', label: 'bold keywords' },
+  { key: 'italicComments', label: 'italic comments' },
+  { key: 'boldFunctions', label: 'bold functions' },
+  { key: 'italicStrings', label: 'italic strings' },
+  { key: 'underlineErrors', label: 'underline errors' },
+]
+
+// Mode-aware color helpers
+const modeColor = (dark: string, light: string) => state.value.mode === 'dark' ? dark : light
+const borderColor = computed(() => modeColor('rgba(255, 255, 255, 0.1)', 'rgba(0, 0, 0, 0.1)'))
+const textColor = computed(() => modeColor('#fff', '#000'))
+const mutedColor = computed(() => modeColor('rgba(255, 255, 255, 0.5)', 'rgba(0, 0, 0, 0.5)'))
+const accentColor = computed(() => modeColor('rgba(255, 255, 255, 0.8)', 'rgba(0, 0, 0, 0.8)'))
 
 const fixingContrast = ref(false)
 const contrastFixSummary = ref<string[]>([])
@@ -159,116 +144,67 @@ const fixAllContrast = async () => {
   fixingContrast.value = true
   contrastFixSummary.value = []
 
-  // Import chroma dynamically
   const chroma = (await import('chroma-js')).default
-
-  // Colors to check (exclude bg/fg as they define the contrast baseline)
-  const colorsToCheck = [
-    'error',
-    'warning',
-    'keyword',
-    'string',
-    'number',
-    'function',
-    'constant',
-    'type',
-    'variable',
-    'operator',
-    'builtin',
-    'parameter',
-    'property',
-    'namespace',
-    'macro',
-    'tag',
-    'punctuation',
-    'heading',
-    'comment',
-    'base',
-    'hint',
-  ]
+  const colorsToCheck = colorTypes.filter((c) => c !== 'fg' && c !== 'bg')
 
   // Temporarily disable colorblind sim to get true color values
   const originalColorblindMode = state.value.colorblindMode
   state.value.colorblindMode = 'none'
 
-  // Get base colors without simulation
   const { colors } = useTheme()
   const bgColor = colors.value.bg
-  const targetRatio = 7.0 // AAA level
+  const targetRatio = 7.0
   const baseColors = { ...colors.value }
+  const isDark = state.value.mode === 'dark'
+  const sat = (isDark ? state.value.saturation : state.value.lightModeSaturation) / 100
 
   let checkedCount = 0
   let fixedCount = 0
 
   for (const colorName of colorsToCheck) {
     const currentColor = baseColors[colorName as keyof typeof baseColors] as string
-
-    // Calculate current contrast
     const currentRatio = chroma.contrast(currentColor, bgColor)
     checkedCount++
 
-    if (currentRatio >= targetRatio) {
-      continue // Already compliant
-    }
+    if (currentRatio >= targetRatio) continue
 
     fixedCount++
 
-    // Get current values
-    const multiplier =
-      (state.value[`${colorName}Multiplier` as keyof typeof state.value] as number) || 0
-    const individualOffset =
-      (state.value[`${colorName}Offset` as keyof typeof state.value] as number) || 0
-    const isLinked = state.value[`${colorName}Linked` as keyof typeof state.value] as boolean
-    const sat =
-      (state.value.mode === 'dark' ? state.value.saturation : state.value.lightModeSaturation) / 100
-
-    const currentOffset = isLinked
-      ? state.value.hueOffset * multiplier + individualOffset
-      : individualOffset
+    const s = state.value as Record<string, any>
+    const multiplier = s[`${colorName}Multiplier`] || 0
+    const individualOffset = s[`${colorName}Offset`] || 0
+    const isLinked = s[`${colorName}Linked`] as boolean
+    const currentOffset = isLinked ? state.value.hueOffset * multiplier + individualOffset : individualOffset
     const hue = (state.value.baseHue + currentOffset + 360) % 360
 
     // Binary search for AAA-compliant lightness
-    let low = 0
-    let high = 100
-    let bestLightness = 50
-
+    let low = 0, high = 100, bestLightness = 50
     for (let i = 0; i < 20; i++) {
       const mid = (low + high) / 2
       const testColor = chroma.hsl(hue, sat, mid / 100).hex()
       const ratio = chroma.contrast(testColor, bgColor)
-
       if (ratio >= targetRatio) {
         bestLightness = mid
-        if (state.value.mode === 'dark') {
-          low = mid
-        } else {
-          high = mid
-        }
+        isDark ? (low = mid) : (high = mid)
       } else {
-        if (state.value.mode === 'dark') {
-          high = mid
-        } else {
-          low = mid
-        }
+        isDark ? (high = mid) : (low = mid)
       }
     }
 
-    const oldLightness = state.value[`${colorName}Lightness` as keyof typeof state.value] as number
+    const oldLightness = s[`${colorName}Lightness`] as number
     const newLightness = Math.round(bestLightness)
 
     if (Math.abs(newLightness - oldLightness) > 1) {
-      state.value[`${colorName}Lightness` as keyof typeof state.value] = newLightness as any
-      contrastFixSummary.value.push(`${colorName}: L${oldLightness} → L${newLightness}`)
+      s[`${colorName}Lightness`] = newLightness
+      contrastFixSummary.value.push(`${colorName}: L${oldLightness} -> L${newLightness}`)
     }
   }
 
-  // Restore colorblind mode
   state.value.colorblindMode = originalColorblindMode
 
-  // Show summary
   if (contrastFixSummary.value.length === 0) {
     contrastFixSummary.value = [
-      `Checked ${checkedCount} colors - all AAA compliant! ✓`,
+      `Checked ${checkedCount} colors - all AAA compliant`,
       `(Contrast slider at ${state.value.contrast})`,
     ]
   } else {
@@ -276,39 +212,22 @@ const fixAllContrast = async () => {
   }
 
   fixingContrast.value = false
-
-  // Clear summary after 5 seconds
-  setTimeout(() => {
-    contrastFixSummary.value = []
-  }, 5000)
+  setTimeout(() => { contrastFixSummary.value = [] }, 5000)
 }
 </script>
 
 <template>
   <div class="controls">
     <!-- Theme name + mode display -->
-    <div
-      class="theme-header"
-      :style="{
-        borderBottomColor:
-          state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <div class="theme-name" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        {{ state.themeName }}
-      </div>
+    <div class="theme-header" :style="{ borderBottomColor: borderColor }">
+      <div class="theme-name" :style="{ color: textColor }">{{ state.themeName }}</div>
       <div class="mode-toggle-group">
         <button
           @click="state.mode = 'dark'"
           class="mode-toggle-btn"
           :class="{ active: state.mode === 'dark' }"
           :style="{
-            color:
-              state.mode === 'dark'
-                ? 'rgba(150, 180, 255, 1)'
-                : state.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
+            color: state.mode === 'dark' ? 'rgba(150, 180, 255, 1)' : 'rgba(0, 0, 0, 0.4)',
             borderColor: state.mode === 'dark' ? 'rgba(100, 150, 255, 0.5)' : 'transparent',
             background: state.mode === 'dark' ? 'rgba(100, 150, 255, 0.1)' : 'transparent',
           }"
@@ -316,24 +235,13 @@ const fixAllContrast = async () => {
         >
           DARK
         </button>
-        <span
-          :style="{
-            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-            fontSize: '8px',
-          }"
-          >|</span
-        >
+        <span :style="{ color: modeColor('rgba(255, 255, 255, 0.2)', 'rgba(0, 0, 0, 0.2)'), fontSize: '8px' }">|</span>
         <button
           @click="state.mode = 'light'"
           class="mode-toggle-btn"
           :class="{ active: state.mode === 'light' }"
           :style="{
-            color:
-              state.mode === 'light'
-                ? 'rgba(255, 200, 0, 1)'
-                : state.mode === 'dark'
-                  ? 'rgba(255, 255, 255, 0.4)'
-                  : 'rgba(0, 0, 0, 0.4)',
+            color: state.mode === 'light' ? 'rgba(255, 200, 0, 1)' : modeColor('rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)'),
             borderColor: state.mode === 'light' ? 'rgba(255, 200, 0, 0.5)' : 'transparent',
             background: state.mode === 'light' ? 'rgba(255, 200, 0, 0.1)' : 'transparent',
           }"
@@ -345,28 +253,17 @@ const fixAllContrast = async () => {
     </div>
 
     <!-- Colorblind Simulation -->
-    <div
-      class="colorblind-section"
-      :style="{
-        borderBottomColor:
-          state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <label
-        class="section-label"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
-        }"
-      >
+    <div class="colorblind-section" :style="{ borderBottomColor: borderColor }">
+      <label class="section-label" :style="{ color: modeColor('rgba(255, 255, 255, 0.7)', 'rgba(0, 0, 0, 0.7)') }">
         COLORBLIND SIM
       </label>
       <select
         v-model="state.colorblindMode"
         class="colorblind-select"
         :style="{
-          background: state.mode === 'dark' ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)',
-          borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
-          color: state.mode === 'dark' ? '#fff' : '#000',
+          background: modeColor('rgba(0, 0, 0, 0.3)', 'rgba(255, 255, 255, 0.3)'),
+          borderColor: modeColor('rgba(255, 255, 255, 0.3)', 'rgba(0, 0, 0, 0.3)'),
+          color: textColor,
         }"
       >
         <option value="none">Normal Vision</option>
@@ -375,32 +272,21 @@ const fixAllContrast = async () => {
         <option value="tritanopia">Tritanopia (no blue)</option>
         <option value="achromatopsia">Achromatopsia (grayscale)</option>
       </select>
-      <div
-        class="sim-hint"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-        }"
-      >
+      <div class="sim-hint" :style="{ color: mutedColor }">
         Preview how your theme looks with different types of color vision
       </div>
     </div>
 
     <!-- Fix All Contrast Button -->
-    <div
-      class="fix-contrast-section"
-      :style="{
-        borderBottomColor:
-          state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
+    <div class="fix-contrast-section" :style="{ borderBottomColor: borderColor }">
       <button
         @click="fixAllContrast"
         :disabled="fixingContrast"
         class="fix-contrast-btn"
         :style="{
-          background: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.15)' : 'rgba(0, 200, 0, 0.15)',
-          borderColor: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.4)' : 'rgba(0, 200, 0, 0.4)',
-          color: state.mode === 'dark' ? 'rgba(100, 255, 100, 1)' : 'rgba(0, 150, 0, 1)',
+          background: modeColor('rgba(100, 255, 100, 0.15)', 'rgba(0, 200, 0, 0.15)'),
+          borderColor: modeColor('rgba(100, 255, 100, 0.4)', 'rgba(0, 200, 0, 0.4)'),
+          color: modeColor('rgba(100, 255, 100, 1)', 'rgba(0, 150, 0, 1)'),
           opacity: fixingContrast ? 0.5 : 1,
           cursor: fixingContrast ? 'wait' : 'pointer',
         }"
@@ -414,81 +300,26 @@ const fixAllContrast = async () => {
           v-for="(line, idx) in contrastFixSummary"
           :key="idx"
           class="summary-line"
-          :style="{
-            color: state.mode === 'dark' ? 'rgba(100, 255, 100, 0.9)' : 'rgba(0, 150, 0, 0.9)',
-          }"
+          :style="{ color: modeColor('rgba(100, 255, 100, 0.9)', 'rgba(0, 150, 0, 0.9)') }"
         >
           {{ line }}
         </div>
       </div>
     </div>
 
-    <div
-      class="checkbox-group"
-      :style="{
-        borderBottomColor:
-          state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
+    <div class="checkbox-group" :style="{ borderBottomColor: borderColor }">
+      <label
+        v-for="toggle in styleToggles"
+        :key="toggle.key"
+        class="checkbox-label"
+        :style="{ color: textColor }"
+      >
         <input
           type="checkbox"
-          v-model="state.monochromeMode"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
+          v-model="state[toggle.key as keyof typeof state]"
+          :style="{ accentColor: accentColor }"
         />
-        <span>monochrome fg</span>
-      </label>
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        <input
-          type="checkbox"
-          v-model="state.boldKeywords"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
-        />
-        <span>bold keywords</span>
-      </label>
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        <input
-          type="checkbox"
-          v-model="state.italicComments"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
-        />
-        <span>italic comments</span>
-      </label>
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        <input
-          type="checkbox"
-          v-model="state.boldFunctions"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
-        />
-        <span>bold functions</span>
-      </label>
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        <input
-          type="checkbox"
-          v-model="state.italicStrings"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
-        />
-        <span>italic strings</span>
-      </label>
-      <label class="checkbox-label" :style="{ color: state.mode === 'dark' ? '#fff' : '#000' }">
-        <input
-          type="checkbox"
-          v-model="state.underlineErrors"
-          :style="{
-            accentColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
-          }"
-        />
-        <span>underline errors</span>
+        <span>{{ toggle.label }}</span>
       </label>
     </div>
 
@@ -505,13 +336,7 @@ const fixAllContrast = async () => {
     />
 
     <!-- Monochrome-specific controls -->
-    <div
-      v-if="state.monochromeMode"
-      class="monochrome-controls"
-      :style="{
-        borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
+    <div v-if="state.monochromeMode" class="monochrome-controls" :style="{ borderTopColor: borderColor }">
       <BaseSlider
         v-for="slider in monochromeSliders"
         :key="slider.key"
@@ -524,20 +349,8 @@ const fixAllContrast = async () => {
     </div>
 
     <!-- Visual effects controls -->
-    <div
-      class="visual-effects-section"
-      :style="{
-        borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <div
-        class="section-header"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-        }"
-      >
-        VISUAL EFFECTS
-      </div>
+    <div class="visual-effects-section" :style="{ borderTopColor: borderColor }">
+      <div class="section-header" :style="{ color: mutedColor }">VISUAL EFFECTS</div>
       <BaseSlider
         v-for="slider in visualEffectsSliders"
         :key="slider.key"
@@ -550,20 +363,8 @@ const fixAllContrast = async () => {
     </div>
 
     <!-- MapLibre color controls -->
-    <div
-      class="maplibre-section"
-      :style="{
-        borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <div
-        class="section-header"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-        }"
-      >
-        MAP COLORS
-      </div>
+    <div class="maplibre-section" :style="{ borderTopColor: borderColor }">
+      <div class="section-header" :style="{ color: mutedColor }">MAP COLORS</div>
 
       <!-- Main map color intensity controls -->
       <BaseSlider
@@ -579,11 +380,7 @@ const fixAllContrast = async () => {
 
       <!-- Advanced hue controls (optional) -->
       <details class="advanced-controls">
-        <summary
-          :style="{
-            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
-          }"
-        >
+        <summary :style="{ color: modeColor('rgba(255, 255, 255, 0.4)', 'rgba(0, 0, 0, 0.4)') }">
           advanced hue shifts
         </summary>
         <BaseSlider
@@ -601,20 +398,8 @@ const fixAllContrast = async () => {
     </div>
 
     <!-- Individual color offset controls -->
-    <div
-      class="color-offsets-section"
-      :style="{
-        borderTopColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      }"
-    >
-      <div
-        class="section-header"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-        }"
-      >
-        INDIVIDUAL COLORS
-      </div>
+    <div class="color-offsets-section" :style="{ borderTopColor: borderColor }">
+      <div class="section-header" :style="{ color: mutedColor }">INDIVIDUAL COLORS</div>
       <BaseSlider
         v-for="slider in offsetSliders"
         :key="slider.key"

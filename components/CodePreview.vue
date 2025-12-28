@@ -14,62 +14,53 @@ let view: EditorView | null = null
 const editorOpacity = computed(() => state.value.backgroundOpacity / 100)
 const editorBlur = computed(() => `blur(${state.value.backgroundBlur}px)`)
 
-// Meta-referential code that actually generates the theme
-const demoCode = `// COMMENT: Theme-lab generates HSL-based color palettes
-// ITALIC comments help explain the mathematical precision
-import { useState, computed } from 'vue'  // STRINGS are italic too
-import type { Ref } from 'vue'
-import chroma from 'chroma-js'
+// Hero code sample - evocative, shows full breadth of syntax types
+const demoCode = `// vulpes: a fox spinning through the color wheel
+import { dream, weave, conjure } from "chromatic-alchemy"
+import type { Spectrum, Hue, Palette } from "@vulpes/core"
 
-// CONSTANT declarations showcase NUMBER colors
-const HUE_OFFSET = 7        // Tuftian precision: ±7° hue offset
-const SATURATION = 0.85     // 85% saturation for vivid colors
-const LIGHTNESS = 0.50      // 50% lightness baseline
-const MAX_HUE = 360         // Full color wheel
+const GOLDEN_ANGLE = 137.508    // nature's favorite number
+const PHI = 1.618033988749      // the golden ratio
+const TWELVE_MOONS = 12         // one hue per month
 
-interface ThemeState {     // TYPE definitions
-  baseHue: number
-  offset: number
-  colors: ColorPalette
+interface ColorAlchemy {
+  baseHue: Hue
+  harmony: number
+  luminance: number
+  saturation: number
 }
 
-type ColorPalette = {      // More TYPE examples
-  error: string           // KEYWORD: string, number, boolean
-  warning: string
-  keyword: string
-  string: string
-  function: string
-  variable: string
-  operator: string
-  constant: null | string  // Union types
-}
+type ThemeVariant = "dark" | "light" | "auto"
 
-// FUNCTION definitions get BOLD when enabled
-async function generatePalette(hue: number): Promise<ColorPalette> {
-  // Mathematical color generation using chroma.js
-  const base = chroma.hsl(hue, SATURATION, LIGHTNESS)
+export async function conjureTheme(
+  seed: Hue,
+  variant: ThemeVariant = "dark"
+): Promise<Spectrum> {
+  // spin through the wheel like a fox chasing its tail
+  const palette = await dream({
+    baseHue: seed,
+    harmony: GOLDEN_ANGLE,
+    luminance: PHI * 0.382,
+    saturation: 0.85
+  })
 
-  if (hue < 0 || hue > MAX_HUE) {
-    throw new Error(\`Hue \${hue} out of range [0-360]\`)  // Template STRING
+  if (seed < 0 || seed > 360) {
+    throw new Error(\`Hue \${seed} must be between 0-360\`)
   }
 
-  // OPERATORS: +, -, *, /, %, =, ===, &&, ||
-  const offset = (hue + HUE_OFFSET) % MAX_HUE
-  const multiplier = 1.5
+  // semantic shifts: errors clockwise, warnings counter
+  const errorHue = (seed + 7) % 360
+  const warningHue = (seed - 7 + 360) % 360
+  const isNight = variant === "dark" || variant === "auto"
 
-  return {
-    error: chroma.hsl(hue, 0.85, 0.55).hex(),
-    warning: chroma.hsl(hue + 30, 0.85, 0.60).hex(),
-    keyword: chroma.hsl(hue + 60, 0.85, 0.65).hex(),
-    string: \`#\${Math.floor(hue).toString(16)}\`,
-    function: await fetchColor(hue),  // KEYWORD: await, async
-    variable: base.hex(),
-    operator: chroma.hsl(offset * multiplier, 0.8, 0.5).hex(),
-    constant: null  // KEYWORD: null
-  }
+  return weave(palette)
+    .with({ error: errorHue, warning: warningHue })
+    .into(isNight ? "neon-midnight" : "paper-dawn")
 }
 
-export default generatePalette  // KEYWORD: export, default
+// twelve moons, twelve hues, one complete journey
+const vulpes = await conjureTheme(330, "dark")
+console.log("theme ready:", vulpes.name)
 `
 
 const createTheme = () => {
@@ -80,7 +71,7 @@ const createTheme = () => {
     '&': {
       color: currentColors.fg,
       backgroundColor: currentColors.bg,
-      fontSize: '11px',
+      fontSize: '14px',
       fontFamily: 'Monaspace Krypton, monospace',
       height: '100%',
     },
@@ -308,6 +299,6 @@ onBeforeUnmount(() => {
   font-family:
     Monaspace Krypton,
     monospace;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 </style>

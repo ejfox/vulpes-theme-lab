@@ -10,10 +10,16 @@ export default defineNuxtConfig({
     baseURL: process.env.NODE_ENV === 'production' ? '/vulpes-theme-lab/' : '/',
     head: {
       link: [
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=VT323&display=swap',
-        },
+        // Monaspace font family - all variants
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-argon@5.0.1/400.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-argon@5.0.1/700.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-krypton@5.0.1/400.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-krypton@5.0.1/700.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.1/400.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.0.1/700.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-xenon@5.0.1/400.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-xenon@5.0.1/400-italic.css' },
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@fontsource/monaspace-radon@5.0.1/400.css' },
       ],
     },
   },

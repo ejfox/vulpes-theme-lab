@@ -1,4 +1,11 @@
 :root {
+  /* Monaspace font family variants */
+  --font-code: 'Monaspace Krypton', monospace;      /* code, technical, mono */
+  --font-body: 'Monaspace Argon', sans-serif;       /* body text, humanist */
+  --font-ui: 'Monaspace Neon', sans-serif;          /* headings, UI, neo-grotesque */
+  --font-prose: 'Monaspace Xenon', serif;           /* quotes, prose, serif-like */
+  --font-display: 'Monaspace Radon', cursive;       /* decorative, handwriting */
+
   /* Opacity scale (semantic) */
   --opacity-subtle: 0.05;
   --opacity-muted: 0.1;
@@ -33,4 +40,29 @@
   --spacing-md: 12px;
   --spacing-lg: 16px;
   --spacing-xl: 24px;
+}
+
+/* Base typography */
+body {
+  font-family: var(--font-body);
+}
+
+code, pre, .font-code {
+  font-family: var(--font-code);
+}
+
+h1, h2, h3, h4, h5, h6, .font-ui {
+  font-family: var(--font-ui);
+}
+
+blockquote, .font-prose {
+  font-family: var(--font-prose);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
 }

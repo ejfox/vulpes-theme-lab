@@ -16,6 +16,21 @@ import {
 } from '~/utils/exporters'
 import { serializeItermTheme } from '~/utils/iterm'
 import { serializeTmuxTheme } from '~/utils/tmux'
+
+// Export format handlers
+const EXPORTERS: Record<string, (palette: any, name: string) => ExportResult> = {
+  ghostty: exportGhostty,
+  neovim: exportNeovim,
+  bat: exportBat,
+  yazi: exportYazi,
+  lazygit: exportLazygit,
+  zsh: exportZsh,
+  tweakcc: exportTweakcc,
+  neomutt: exportNeomutt,
+  wezterm: exportWezterm,
+  alacritty: exportAlacritty,
+  maplibre: exportMaplibre,
+}
 import {
   validateThemeContrast,
   applyContrastFixes,
@@ -85,62 +100,19 @@ watch(showImportModal, (isOpen) => {
   }
 })
 
-// Helper to generate config for a single format using new exporters
+// Helper to generate config for a single format
 const generateConfig = (format: string, isDark: boolean): string => {
   const themeColors = isDark ? darkColors.value : lightColors.value
   const baseThemeName = state.value.themeName || 'vulpes'
   const mode = isDark ? 'dark' : 'light'
-
-  // Create semantic palette for new exporters
   const palette = createSemanticPalette(themeColors, mode)
 
-  let result: ExportResult
+  // Legacy exporters not yet migrated
+  if (format === 'iterm') return serializeItermTheme(themeColors, `${baseThemeName}-${mode}`)
+  if (format === 'tmux') return serializeTmuxTheme(themeColors, `${baseThemeName}-${mode}`)
 
-  switch (format) {
-    case 'ghostty':
-      result = exportGhostty(palette, baseThemeName)
-      break
-    case 'neovim':
-      result = exportNeovim(palette, baseThemeName)
-      break
-    case 'bat':
-      result = exportBat(palette, baseThemeName)
-      break
-    case 'yazi':
-      result = exportYazi(palette, baseThemeName)
-      break
-    case 'lazygit':
-      result = exportLazygit(palette, baseThemeName)
-      break
-    case 'zsh':
-      result = exportZsh(palette, baseThemeName)
-      break
-    case 'tweakcc':
-      result = exportTweakcc(palette, baseThemeName)
-      break
-    case 'neomutt':
-      result = exportNeomutt(palette, baseThemeName)
-      break
-    case 'wezterm':
-      result = exportWezterm(palette, baseThemeName)
-      break
-    case 'alacritty':
-      result = exportAlacritty(palette, baseThemeName)
-      break
-    case 'maplibre':
-      result = exportMaplibre(palette, baseThemeName)
-      break
-    case 'iterm':
-      // iTerm not yet migrated to new exporter system
-      return serializeItermTheme(themeColors, `${baseThemeName}-${mode}`)
-    case 'tmux':
-      // Tmux not yet migrated to new exporter system
-      return serializeTmuxTheme(themeColors, `${baseThemeName}-${mode}`)
-    default:
-      result = exportGhostty(palette, baseThemeName)
-  }
-
-  return result.content
+  const exporter = EXPORTERS[format] || EXPORTERS.ghostty
+  return exporter(palette, baseThemeName).content
 }
 
 // Generate preview config for first selected format
@@ -160,192 +132,38 @@ const generateExport = (format: string, isDark: boolean): ExportResult => {
   const baseThemeName = state.value.themeName || 'vulpes'
   const mode = isDark ? 'dark' : 'light'
   const themeName = `${baseThemeName}-${mode}`
-
-  // Create semantic palette for new exporters
   const palette = createSemanticPalette(themeColors, mode)
 
-  switch (format) {
-    case 'ghostty':
-      return exportGhostty(palette, themeName)
-    case 'neovim':
-      return exportNeovim(palette, themeName)
-    case 'bat':
-      return exportBat(palette, themeName)
-    case 'yazi':
-      return exportYazi(palette, themeName)
-    case 'lazygit':
-      return exportLazygit(palette, themeName)
-    case 'zsh':
-      return exportZsh(palette, themeName)
-    case 'tweakcc':
-      return exportTweakcc(palette, themeName)
-    case 'neomutt':
-      return exportNeomutt(palette, themeName)
-    case 'wezterm':
-      return exportWezterm(palette, themeName)
-    case 'alacritty':
-      return exportAlacritty(palette, themeName)
-    case 'iterm':
-      // iTerm not yet migrated - create ExportResult manually
-      return {
-        filename: `${themeName}.itermcolors`,
-        content: serializeItermTheme(themeColors, themeName),
-        format: 'iterm' as any,
-      }
-    case 'tmux':
-      // Tmux not yet migrated - create ExportResult manually
-      return {
-        filename: `${themeName}.tmux.conf`,
-        content: serializeTmuxTheme(themeColors, themeName),
-        format: 'tmux' as any,
-      }
-    default:
-      return exportGhostty(palette, themeName)
+  // Legacy exporters not yet migrated
+  if (format === 'iterm') {
+    return { filename: `${themeName}.itermcolors`, content: serializeItermTheme(themeColors, themeName), format: 'iterm' as any }
   }
+  if (format === 'tmux') {
+    return { filename: `${themeName}.tmux.conf`, content: serializeTmuxTheme(themeColors, themeName), format: 'tmux' as any }
+  }
+
+  const exporter = EXPORTERS[format] || EXPORTERS.ghostty
+  return exporter(palette, themeName)
 }
 
-// Reset functions for each color - resets to 0 offset, 50 lightness, linked=true
+// Default multipliers for each color type
+const COLOR_DEFAULTS: Record<string, number> = {
+  error: 5, warning: -5, keyword: 3, string: 4, number: -4, function: -3,
+  constant: 3.5, type: -2.5, variable: -1, operator: 0.5, builtin: 2.5,
+  parameter: -0.5, property: -1.5, namespace: 1.5, macro: -2, tag: 2,
+  punctuation: 0.25, heading: 3.5,
+}
+
+// Reset a color to defaults (offset=0, lightness=50, linked=true)
 const resetColor = (colorName: string) => {
-  // All colors reset to: offset=0, lightness=50, linked=true
-  // Multipliers come from defaultState in useTheme
-  const defaults: Record<
-    string,
-    { multiplier: number; offset: number; lightness: number; linked: boolean }
-  > = {
-    error: { multiplier: 5, offset: 0, lightness: 50, linked: true },
-    warning: { multiplier: -5, offset: 0, lightness: 50, linked: true },
-    keyword: { multiplier: 3, offset: 0, lightness: 50, linked: true },
-    string: { multiplier: 4, offset: 0, lightness: 50, linked: true },
-    number: { multiplier: -4, offset: 0, lightness: 50, linked: true },
-    function: { multiplier: -3, offset: 0, lightness: 50, linked: true },
-    constant: { multiplier: 3.5, offset: 0, lightness: 50, linked: true },
-    type: { multiplier: -2.5, offset: 0, lightness: 50, linked: true },
-    variable: { multiplier: -1, offset: 0, lightness: 50, linked: true },
-    operator: { multiplier: 0.5, offset: 0, lightness: 50, linked: true },
-    builtin: { multiplier: 2.5, offset: 0, lightness: 50, linked: true },
-    parameter: { multiplier: -0.5, offset: 0, lightness: 50, linked: true },
-    property: { multiplier: -1.5, offset: 0, lightness: 50, linked: true },
-    namespace: { multiplier: 1.5, offset: 0, lightness: 50, linked: true },
-    macro: { multiplier: -2, offset: 0, lightness: 50, linked: true },
-    tag: { multiplier: 2, offset: 0, lightness: 50, linked: true },
-    punctuation: { multiplier: 0.25, offset: 0, lightness: 50, linked: true },
-    heading: { multiplier: 3.5, offset: 0, lightness: 50, linked: true },
-  }
+  const multiplier = COLOR_DEFAULTS[colorName]
+  if (multiplier === undefined) return
 
-  const d = defaults[colorName]
-  if (!d) return
-
-  // Direct property assignment for each color type
-  switch (colorName) {
-    case 'error':
-      state.value.errorOffset = d.offset
-      state.value.errorLightness = d.lightness
-      state.value.errorLinked = d.linked
-      state.value.errorMultiplier = d.multiplier
-      break
-    case 'warning':
-      state.value.warningOffset = d.offset
-      state.value.warningLightness = d.lightness
-      state.value.warningLinked = d.linked
-      state.value.warningMultiplier = d.multiplier
-      break
-    case 'keyword':
-      state.value.keywordOffset = d.offset
-      state.value.keywordLightness = d.lightness
-      state.value.keywordLinked = d.linked
-      state.value.keywordMultiplier = d.multiplier
-      break
-    case 'string':
-      state.value.stringOffset = d.offset
-      state.value.stringLightness = d.lightness
-      state.value.stringLinked = d.linked
-      state.value.stringMultiplier = d.multiplier
-      break
-    case 'number':
-      state.value.numberOffset = d.offset
-      state.value.numberLightness = d.lightness
-      state.value.numberLinked = d.linked
-      state.value.numberMultiplier = d.multiplier
-      break
-    case 'function':
-      state.value.functionOffset = d.offset
-      state.value.functionLightness = d.lightness
-      state.value.functionLinked = d.linked
-      state.value.functionMultiplier = d.multiplier
-      break
-    case 'constant':
-      state.value.constantOffset = d.offset
-      state.value.constantLightness = d.lightness
-      state.value.constantLinked = d.linked
-      state.value.constantMultiplier = d.multiplier
-      break
-    case 'type':
-      state.value.typeOffset = d.offset
-      state.value.typeLightness = d.lightness
-      state.value.typeLinked = d.linked
-      state.value.typeMultiplier = d.multiplier
-      break
-    case 'variable':
-      state.value.variableOffset = d.offset
-      state.value.variableLightness = d.lightness
-      state.value.variableLinked = d.linked
-      state.value.variableMultiplier = d.multiplier
-      break
-    case 'operator':
-      state.value.operatorOffset = d.offset
-      state.value.operatorLightness = d.lightness
-      state.value.operatorLinked = d.linked
-      state.value.operatorMultiplier = d.multiplier
-      break
-    case 'builtin':
-      state.value.builtinOffset = d.offset
-      state.value.builtinLightness = d.lightness
-      state.value.builtinLinked = d.linked
-      state.value.builtinMultiplier = d.multiplier
-      break
-    case 'parameter':
-      state.value.parameterOffset = d.offset
-      state.value.parameterLightness = d.lightness
-      state.value.parameterLinked = d.linked
-      state.value.parameterMultiplier = d.multiplier
-      break
-    case 'property':
-      state.value.propertyOffset = d.offset
-      state.value.propertyLightness = d.lightness
-      state.value.propertyLinked = d.linked
-      state.value.propertyMultiplier = d.multiplier
-      break
-    case 'namespace':
-      state.value.namespaceOffset = d.offset
-      state.value.namespaceLightness = d.lightness
-      state.value.namespaceLinked = d.linked
-      state.value.namespaceMultiplier = d.multiplier
-      break
-    case 'macro':
-      state.value.macroOffset = d.offset
-      state.value.macroLightness = d.lightness
-      state.value.macroLinked = d.linked
-      state.value.macroMultiplier = d.multiplier
-      break
-    case 'tag':
-      state.value.tagOffset = d.offset
-      state.value.tagLightness = d.lightness
-      state.value.tagLinked = d.linked
-      state.value.tagMultiplier = d.multiplier
-      break
-    case 'punctuation':
-      state.value.punctuationOffset = d.offset
-      state.value.punctuationLightness = d.lightness
-      state.value.punctuationLinked = d.linked
-      state.value.punctuationMultiplier = d.multiplier
-      break
-    case 'heading':
-      state.value.headingOffset = d.offset
-      state.value.headingLightness = d.lightness
-      state.value.headingLinked = d.linked
-      state.value.headingMultiplier = d.multiplier
-      break
-  }
+  const s = state.value as Record<string, any>
+  s[`${colorName}Offset`] = 0
+  s[`${colorName}Lightness`] = 50
+  s[`${colorName}Linked`] = true
+  s[`${colorName}Multiplier`] = multiplier
 }
 
 // Download file helper
@@ -432,36 +250,9 @@ const performExport = (
 
 // Generate export from a fixed palette
 const generateExportFromPalette = (format: string, palette: any, isDark: boolean): ExportResult => {
-  const baseThemeName = state.value.themeName || 'vulpes'
-  const mode = isDark ? 'dark' : 'light'
-  const themeName = `${baseThemeName}-${mode}`
-
-  switch (format) {
-    case 'ghostty':
-      return exportGhostty(palette, themeName)
-    case 'neovim':
-      return exportNeovim(palette, themeName)
-    case 'bat':
-      return exportBat(palette, themeName)
-    case 'yazi':
-      return exportYazi(palette, themeName)
-    case 'lazygit':
-      return exportLazygit(palette, themeName)
-    case 'zsh':
-      return exportZsh(palette, themeName)
-    case 'tweakcc':
-      return exportTweakcc(palette, themeName)
-    case 'neomutt':
-      return exportNeomutt(palette, themeName)
-    case 'wezterm':
-      return exportWezterm(palette, themeName)
-    case 'alacritty':
-      return exportAlacritty(palette, themeName)
-    case 'maplibre':
-      return exportMaplibre(palette, themeName)
-    default:
-      return exportGhostty(palette, themeName)
-  }
+  const themeName = `${state.value.themeName || 'vulpes'}-${isDark ? 'dark' : 'light'}`
+  const exporter = EXPORTERS[format] || EXPORTERS.ghostty
+  return exporter(palette, themeName)
 }
 
 // Export both dark and light for all selected formats
@@ -590,24 +381,11 @@ const loadPreset = (preset: any) => {
   state.value.themeName = preset.id
 
   // Apply all color offsets
-  state.value.errorOffset = preset.errorOffset
-  state.value.warningOffset = preset.warningOffset
-  state.value.keywordOffset = preset.keywordOffset
-  state.value.stringOffset = preset.stringOffset
-  state.value.numberOffset = preset.numberOffset
-  state.value.functionOffset = preset.functionOffset
-  state.value.constantOffset = preset.constantOffset
-  state.value.typeOffset = preset.typeOffset
-  state.value.variableOffset = preset.variableOffset
-  state.value.operatorOffset = preset.operatorOffset
-  state.value.builtinOffset = preset.builtinOffset
-  state.value.parameterOffset = preset.parameterOffset
-  state.value.propertyOffset = preset.propertyOffset
-  state.value.namespaceOffset = preset.namespaceOffset
-  state.value.macroOffset = preset.macroOffset
-  state.value.tagOffset = preset.tagOffset
-  state.value.punctuationOffset = preset.punctuationOffset
-  state.value.headingOffset = preset.headingOffset
+  const offsetKeys = Object.keys(COLOR_DEFAULTS)
+  for (const key of offsetKeys) {
+    const s = state.value as Record<string, any>
+    s[`${key}Offset`] = preset[`${key}Offset`]
+  }
 }
 
 // Theme presets - based on real theme color analysis

@@ -2,215 +2,122 @@
 const { colors, options, state } = useTheme()
 const { setHighlightedColor, clearHighlightedColor } = useHighlightedColor()
 
+// Hero code sample - evocative, shows all syntax colors
 const codeLines = [
+  { num: 1, text: '// vulpes: a fox in the color wheel', highlighted: false, error: false, comment: true },
+  { num: 2, text: '', highlighted: false, error: false },
   {
-    num: 1,
-    text: 'import { useState, computed } from "vue"',
+    num: 3,
+    text: 'import { dream, weave } from "chromatic-alchemy"',
     highlighted: false,
     error: false,
     keyword: 'import',
-    builtin: 'useState, computed',
-    string: '"vue"',
+    builtin: 'dream, weave',
+    string: '"chromatic-alchemy"',
   },
   {
-    num: 2,
-    text: 'import type { ThemeColors, ColorPalette } from "@/types"',
+    num: 4,
+    text: 'import type { Spectrum, Hue } from "@vulpes/core"',
     highlighted: false,
     error: false,
     keyword: 'import type',
-    type: 'ThemeColors, ColorPalette',
-    string: '"@/types"',
+    type: 'Spectrum, Hue',
+    string: '"@vulpes/core"',
   },
-  {
-    num: 3,
-    text: 'import chroma from "chroma-js"',
-    highlighted: false,
-    error: false,
-    keyword: 'import',
-    string: '"chroma-js"',
-  },
-  { num: 4, text: '', highlighted: false, error: false },
-  {
-    num: 5,
-    text: '// HSL-based theme generation with mathematical precision',
-    highlighted: false,
-    error: false,
-    comment: true,
-  },
+  { num: 5, text: '', highlighted: false, error: false },
   {
     num: 6,
-    text: '// Tuftian design: ±7° hue offset for minimal variation',
+    text: 'const GOLDEN_ANGLE = 137.508',
     highlighted: false,
     error: false,
-    comment: true,
+    keyword: 'const',
+    constant: 'GOLDEN_ANGLE',
+    number: '137.508',
   },
   { num: 7, text: '', highlighted: false, error: false },
   {
     num: 8,
-    text: 'interface ThemeConfig {',
+    text: 'interface ColorAlchemy {',
     highlighted: false,
     error: false,
     keyword: 'interface',
-    type: 'ThemeConfig',
+    type: 'ColorAlchemy',
     punctuation: '{',
   },
+  { num: 9, text: '  baseHue: Hue', highlighted: false, error: false, property: 'baseHue', punctuation: ':', type: 'Hue' },
+  { num: 10, text: '  harmony: number', highlighted: false, error: false, property: 'harmony', punctuation: ':', type: 'number' },
+  { num: 11, text: '  luminance: number', highlighted: false, error: false, property: 'luminance', punctuation: ':', type: 'number' },
+  { num: 12, text: '}', highlighted: false, error: false, punctuation: '}' },
+  { num: 13, text: '', highlighted: false, error: false },
   {
-    num: 9,
-    text: '  baseHue: number',
+    num: 14,
+    text: 'export async function conjureTheme(seed: Hue): Promise<Spectrum> {',
     highlighted: false,
     error: false,
-    property: 'baseHue',
-    punctuation: ':',
-    type: 'number',
+    keyword: 'export async function',
+    func: 'conjureTheme',
+    parameter: 'seed',
+    type: 'Hue, Promise, Spectrum',
   },
-  {
-    num: 10,
-    text: '  offset: number',
-    highlighted: false,
-    error: false,
-    property: 'offset',
-    punctuation: ':',
-    type: 'number',
-  },
-  {
-    num: 11,
-    text: '  saturation: number',
-    highlighted: false,
-    error: false,
-    property: 'saturation',
-    punctuation: ':',
-    type: 'number',
-  },
-  {
-    num: 12,
-    text: '  palette: ColorPalette',
-    highlighted: false,
-    error: false,
-    property: 'palette',
-    punctuation: ':',
-    type: 'ColorPalette',
-  },
-  { num: 13, text: '}', highlighted: false, error: false, punctuation: '}' },
-  { num: 14, text: '', highlighted: false, error: false },
-  {
-    num: 15,
-    text: 'export const useTheme = () => {',
-    highlighted: false,
-    error: false,
-    keyword: 'export const',
-    func: 'useTheme',
-  },
+  { num: 15, text: '  // spin through the color wheel like a fox chasing its tail', highlighted: false, error: false, comment: true },
   {
     num: 16,
-    text: '  const state = useState<ThemeConfig>("theme", () => ({',
-    highlighted: false,
+    text: '  const palette = await dream({',
+    highlighted: true,
     error: false,
-    keyword: 'const',
-    builtin: 'useState',
-    type: 'ThemeConfig',
+    keyword: 'const await',
+    builtin: 'dream',
   },
   {
     num: 17,
-    text: '    baseHue: 267,  // Catppuccin mauve',
+    text: '    baseHue: seed,',
     highlighted: true,
     error: false,
     property: 'baseHue',
-    number: '267',
-    comment: '// Catppuccin mauve',
+    variable: 'seed',
   },
   {
     num: 18,
-    text: '    offset: 7,',
+    text: '    harmony: GOLDEN_ANGLE,',
     highlighted: true,
     error: false,
-    property: 'offset',
-    number: '7',
+    property: 'harmony',
+    constant: 'GOLDEN_ANGLE',
   },
   {
     num: 19,
-    text: '    saturation: 0.85',
+    text: '    luminance: 0.618',
     highlighted: false,
     error: true,
-    property: 'saturation',
-    number: '0.85',
+    property: 'luminance',
+    number: '0.618',
   },
-  {
-    num: 20,
-    text: "    // Expected ',' after property value",
-    highlighted: false,
-    error: false,
-    comment: true,
-  },
-  { num: 21, text: '  }))', highlighted: false, error: false, punctuation: '))' },
+  { num: 20, text: "    // missing comma - the devil's in the details", highlighted: false, error: false, comment: true },
+  { num: 21, text: '  })', highlighted: false, error: false, punctuation: '})' },
   { num: 22, text: '', highlighted: false, error: false },
   {
     num: 23,
-    text: '  const generateColor = async (hue: number, offset: number) => {',
-    highlighted: false,
-    error: false,
-    keyword: 'const async',
-    func: 'generateColor',
-    parameter: 'hue, offset',
-    type: 'number',
-  },
-  {
-    num: 24,
-    text: '    return chroma.hsl(hue + offset, 0.85, 0.60).hex()',
+    text: '  return weave(palette).into("neon-midnight")',
     highlighted: false,
     error: false,
     keyword: 'return',
-    namespace: 'chroma',
-    func: 'hsl, hex',
-    parameter: 'hue, offset',
+    namespace: 'weave',
+    func: 'into',
+    string: '"neon-midnight"',
   },
-  { num: 25, text: '  }', highlighted: false, error: false, punctuation: '}' },
-  { num: 26, text: '', highlighted: false, error: false },
+  { num: 24, text: '}', highlighted: false, error: false, punctuation: '}' },
+  { num: 25, text: '', highlighted: false, error: false },
+  { num: 26, text: '// twelve moons, twelve hues, one journey', highlighted: false, error: false, comment: true },
   {
     num: 27,
-    text: '  const colors = computed(() => ({',
+    text: 'const vulpes = conjureTheme(330)',
     highlighted: false,
     error: false,
     keyword: 'const',
-    builtin: 'computed',
+    variable: 'vulpes',
+    func: 'conjureTheme',
+    number: '330',
   },
-  {
-    num: 28,
-    text: '    error: "#f38ba8",    // Catppuccin red',
-    highlighted: false,
-    error: false,
-    property: 'error',
-    string: '"#f38ba8"',
-    comment: '// Catppuccin red',
-  },
-  {
-    num: 29,
-    text: '    keyword: "#cba6f7",  // Catppuccin mauve',
-    highlighted: false,
-    error: false,
-    property: 'keyword',
-    string: '"#cba6f7"',
-    comment: '// Catppuccin mauve',
-  },
-  {
-    num: 30,
-    text: '    string: "#a6e3a1",   // Catppuccin green',
-    highlighted: false,
-    error: false,
-    property: 'string',
-    string: '"#a6e3a1"',
-    comment: '// Catppuccin green',
-  },
-  { num: 31, text: '  }))', highlighted: false, error: false, punctuation: '))' },
-  { num: 32, text: '', highlighted: false, error: false },
-  {
-    num: 33,
-    text: '  return { state, colors }',
-    highlighted: false,
-    error: false,
-    keyword: 'return',
-    variable: 'state, colors',
-  },
-  { num: 34, text: '}', highlighted: false, error: false, punctuation: '}' },
 ]
 </script>
 
@@ -234,9 +141,9 @@ const codeLines = [
         color: colors.base,
       }"
     >
-      <span style="font-weight: bold; font-size: 10px">NEOVIM EDITOR</span>
+      <span style="font-weight: bold; font-size: 10px">NEOVIM</span>
       <span :style="{ marginLeft: 'auto', fontSize: '8px', color: colors.hint }">
-        lsp • telescope • diagnostics
+        lsp + telescope + treesitter
       </span>
     </div>
     <!-- Tab line -->
@@ -245,10 +152,10 @@ const codeLines = [
       :style="{ background: colors.bg, borderBottom: `1px solid ${colors.comment}30` }"
     >
       <span class="tab active" :style="{ background: colors.base + '20', color: colors.base }">
-        useTheme.ts
+        conjure.ts
       </span>
-      <span class="tab" :style="{ color: colors.comment }"> ColorControls.vue </span>
-      <span class="tab" :style="{ color: colors.comment }"> index.vue </span>
+      <span class="tab" :style="{ color: colors.comment }"> spectrum.ts </span>
+      <span class="tab" :style="{ color: colors.comment }"> vulpes.ts </span>
     </div>
 
     <!-- Editor content -->
@@ -386,6 +293,16 @@ const codeLines = [
                 {{ line.type }}</span
               >
               <span
+                v-if="line.constant"
+                :style="{ color: colors.constant }"
+                @mouseenter="setHighlightedColor('constant')"
+                @mouseleave="clearHighlightedColor()"
+                title="constant color"
+                class="hoverable-color"
+              >
+                {{ line.constant }}</span
+              >
+              <span
                 v-if="line.number"
                 :style="{ color: colors.number }"
                 @mouseenter="setHighlightedColor('number')"
@@ -475,12 +392,12 @@ const codeLines = [
     >
       <span :style="{ color: colors.base, fontWeight: 'bold' }">NORMAL</span>
       <span :style="{ color: colors.comment }">|</span>
-      <span>composables/useTheme.ts</span>
+      <span>alchemy/conjure.ts</span>
       <span :style="{ marginLeft: 'auto', color: colors.comment }">typescript</span>
       <span :style="{ color: colors.comment }">|</span>
-      <span :style="{ color: colors.warning }">⚠ 1</span>
+      <span :style="{ color: colors.warning }">1</span>
       <span :style="{ color: colors.comment }">|</span>
-      <span>10:38</span>
+      <span>16:12</span>
     </div>
 
     <!-- Command line with search -->
@@ -489,7 +406,7 @@ const codeLines = [
       :style="{ background: colors.bg, borderTop: `1px solid ${colors.comment}20` }"
     >
       <span :style="{ color: colors.keyword }">/</span>
-      <span :style="{ color: colors.string }">saturation</span>
+      <span :style="{ color: colors.string }">golden</span>
       <span class="cursor" :style="{ background: colors.base }"></span>
     </div>
 
@@ -506,7 +423,7 @@ const codeLines = [
         <span :style="{ fontSize: '10px' }">●</span> typescript-ls
       </div>
       <div :style="{ fontSize: '8px', color: colors.comment, marginBottom: '2px' }">
-        composables/useTheme.ts:15:20
+        alchemy/conjure.ts:19:20
       </div>
       <div :style="{ marginBottom: '4px' }">Expected ',' after property value</div>
       <div :style="{ fontSize: '8px', color: colors.hint }">TS1005</div>
@@ -522,21 +439,21 @@ const codeLines = [
       }"
     >
       <div class="telescope-prompt" :style="{ borderBottom: `1px solid ${colors.comment}30` }">
-        <span :style="{ color: colors.base }">❯</span>
-        <span :style="{ color: colors.fg }">useTheme</span>
+        <span :style="{ color: colors.base }">></span>
+        <span :style="{ color: colors.fg }">conjure</span>
       </div>
       <div class="telescope-results">
         <div
           class="result-item selected"
           :style="{ background: colors.base + '20', color: colors.base }"
         >
-          <span :style="{ color: colors.warning }">▶</span> composables/useTheme.ts:11
+          <span :style="{ color: colors.warning }">></span> alchemy/conjure.ts:14
         </div>
         <div class="result-item" :style="{ color: colors.comment }">
-          <span :style="{ opacity: 0 }">▶</span> utils/themeGenerator.ts:45
+          <span :style="{ opacity: 0 }">></span> themes/vulpes.ts:27
         </div>
         <div class="result-item" :style="{ color: colors.comment }">
-          <span :style="{ opacity: 0 }">▶</span> components/ColorControls.vue:23
+          <span :style="{ opacity: 0 }">></span> lib/spectrum.ts:89
         </div>
       </div>
       <div
@@ -547,7 +464,7 @@ const codeLines = [
           color: colors.comment,
         }"
       >
-        3/142 matches
+        3/42 matches
       </div>
     </div>
   </div>

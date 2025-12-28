@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { VULPES_MONTHLY_PRESETS } from '~/utils/presets'
-import { useRafFn, useWindowFocus } from '@vueuse/core'
 
 useHead({
   title: 'vulpes — monochrome themes for terminal aesthetes',
@@ -14,107 +13,16 @@ useHead({
 })
 
 const { state, colors, lightColors } = useTheme()
+const {
+  speedMultiplier,
+  isHoveringAccelerator,
+  toggleSpeed,
+  formattedOffset,
+  formattedOffsetAbs,
+  formattedWarningOffset,
+} = useShowcaseAnimation()
 
-// Use actual vulpes-month themes
 const themes = VULPES_MONTHLY_PRESETS
-
-// Speed multiplier for animation (1x or 4x)
-const speedMultiplier = ref(1)
-
-const toggleSpeed = () => {
-  speedMultiplier.value = speedMultiplier.value === 1 ? 4 : 1
-}
-
-// Hover state for the accelerator
-const isHoveringAccelerator = ref(false)
-
-// Apply a preset theme to the page
-const applyPreset = (preset: typeof VULPES_MONTHLY_PRESETS[0]) => {
-  state.value.themeName = preset.name
-  state.value.baseHue = preset.baseHue
-  state.value.saturation = preset.baseSaturation
-  state.value.mode = preset.isDark ? 'dark' : 'light'
-
-  // Apply all offset properties
-  state.value.errorOffset = preset.errorOffset
-  state.value.warningOffset = preset.warningOffset
-  state.value.keywordOffset = preset.keywordOffset
-  state.value.stringOffset = preset.stringOffset
-  state.value.numberOffset = preset.numberOffset
-  state.value.functionOffset = preset.functionOffset
-  state.value.constantOffset = preset.constantOffset
-  state.value.typeOffset = preset.typeOffset
-  state.value.variableOffset = preset.variableOffset
-  state.value.operatorOffset = preset.operatorOffset
-  state.value.builtinOffset = preset.builtinOffset
-  state.value.parameterOffset = preset.parameterOffset
-  state.value.propertyOffset = preset.propertyOffset
-  state.value.namespaceOffset = preset.namespaceOffset
-  state.value.macroOffset = preset.macroOffset
-  state.value.tagOffset = preset.tagOffset
-  state.value.punctuationOffset = preset.punctuationOffset
-  state.value.headingOffset = preset.headingOffset
-}
-
-// Smooth hue rotation over 45 seconds with throttled state updates using VueUse
-const lastTime = ref(Date.now())
-const lastStateUpdate = ref(Date.now())
-const animationTime = ref(0) // Accumulated time for sin wave
-const baseAnimationSpeed = 35000 // ~35 seconds for full rotation at 1x speed (1.3x faster)
-const semanticWavePeriod = 9200 // ~9 seconds for full sin wave cycle (1.3x faster)
-const stateUpdateInterval = 100 // Update state max 10 times per second
-
-const { pause, resume } = useRafFn(() => {
-  const now = Date.now()
-  const delta = now - lastTime.value
-  lastTime.value = now
-
-  // Only update reactive state every 100ms to avoid router history spam
-  if (now - lastStateUpdate.value >= stateUpdateInterval) {
-    const animationSpeed = baseAnimationSpeed / speedMultiplier.value
-    state.value.baseHue = (state.value.baseHue + (360 / animationSpeed) * delta) % 360
-
-    // Animate semantic offset with sin wave (oscillates between -18 and +18)
-    animationTime.value += delta * speedMultiplier.value
-    const sinValue = Math.sin((animationTime.value / semanticWavePeriod) * Math.PI * 2)
-    state.value.hueOffset = sinValue * 18 // Range: -18 to +18
-
-    lastStateUpdate.value = now
-  }
-})
-
-// Pause animation when window loses focus
-const windowFocused = useWindowFocus()
-watch(windowFocused, (focused) => {
-  if (focused) {
-    lastTime.value = Date.now() // Reset time to avoid huge delta jump
-    resume()
-  } else {
-    pause()
-  }
-})
-
-// Dynamic selection color
-watch(
-  () => colors.base,
-  (base) => {
-    if (typeof document !== 'undefined') {
-      const style = document.createElement('style')
-      style.id = 'dynamic-selection'
-      const existing = document.getElementById('dynamic-selection')
-      if (existing) existing.remove()
-
-      style.textContent = `
-        ::selection {
-          background-color: ${base}33;
-          color: ${colors.fg};
-        }
-      `
-      document.head.appendChild(style)
-    }
-  },
-  { immediate: true }
-)
 
 const features = [
   {
@@ -128,29 +36,48 @@ const features = [
   {
     title: 'Semantic Hue Shifts',
     desc: 'Errors shift +7° clockwise. Warnings shift -7° counter-clockwise. Success stays at base hue. Your eyes learn the pattern in minutes, never think about it again. Color becomes meaningful, not decorative.',
-    hasColorDemo: true,
   },
 ]
-
-// Computed formatted offset for display
-const formattedOffset = computed(() => {
-  const val = state.value.hueOffset
-  if (val >= 0) return `+${Math.round(val)}°`
-  return `${Math.round(val)}°`
-})
-
-const formattedOffsetAbs = computed(() => `±${Math.abs(Math.round(state.value.hueOffset))}°`)
 
 const stats = computed(() => [
   { label: 'Export Formats', value: '8' },
   { label: 'Semantic Offset', value: formattedOffsetAbs.value },
   { label: 'Config Files', value: '1' },
 ])
+
+function applyPreset(preset: (typeof VULPES_MONTHLY_PRESETS)[0]) {
+  state.value.themeName = preset.name
+  state.value.baseHue = preset.baseHue
+  state.value.saturation = preset.baseSaturation
+  state.value.mode = preset.isDark ? 'dark' : 'light'
+
+  const offsetKeys = [
+    'errorOffset',
+    'warningOffset',
+    'keywordOffset',
+    'stringOffset',
+    'numberOffset',
+    'functionOffset',
+    'constantOffset',
+    'typeOffset',
+    'variableOffset',
+    'operatorOffset',
+    'builtinOffset',
+    'parameterOffset',
+    'propertyOffset',
+    'namespaceOffset',
+    'macroOffset',
+    'tagOffset',
+    'punctuationOffset',
+    'headingOffset',
+  ] as const
+  for (const key of offsetKeys) state.value[key] = preset[key]
+}
 </script>
 
 <template>
   <div
-    class="min-h-screen transition-colors duration-1000 ease-out"
+    class="showcase-root min-h-screen transition-colors duration-1000 ease-out"
     :style="{ backgroundColor: colors.bg, color: colors.fg }"
   >
     <!-- Nav -->
@@ -192,13 +119,18 @@ const stats = computed(() => [
               backgroundColor: isHoveringAccelerator ? `${colors.base}25` : `${colors.fg}08`,
               border: `2px solid ${isHoveringAccelerator ? colors.base : colors.fg + '15'}`,
               cursor: 'pointer',
-              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s, border-color 0.3s, box-shadow 0.3s',
+              transition:
+                'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s, border-color 0.3s, box-shadow 0.3s',
               transform: isHoveringAccelerator
                 ? `scale(1.08) skewX(-2deg) translateY(4px)`
-                : (speedMultiplier === 4 ? 'scale(1.02)' : 'scale(1)'),
+                : speedMultiplier === 4
+                  ? 'scale(1.02)'
+                  : 'scale(1)',
               boxShadow: isHoveringAccelerator
                 ? `0 8px 32px ${colors.base}40, 0 0 0 4px ${colors.base}15, inset 0 1px 0 ${colors.fg}20`
-                : (speedMultiplier === 4 ? `0 4px 20px ${colors.base}30` : 'none'),
+                : speedMultiplier === 4
+                  ? `0 4px 20px ${colors.base}30`
+                  : 'none',
               zIndex: isHoveringAccelerator ? 10 : 1,
               transformOrigin: 'center center',
             }"
@@ -230,7 +162,7 @@ const stats = computed(() => [
                   boxShadow: `0 4px 12px ${colors.base}30`,
                 }"
               >
-                {{ speedMultiplier === 4 ? '⚡ Click to chill' : '🚀 Click to accelerate' }}
+                {{ speedMultiplier === 4 ? 'slow down (space)' : 'speed up (space)' }}
               </span>
             </div>
 
@@ -258,25 +190,50 @@ const stats = computed(() => [
                   height: '12px',
                   borderRadius: '50%',
                   backgroundColor: colors.base,
-                  boxShadow: isHoveringAccelerator ? `0 0 16px ${colors.base}, 0 0 32px ${colors.base}66` : `0 0 8px ${colors.base}66`,
+                  boxShadow: isHoveringAccelerator
+                    ? `0 0 16px ${colors.base}, 0 0 32px ${colors.base}66`
+                    : `0 0 8px ${colors.base}66`,
                   transition: 'box-shadow 0.3s, transform 0.3s',
                   transform: isHoveringAccelerator ? 'scale(1.3)' : 'scale(1)',
                 }"
               ></div>
-              <span :style="{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.comment }">base</span>
-              <span :style="{ fontSize: '16px', fontFamily: 'monospace', fontWeight: 'bold', color: colors.fg, minWidth: '42px', display: 'inline-block', textAlign: 'right' }">
+              <span
+                :style="{
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  color: colors.comment,
+                }"
+                >base</span
+              >
+              <span
+                :style="{
+                  fontSize: '16px',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  color: colors.fg,
+                  minWidth: '42px',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                }"
+              >
                 {{ String(Math.round(state.baseHue)).padStart(3, '\u2007') }}°
               </span>
             </div>
 
             <!-- Arrow - animated on hover -->
-            <span :style="{
-              color: isHoveringAccelerator ? colors.base : colors.comment,
-              fontSize: '14px',
-              transition: 'color 0.3s, transform 0.3s',
-              transform: isHoveringAccelerator ? 'translateX(4px) scale(1.3)' : 'translateX(0) scale(1)',
-              display: 'inline-block',
-            }">→</span>
+            <span
+              :style="{
+                color: isHoveringAccelerator ? colors.base : colors.comment,
+                fontSize: '14px',
+                transition: 'color 0.3s, transform 0.3s',
+                transform: isHoveringAccelerator
+                  ? 'translateX(4px) scale(1.3)'
+                  : 'translateX(0) scale(1)',
+                display: 'inline-block',
+              }"
+              >→</span
+            >
 
             <!-- Error color -->
             <div :style="{ display: 'flex', alignItems: 'center', gap: '6px' }">
@@ -286,14 +243,37 @@ const stats = computed(() => [
                   height: '12px',
                   borderRadius: '50%',
                   backgroundColor: colors.error,
-                  boxShadow: isHoveringAccelerator ? `0 0 16px ${colors.error}, 0 0 32px ${colors.error}66` : `0 0 8px ${colors.error}66`,
+                  boxShadow: isHoveringAccelerator
+                    ? `0 0 16px ${colors.error}, 0 0 32px ${colors.error}66`
+                    : `0 0 8px ${colors.error}66`,
                   transition: 'box-shadow 0.3s, transform 0.3s',
                   transform: isHoveringAccelerator ? 'scale(1.3)' : 'scale(1)',
                 }"
               ></div>
-              <span :style="{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.comment }">error</span>
-              <span :style="{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 'bold', color: colors.error, minWidth: '38px', display: 'inline-block', textAlign: 'right' }">
-                {{ (state.hueOffset >= 0 ? '+' : '') + String(Math.round(state.hueOffset)).padStart(2, '\u2007') }}°
+              <span
+                :style="{
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  color: colors.comment,
+                }"
+                >error</span
+              >
+              <span
+                :style="{
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  color: colors.error,
+                  minWidth: '38px',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                }"
+              >
+                {{
+                  (state.hueOffset >= 0 ? '+' : '') +
+                  String(Math.round(state.hueOffset)).padStart(2, '\u2007')
+                }}°
               </span>
             </div>
 
@@ -305,14 +285,37 @@ const stats = computed(() => [
                   height: '12px',
                   borderRadius: '50%',
                   backgroundColor: colors.warning,
-                  boxShadow: isHoveringAccelerator ? `0 0 16px ${colors.warning}, 0 0 32px ${colors.warning}66` : `0 0 8px ${colors.warning}66`,
+                  boxShadow: isHoveringAccelerator
+                    ? `0 0 16px ${colors.warning}, 0 0 32px ${colors.warning}66`
+                    : `0 0 8px ${colors.warning}66`,
                   transition: 'box-shadow 0.3s, transform 0.3s',
                   transform: isHoveringAccelerator ? 'scale(1.3)' : 'scale(1)',
                 }"
               ></div>
-              <span :style="{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: colors.comment }">warn</span>
-              <span :style="{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 'bold', color: colors.warning, minWidth: '38px', display: 'inline-block', textAlign: 'right' }">
-                {{ (state.hueOffset >= 0 ? '-' : '+') + String(Math.abs(Math.round(state.hueOffset))).padStart(2, '\u2007') }}°
+              <span
+                :style="{
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  color: colors.comment,
+                }"
+                >warn</span
+              >
+              <span
+                :style="{
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  color: colors.warning,
+                  minWidth: '38px',
+                  display: 'inline-block',
+                  textAlign: 'right',
+                }"
+              >
+                {{
+                  (state.hueOffset >= 0 ? '-' : '+') +
+                  String(Math.abs(Math.round(state.hueOffset))).padStart(2, '\u2007')
+                }}°
               </span>
             </div>
 
@@ -325,7 +328,8 @@ const stats = computed(() => [
                 fontWeight: 'bold',
                 animation: 'pulse 0.5s ease-in-out infinite',
               }"
-            >⚡4x</span>
+              >⚡4x</span
+            >
           </div>
         </div>
         <NuxtLink
@@ -348,33 +352,38 @@ const stats = computed(() => [
       <div class="max-w-7xl mx-auto">
         <div class="max-w-4xl">
           <h1
-            class="text-7xl md:text-8xl font-bold leading-tight mb-8 transition-colors duration-1000"
+            class="font-ui text-7xl md:text-8xl font-bold leading-tight mb-8 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
             One hue. Eight apps. Zero drift.
           </h1>
           <p
-            class="text-2xl leading-relaxed mb-8 transition-colors duration-1000"
+            class="font-body text-2xl leading-relaxed mb-8 transition-colors duration-1000"
             :style="{ color: colors.comment }"
           >
             Watch this page shift through the entire color wheel while
-            <span :style="{ color: colors.error }">errors</span>,
-            <span :style="{ color: colors.warning }">warnings</span>, and
-            <span :style="{ color: colors.base }">accents</span>
+            <span class="font-code" :style="{ color: colors.error }">errors</span>,
+            <span class="font-code" :style="{ color: colors.warning }">warnings</span>, and
+            <span class="font-code" :style="{ color: colors.base }">accents</span>
             stay semantically distinct. That's the trick:
-            <span :style="{ color: colors.fg }">pick any base hue, and vulpes derives every other color from it.</span>
+            <span :style="{ color: colors.fg }"
+              >pick any base hue, and vulpes derives every other color from it.</span
+            >
           </p>
           <p
-            class="text-xl leading-relaxed mb-12 transition-colors duration-1000"
+            class="font-body text-xl leading-relaxed mb-12 transition-colors duration-1000"
             :style="{ color: colors.comment }"
           >
-            Export to Neovim, Ghostty, Bat, Yazi, Lazygit, ZSH, Alacritty, and Wezterm.
+            Export to <span class="font-code">Neovim</span>, <span class="font-code">Ghostty</span>,
+            <span class="font-code">Bat</span>, <span class="font-code">Yazi</span>,
+            <span class="font-code">Lazygit</span>, <span class="font-code">ZSH</span>,
+            <span class="font-code">Alacritty</span>, and <span class="font-code">Wezterm</span>.
             Change your mind at 2am? Every tool updates together.
           </p>
           <div class="flex gap-4">
             <NuxtLink
               to="/"
-              class="px-8 py-4 rounded-xl font-medium transition-all duration-300"
+              class="font-ui px-8 py-4 rounded-xl font-medium transition-all duration-300"
               :style="{
                 backgroundColor: `${colors.base}33`,
                 border: `2px solid ${colors.base}`,
@@ -386,7 +395,7 @@ const stats = computed(() => [
             <a
               href="https://github.com/ejfox/vulpes-theme-lab"
               target="_blank"
-              class="px-8 py-4 rounded-xl font-medium border transition-colors duration-300"
+              class="font-ui px-8 py-4 rounded-xl font-medium border transition-colors duration-300"
               :style="{
                 borderColor: `${colors.fg}33`,
                 color: colors.fg,
@@ -424,7 +433,10 @@ const stats = computed(() => [
     <!-- Export Formats Grid -->
     <section class="px-8 py-20 border-b" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto">
-        <p class="text-center text-sm uppercase tracking-widest mb-12 transition-colors duration-1000" :style="{ color: colors.comment }">
+        <p
+          class="text-center text-sm uppercase tracking-widest mb-12 transition-colors duration-1000"
+          :style="{ color: colors.comment }"
+        >
           One theme, eight formats
         </p>
         <div class="grid grid-cols-4 md:grid-cols-8 gap-8 items-center justify-items-center">
@@ -435,10 +447,16 @@ const stats = computed(() => [
               :style="{ backgroundColor: `${colors.base}15` }"
             >
               <svg viewBox="0 0 24 24" class="w-7 h-7" :style="{ fill: colors.base }">
-                <path d="M2.214 4.954v13.615L7.655 24V10.314L3.312 3.845 3.312 3.845 2.214 4.954zm4.999 17.98l-4.557-4.548V5.136l.59-.596 3.967 5.908v12.485zm14.573-4.457l-.862.937-4.24-6.376V0l5.068 5.092.034 13.385zM7.431.001l12.998 19.835-3.637 3.637L3.787 3.683 7.43 0z"/>
+                <path
+                  d="M2.214 4.954v13.615L7.655 24V10.314L3.312 3.845 3.312 3.845 2.214 4.954zm4.999 17.98l-4.557-4.548V5.136l.59-.596 3.967 5.908v12.485zm14.573-4.457l-.862.937-4.24-6.376V0l5.068 5.092.034 13.385zM7.431.001l12.998 19.835-3.637 3.637L3.787 3.683 7.43 0z"
+                />
               </svg>
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Neovim</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Neovim</span
+            >
           </div>
 
           <!-- Ghostty - Pixelated text (no official simple icon) -->
@@ -453,11 +471,16 @@ const stats = computed(() => [
                   fontFamily: 'VT323, monospace',
                   fontSize: '22px',
                   color: colors.base,
-                  letterSpacing: '-1px'
+                  letterSpacing: '-1px',
                 }"
-              >👻</span>
+                >👻</span
+              >
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Ghostty</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Ghostty</span
+            >
           </div>
 
           <!-- Alacritty - Official Simple Icons logo -->
@@ -467,10 +490,16 @@ const stats = computed(() => [
               :style="{ backgroundColor: `${colors.base}15` }"
             >
               <svg viewBox="0 0 24 24" class="w-7 h-7" :style="{ fill: colors.base }">
-                <path d="m10.065 0-8.57 21.269h3.595l6.91-16.244 6.91 16.244h3.594l-8.57-21.269zm1.935 9.935c-0.76666 1.8547-1.5334 3.7094-2.298 5.565 1.475 4.54 1.475 4.54 2.298 8.5 0.823-3.96 0.823-3.96 2.297-8.5-0.76637-1.8547-1.5315-3.7099-2.297-5.565z"/>
+                <path
+                  d="m10.065 0-8.57 21.269h3.595l6.91-16.244 6.91 16.244h3.594l-8.57-21.269zm1.935 9.935c-0.76666 1.8547-1.5334 3.7094-2.298 5.565 1.475 4.54 1.475 4.54 2.298 8.5 0.823-3.96 0.823-3.96 2.297-8.5-0.76637-1.8547-1.5315-3.7099-2.297-5.565z"
+                />
               </svg>
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Alacritty</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Alacritty</span
+            >
           </div>
 
           <!-- Wezterm - Pixelated text (no official simple icon) -->
@@ -485,11 +514,16 @@ const stats = computed(() => [
                   fontFamily: 'VT323, monospace',
                   fontSize: '20px',
                   fontWeight: 'bold',
-                  color: colors.base
+                  color: colors.base,
                 }"
-              >WEZ</span>
+                >WEZ</span
+              >
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Wezterm</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Wezterm</span
+            >
           </div>
 
           <!-- Bat - Pixelated text (no official simple icon) -->
@@ -504,11 +538,16 @@ const stats = computed(() => [
                   fontFamily: 'VT323, monospace',
                   fontSize: '20px',
                   fontWeight: 'bold',
-                  color: colors.base
+                  color: colors.base,
                 }"
-              >BAT</span>
+                >BAT</span
+              >
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Bat</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Bat</span
+            >
           </div>
 
           <!-- Yazi - Pixelated text with duck emoji (yazi means duck) -->
@@ -522,11 +561,16 @@ const stats = computed(() => [
                 :style="{
                   fontFamily: 'VT323, monospace',
                   fontSize: '22px',
-                  color: colors.base
+                  color: colors.base,
                 }"
-              >🦆</span>
+                >🦆</span
+              >
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Yazi</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Yazi</span
+            >
           </div>
 
           <!-- Lazygit - Git icon (official Simple Icons) -->
@@ -536,10 +580,16 @@ const stats = computed(() => [
               :style="{ backgroundColor: `${colors.base}15` }"
             >
               <svg viewBox="0 0 24 24" class="w-7 h-7" :style="{ fill: colors.base }">
-                <path d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72.721 1.884 0 2.604-.719.719-1.881.719-2.6 0-.539-.541-.674-1.337-.404-1.996L12.86 8.955v6.525c.176.086.342.203.488.348.713.721.713 1.883 0 2.6-.719.721-1.889.721-2.609 0-.719-.719-.719-1.879 0-2.598.182-.18.387-.316.605-.406V8.835c-.217-.091-.424-.222-.6-.401-.545-.545-.676-1.342-.396-2.009L7.636 3.7.45 10.881c-.6.605-.6 1.584 0 2.189l10.48 10.477c.604.604 1.582.604 2.186 0l10.43-10.43c.605-.603.605-1.582 0-2.187"/>
+                <path
+                  d="M23.546 10.93L13.067.452c-.604-.603-1.582-.603-2.188 0L8.708 2.627l2.76 2.76c.645-.215 1.379-.07 1.889.441.516.515.658 1.258.438 1.9l2.658 2.66c.645-.223 1.387-.078 1.9.435.721.72.721 1.884 0 2.604-.719.719-1.881.719-2.6 0-.539-.541-.674-1.337-.404-1.996L12.86 8.955v6.525c.176.086.342.203.488.348.713.721.713 1.883 0 2.6-.719.721-1.889.721-2.609 0-.719-.719-.719-1.879 0-2.598.182-.18.387-.316.605-.406V8.835c-.217-.091-.424-.222-.6-.401-.545-.545-.676-1.342-.396-2.009L7.636 3.7.45 10.881c-.6.605-.6 1.584 0 2.189l10.48 10.477c.604.604 1.582.604 2.186 0l10.43-10.43c.605-.603.605-1.582 0-2.187"
+                />
               </svg>
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">Lazygit</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >Lazygit</span
+            >
           </div>
 
           <!-- ZSH - GNU Bash icon (official Simple Icons) -->
@@ -549,33 +599,42 @@ const stats = computed(() => [
               :style="{ backgroundColor: `${colors.base}15` }"
             >
               <svg viewBox="0 0 24 24" class="w-7 h-7" :style="{ fill: colors.base }">
-                <path d="M21.038,4.9l-7.577-4.498C13.009,0.134,12.505,0,12,0c-0.505,0-1.009,0.134-1.462,0.403L2.961,4.9 C2.057,5.437,1.5,6.429,1.5,7.503v8.995c0,1.073,0.557,2.066,1.462,2.603l7.577,4.497C10.991,23.866,11.495,24,12,24 c0.505,0,1.009-0.134,1.461-0.402l7.577-4.497c0.904-0.537,1.462-1.529,1.462-2.603V7.503C22.5,6.429,21.943,5.437,21.038,4.9z M15.17,18.946l0.013,0.646c0.001,0.078-0.05,0.167-0.111,0.198l-0.383,0.22c-0.061,0.031-0.111-0.007-0.112-0.085L14.57,19.29 c-0.328,0.136-0.66,0.169-0.872,0.084c-0.04-0.016-0.057-0.075-0.041-0.142l0.139-0.584c0.011-0.046,0.036-0.092,0.069-0.121 c0.012-0.011,0.024-0.02,0.036-0.026c0.022-0.011,0.043-0.014,0.062-0.006c0.229,0.077,0.521,0.041,0.802-0.101 c0.357-0.181,0.596-0.545,0.592-0.907c-0.003-0.328-0.181-0.465-0.613-0.468c-0.55,0.001-1.064-0.107-1.072-0.917 c-0.007-0.667,0.34-1.361,0.889-1.8l-0.007-0.652c-0.001-0.08,0.048-0.168,0.111-0.2l0.37-0.236 c0.061-0.031,0.111,0.007,0.112,0.087l0.006,0.653c0.273-0.109,0.511-0.138,0.726-0.088c0.047,0.012,0.067,0.076,0.048,0.151 l-0.144,0.578c-0.011,0.044-0.036,0.088-0.065,0.116c-0.012,0.012-0.025,0.021-0.038,0.028c-0.019,0.01-0.038,0.013-0.057,0.009 c-0.098-0.022-0.332-0.073-0.699,0.113c-0.385,0.195-0.52,0.53-0.517,0.778c0.003,0.297,0.155,0.387,0.681,0.396 c0.7,0.012,1.003,0.318,1.01,1.023C16.105,17.747,15.736,18.491,15.17,18.946z M19.143,17.859c0,0.06-0.008,0.116-0.058,0.145 l-1.916,1.164c-0.05,0.029-0.09,0.004-0.09-0.056v-0.494c0-0.06,0.037-0.093,0.087-0.122l1.887-1.129 c0.05-0.029,0.09-0.004,0.09,0.056V17.859z M20.459,6.797l-7.168,4.427c-0.894,0.523-1.553,1.109-1.553,2.187v8.833 c0,0.645,0.26,1.063,0.66,1.184c-0.131,0.023-0.264,0.039-0.398,0.039c-0.42,0-0.833-0.114-1.197-0.33L3.226,18.64 c-0.741-0.44-1.201-1.261-1.201-2.142V7.503c0-0.881,0.46-1.702,1.201-2.142l7.577-4.498c0.363-0.216,0.777-0.33,1.197-0.33 c0.419,0,0.833,0.114,1.197,0.33l7.577,4.498c0.624,0.371,1.046,1.013,1.164,1.732C21.686,6.557,21.12,6.411,20.459,6.797z"/>
+                <path
+                  d="M21.038,4.9l-7.577-4.498C13.009,0.134,12.505,0,12,0c-0.505,0-1.009,0.134-1.462,0.403L2.961,4.9 C2.057,5.437,1.5,6.429,1.5,7.503v8.995c0,1.073,0.557,2.066,1.462,2.603l7.577,4.497C10.991,23.866,11.495,24,12,24 c0.505,0,1.009-0.134,1.461-0.402l7.577-4.497c0.904-0.537,1.462-1.529,1.462-2.603V7.503C22.5,6.429,21.943,5.437,21.038,4.9z M15.17,18.946l0.013,0.646c0.001,0.078-0.05,0.167-0.111,0.198l-0.383,0.22c-0.061,0.031-0.111-0.007-0.112-0.085L14.57,19.29 c-0.328,0.136-0.66,0.169-0.872,0.084c-0.04-0.016-0.057-0.075-0.041-0.142l0.139-0.584c0.011-0.046,0.036-0.092,0.069-0.121 c0.012-0.011,0.024-0.02,0.036-0.026c0.022-0.011,0.043-0.014,0.062-0.006c0.229,0.077,0.521,0.041,0.802-0.101 c0.357-0.181,0.596-0.545,0.592-0.907c-0.003-0.328-0.181-0.465-0.613-0.468c-0.55,0.001-1.064-0.107-1.072-0.917 c-0.007-0.667,0.34-1.361,0.889-1.8l-0.007-0.652c-0.001-0.08,0.048-0.168,0.111-0.2l0.37-0.236 c0.061-0.031,0.111,0.007,0.112,0.087l0.006,0.653c0.273-0.109,0.511-0.138,0.726-0.088c0.047,0.012,0.067,0.076,0.048,0.151 l-0.144,0.578c-0.011,0.044-0.036,0.088-0.065,0.116c-0.012,0.012-0.025,0.021-0.038,0.028c-0.019,0.01-0.038,0.013-0.057,0.009 c-0.098-0.022-0.332-0.073-0.699,0.113c-0.385,0.195-0.52,0.53-0.517,0.778c0.003,0.297,0.155,0.387,0.681,0.396 c0.7,0.012,1.003,0.318,1.01,1.023C16.105,17.747,15.736,18.491,15.17,18.946z M19.143,17.859c0,0.06-0.008,0.116-0.058,0.145 l-1.916,1.164c-0.05,0.029-0.09,0.004-0.09-0.056v-0.494c0-0.06,0.037-0.093,0.087-0.122l1.887-1.129 c0.05-0.029,0.09-0.004,0.09,0.056V17.859z M20.459,6.797l-7.168,4.427c-0.894,0.523-1.553,1.109-1.553,2.187v8.833 c0,0.645,0.26,1.063,0.66,1.184c-0.131,0.023-0.264,0.039-0.398,0.039c-0.42,0-0.833-0.114-1.197-0.33L3.226,18.64 c-0.741-0.44-1.201-1.261-1.201-2.142V7.503c0-0.881,0.46-1.702,1.201-2.142l7.577-4.498c0.363-0.216,0.777-0.33,1.197-0.33 c0.419,0,0.833,0.114,1.197,0.33l7.577,4.498c0.624,0.371,1.046,1.013,1.164,1.732C21.686,6.557,21.12,6.411,20.459,6.797z"
+                />
               </svg>
             </div>
-            <span class="text-xs font-medium transition-colors duration-300" :style="{ color: colors.comment }">ZSH</span>
+            <span
+              class="text-xs font-medium transition-colors duration-300"
+              :style="{ color: colors.comment }"
+              >ZSH</span
+            >
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Code Examples -->
-    <section class="px-8 py-32 border-b" :style="{ borderColor: `${colors.fg}0d` }">
+    <!-- Code Examples - HERO SECTION -->
+    <section class="px-8 py-24 border-b" :style="{ borderColor: `${colors.fg}0d` }">
       <div class="max-w-7xl mx-auto">
-        <div class="mb-20">
+        <div class="mb-12 text-center">
           <h2
-            class="text-5xl font-bold mb-4 transition-colors duration-1000"
+            class="text-6xl font-bold mb-6 transition-colors duration-1000"
             :style="{ color: colors.fg }"
           >
-            Monochrome syntax highlighting
+            One hue. Full spectrum.
           </h2>
-          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
-            Watch how code stays readable with just lightness variation. Colors indicate semantic
-            meaning, not decoration.
+          <p
+            class="text-xl max-w-2xl mx-auto transition-colors duration-1000"
+            :style="{ color: colors.comment }"
+          >
+            Keywords, strings, functions, types, constants, operators, comments. All derived from a
+            single base hue with semantic shifts.
           </p>
         </div>
 
-        <!-- One killer example showing all syntax types -->
-        <div class="max-w-5xl mx-auto" style="height: 600px">
+        <!-- Full-width code preview -->
+        <div class="mx-auto" style="height: 720px; max-width: 1000px">
           <CodePreview />
         </div>
       </div>
@@ -601,7 +660,7 @@ const stats = computed(() => [
             <span
               class="font-mono font-bold transition-colors duration-1000"
               :style="{ color: colors.warning }"
-              >{{ state.hueOffset >= 0 ? `-${Math.round(state.hueOffset)}°` : `+${Math.abs(Math.round(state.hueOffset))}°` }}</span
+              >{{ formattedWarningOffset }}</span
             >. Your eyes learn the pattern instantly.
           </p>
         </div>
@@ -620,7 +679,7 @@ const stats = computed(() => [
               :style="{
                 backgroundColor: `${colors.base}33`,
                 border: `1px solid ${colors.base}`,
-                color: colors.fg
+                color: colors.fg,
               }"
             >
               base ({{ Math.round(state.baseHue) }}°)
@@ -643,7 +702,7 @@ const stats = computed(() => [
               :style="{
                 backgroundColor: `${colors.error}33`,
                 border: `1px solid ${colors.error}`,
-                color: colors.fg
+                color: colors.fg,
               }"
             >
               error ({{ formattedOffset }})
@@ -666,10 +725,10 @@ const stats = computed(() => [
               :style="{
                 backgroundColor: `${colors.warning}33`,
                 border: `1px solid ${colors.warning}`,
-                color: colors.fg
+                color: colors.fg,
               }"
             >
-              warning ({{ state.hueOffset >= 0 ? `-${Math.round(state.hueOffset)}°` : `+${Math.abs(Math.round(state.hueOffset))}°` }})
+              warning ({{ formattedWarningOffset }})
             </div>
             <p class="text-lg transition-colors duration-1000" :style="{ color: colors.fg }">
               Cautions, deprecations, modified states. Shifted {{ formattedOffsetAbs }} opposite.
@@ -689,7 +748,7 @@ const stats = computed(() => [
               :style="{
                 backgroundColor: `${colors.base}33`,
                 border: `1px solid ${colors.base}`,
-                color: colors.fg
+                color: colors.fg,
               }"
             >
               success (base hue)
@@ -730,7 +789,7 @@ const stats = computed(() => [
                   )
                   .replace(
                     '-7°',
-                    `<span class='font-mono font-bold transition-colors duration-1000' style='color: ${colors.warning}'>${state.hueOffset >= 0 ? `-${Math.round(state.hueOffset)}°` : `+${Math.abs(Math.round(state.hueOffset))}°`}</span>`
+                    `<span class='font-mono font-bold transition-colors duration-1000' style='color: ${colors.warning}'>${formattedWarningOffset}</span>`
                   )
               "
             ></p>
@@ -789,7 +848,8 @@ const stats = computed(() => [
               class="text-xl mb-8 transition-colors duration-1000"
               :style="{ color: colors.comment }"
             >
-              Export MapLibre GL styles with semantic hue shifts. Water stays blue, parks stay green—but everything else adapts to your palette.
+              Export MapLibre GL styles with semantic hue shifts. Water stays blue, parks stay
+              green—but everything else adapts to your palette.
             </p>
             <div class="flex flex-wrap gap-3">
               <span
@@ -819,7 +879,7 @@ const stats = computed(() => [
             }"
           >
             <ClientOnly>
-              <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+              <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
                 <MapPreview />
               </div>
               <template #fallback>
@@ -852,11 +912,9 @@ const stats = computed(() => [
           >
             Light mode. Same math.
           </h2>
-          <p
-            class="text-xl transition-colors duration-1000"
-            :style="{ color: colors.comment }"
-          >
-            Every theme exports both variants. The semantic relationships stay identical—only the lightness inverts.
+          <p class="text-xl transition-colors duration-1000" :style="{ color: colors.comment }">
+            Every theme exports both variants. The semantic relationships stay identical—only the
+            lightness inverts.
           </p>
         </div>
 
@@ -878,11 +936,25 @@ const stats = computed(() => [
             <span
               class="text-xs font-mono uppercase tracking-wider transition-colors duration-1000"
               :style="{ color: lightColors.base }"
-            >Light Mode</span>
+              >Light Mode</span
+            >
             <div class="flex gap-4 text-xs font-mono" :style="{ color: lightColors.comment }">
-              <span>base <span :style="{ color: lightColors.base }">{{ Math.round(state.baseHue) }}°</span></span>
-              <span>error <span :style="{ color: lightColors.error }">{{ formattedOffset }}</span></span>
-              <span>warn <span :style="{ color: lightColors.warning }">{{ state.hueOffset >= 0 ? `-${Math.round(state.hueOffset)}°` : `+${Math.abs(Math.round(state.hueOffset))}°` }}</span></span>
+              <span
+                >base
+                <span :style="{ color: lightColors.base }"
+                  >{{ Math.round(state.baseHue) }}°</span
+                ></span
+              >
+              <span
+                >error
+                <span :style="{ color: lightColors.error }">{{ formattedOffset }}</span></span
+              >
+              <span
+                >warn
+                <span :style="{ color: lightColors.warning }">{{
+                  formattedWarningOffset
+                }}</span></span
+              >
             </div>
           </div>
           <pre
@@ -898,11 +970,19 @@ const stats = computed(() => [
   <span :style="{ color: lightColors.comment }">// Same formula, inverted lightness</span>
   <span :style="{ color: lightColors.keyword }">return</span> {
     <span :style="{ color: lightColors.property }">error</span>: <span :style="{ color: lightColors.function }">hsl</span>(<span :style="{ color: lightColors.parameter }">hue</span> + <span :style="{ color: lightColors.parameter }">offset</span>),  <span :style="{ color: lightColors.comment }">// {{ formattedOffset }}</span>
-    <span :style="{ color: lightColors.property }">warning</span>: <span :style="{ color: lightColors.function }">hsl</span>(<span :style="{ color: lightColors.parameter }">hue</span> - <span :style="{ color: lightColors.parameter }">offset</span>), <span :style="{ color: lightColors.comment }">// {{ state.hueOffset >= 0 ? `-${Math.round(state.hueOffset)}°` : `+${Math.abs(Math.round(state.hueOffset))}°` }}</span>
+    <span :style="{ color: lightColors.property }">warning</span>: <span :style="{ color: lightColors.function }">hsl</span>(<span :style="{ color: lightColors.parameter }">hue</span> - <span :style="{ color: lightColors.parameter }">offset</span>), <span :style="{ color: lightColors.comment }">// {{ formattedWarningOffset }}</span>
   }
 }</pre>
         </div>
       </div>
+    </section>
+
+    <!-- Preset Showcase - Visual Grid -->
+    <section
+      class="border-t"
+      :style="{ borderColor: `${colors.fg}33`, backgroundColor: colors.bg }"
+    >
+      <PresetShowcase @select="applyPreset" />
     </section>
 
     <!-- Themes Data Table (Brutalist) -->
@@ -973,8 +1053,16 @@ const stats = computed(() => [
               transition: 'all 0.1s',
             }"
             @click="applyPreset(theme)"
-            @mouseenter="(e) => { e.currentTarget.style.backgroundColor = `${colors.fg}0d` }"
-            @mouseleave="(e) => { e.currentTarget.style.backgroundColor = 'transparent' }"
+            @mouseenter="
+              (e) => {
+                e.currentTarget.style.backgroundColor = `${colors.fg}0d`
+              }
+            "
+            @mouseleave="
+              (e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }
+            "
           >
             <div class="col-span-4 p-2 border-r" :style="{ borderColor: `${colors.fg}1a` }">
               {{ theme.name }}
@@ -1097,8 +1185,25 @@ const stats = computed(() => [
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Page fade-in */
+.showcase-root {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
