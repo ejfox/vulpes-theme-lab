@@ -2,6 +2,9 @@
 
 🎨 **[Live Demo](https://ejfox.github.io/vulpes-theme-lab/)** — Try it now in your browser
 
+<img width="898" height="1131" alt="screenshot 2025-12-28 at 5 48 34 PM" src="https://github.com/user-attachments/assets/3843023e-d9b1-41cb-9b23-38ce9e1e8575" />
+
+
 a minimal theme builder for ghostty terminal with live previews of nvim, lazygit, htop, and tmux.
 
 ## design principles
