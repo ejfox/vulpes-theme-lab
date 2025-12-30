@@ -41,6 +41,7 @@ const formats = [
   { id: 'zsh', label: 'ZSH/FZF', desc: 'Shell & fuzzy finder' },
   { id: 'tweakcc', label: 'tweakcc', desc: 'Claude Code customization' },
   { id: 'maplibre', label: 'MapLibre', desc: 'Cyberpunk neon cartography' },
+  { id: 'tailwind', label: 'Tailwind', desc: 'CSS variables & config' },
 ]
 
 const selectAll = () => {

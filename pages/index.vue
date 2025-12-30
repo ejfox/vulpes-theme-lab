@@ -11,6 +11,7 @@ import {
   exportWezterm,
   exportAlacritty,
   exportMaplibre,
+  exportTailwind,
   createSemanticPalette,
   type ExportResult,
 } from '~/utils/exporters'
@@ -30,6 +31,7 @@ const EXPORTERS: Record<string, (palette: any, name: string) => ExportResult> = 
   wezterm: exportWezterm,
   alacritty: exportAlacritty,
   maplibre: exportMaplibre,
+  tailwind: exportTailwind,
 }
 import {
   validateThemeContrast,

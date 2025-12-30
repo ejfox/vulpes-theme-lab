@@ -146,6 +146,7 @@ export type ExportFormat =
   | 'wezterm'
   | 'alacritty'
   | 'maplibre'
+  | 'tailwind'
 
 /**
  * Result of a theme export operation
