@@ -62,7 +62,7 @@ const getColor = (element: string) => {
               <span> theme = {</span>
             </div>
             <div class="code-indent">
-              <span :style="{ color: colors.value.property || colors.value.variable }">accent</span>
+              <span :style="{ color: colors.value.variable }">accent</span>
               <span>: </span>
               <span :style="{ color: getColor('code') }">{{ '"vulpes"' }}</span>
             </div>
