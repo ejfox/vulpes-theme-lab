@@ -6,17 +6,6 @@ const documents = [
   { name: 'Daily Notes', icon: '📅' },
   { name: 'Projects', icon: '🎯' },
 ]
-
-const getColor = (element: string) => {
-  switch (element) {
-    case 'heading': return colors.value.keyword
-    case 'code': return colors.value.string
-    case 'comment': return colors.value.comment
-    case 'keyword': return colors.value.keyword
-    case 'accent': return colors.value.base
-    default: return colors.value.fg
-  }
-}
 </script>
 
 <template>
@@ -51,32 +40,32 @@ const getColor = (element: string) => {
       <!-- Editor -->
       <div class="editor">
         <div class="markdown-preview">
-          <h1 :style="{ color: getColor('heading') }">Welcome to Obsidian</h1>
+          <h1 :style="{ color: colors.keyword }">Welcome to Obsidian</h1>
           <p>This is a <strong :style="{ fontWeight: 'bold' }">themed</strong> preview of your colors in action.</p>
 
-          <h2 :style="{ color: getColor('heading') }">Code Example</h2>
+          <h2 :style="{ color: colors.keyword }">Code Example</h2>
           <div class="code-block" :style="{ background: colors.base + '08', borderLeft: `3px solid ${colors.base}` }">
-            <div :style="{ color: getColor('comment') }">// Your theme applied</div>
+            <div :style="{ color: colors.comment }">// Your theme applied</div>
             <div>
-              <span :style="{ color: getColor('keyword') }">const</span>
+              <span :style="{ color: colors.keyword }">const</span>
               <span> theme = {</span>
             </div>
             <div class="code-indent">
-              <span :style="{ color: colors.value.variable }">accent</span>
+              <span :style="{ color: colors.variable }">accent</span>
               <span>: </span>
-              <span :style="{ color: getColor('code') }">{{ '"vulpes"' }}</span>
+              <span :style="{ color: colors.string }">{{ '"vulpes"' }}</span>
             </div>
             <div>}</div>
           </div>
 
-          <h3 :style="{ color: getColor('heading') }">Features</h3>
+          <h3 :style="{ color: colors.keyword }">Features</h3>
           <ul>
-            <li><span :style="{ color: colors.value.success }">✓</span> Syntax highlighting</li>
-            <li><span :style="{ color: colors.value.error }">✗</span> Error states</li>
-            <li><span :style="{ color: colors.value.warning }">⚠</span> Warnings</li>
+            <li><span :style="{ color: colors.base }">✓</span> Syntax highlighting</li>
+            <li><span :style="{ color: colors.error }">✗</span> Error states</li>
+            <li><span :style="{ color: colors.warning }">⚠</span> Warnings</li>
           </ul>
 
-          <div class="blockquote" :style="{ color: getColor('comment'), borderLeft: `3px solid ${colors.comment}60` }">
+          <div class="blockquote" :style="{ color: colors.comment, borderLeft: `3px solid ${colors.comment}60` }">
             Blockquotes use muted colors for visual hierarchy
           </div>
         </div>
