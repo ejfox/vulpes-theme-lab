@@ -147,6 +147,7 @@ export type ExportFormat =
   | 'alacritty'
   | 'maplibre'
   | 'tailwind'
+  | 'obsidian'
 
 /**
  * Result of a theme export operation

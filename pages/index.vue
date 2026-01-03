@@ -12,6 +12,7 @@ import {
   exportAlacritty,
   exportMaplibre,
   exportTailwind,
+  exportObsidian,
   createSemanticPalette,
   type ExportResult,
 } from '~/utils/exporters'
@@ -32,6 +33,7 @@ const EXPORTERS: Record<string, (palette: any, name: string) => ExportResult> = 
   alacritty: exportAlacritty,
   maplibre: exportMaplibre,
   tailwind: exportTailwind,
+  obsidian: exportObsidian,
 }
 import {
   validateThemeContrast,
@@ -1018,6 +1020,10 @@ const handlePick = ({ name, color }: { name: string; color: string }) => {
         <ClientOnly>
           <MapPreview />
         </ClientOnly>
+      </ScenarioSection>
+
+      <ScenarioSection label="obsidian - knowledge vault theme" :mode="state.mode">
+        <ObsidianPreview />
       </ScenarioSection>
 
       <ScenarioSection label="simulacra palette - the hyperreal rendered" :mode="state.mode">

@@ -15,6 +15,7 @@ export { exportWezterm } from './wezterm'
 export { exportAlacritty } from './alacritty'
 export { exportMaplibre } from './maplibre'
 export { exportTailwind } from './tailwind'
+export { exportObsidian } from './obsidian'
 
 export type { ThemePalette, ExportFormat, ExportResult } from '../types'
 export { createSemanticPalette } from '../types'
