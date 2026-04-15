@@ -27,6 +27,12 @@ export default defineNuxtConfig({
   ssr: false,
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
+  // Pre-optimize heavy deps so Vite doesn't 504 on first load
+  vite: {
+    optimizeDeps: {
+      include: ['maplibre-gl', 'chroma-js', '@vueuse/core'],
+    },
+  },
   // Runtime config for environment variables
   runtimeConfig: {
     public: {
