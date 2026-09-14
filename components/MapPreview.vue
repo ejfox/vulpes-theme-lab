@@ -6,10 +6,10 @@ import { exportMaplibre, createSemanticPalette } from '~/utils/exporters'
 
 const { colors, darkColors, lightColors, state } = useTheme()
 
-// Throttle helper to prevent excessive style updates during animation
+// Debounce map restyles: maplibre.setStyle deep-diffs the whole style (~expensive),
+// so only run it once the user stops changing colors, never mid-drag.
 let styleUpdateTimeout: ReturnType<typeof setTimeout> | null = null
-let lastStyleUpdate = 0
-const THROTTLE_MS = 500 // Only update map style every 500ms max
+const RESTYLE_IDLE_MS = 400
 const config = useRuntimeConfig()
 const mapContainer = ref<HTMLDivElement | null>(null)
 let map: maplibregl.Map | null = null
@@ -81,14 +81,11 @@ const updateMapStyle = () => {
     const currentColors = state.value.mode === 'dark' ? darkColors.value : lightColors.value
     const palette = createSemanticPalette(currentColors, state.value.mode)
     const styleResult = exportMaplibre(palette, 'vulpes')
-    const style = JSON.parse(styleResult.content)
 
     const maptilerKey = config.public.maptilerKey || 'get_your_own_OpIi9ZULNHzrESv6T2vL'
-    const styleString = JSON.stringify(style).replace(/{key}/g, maptilerKey)
-    const parsedStyle = JSON.parse(styleString)
+    const parsedStyle = JSON.parse(styleResult.content.replace(/{key}/g, maptilerKey))
 
     map.setStyle(parsedStyle)
-    lastStyleUpdate = Date.now()
   } catch (error) {
     console.error('MapPreview: Error updating style:', error)
   }
@@ -99,33 +96,34 @@ watch(
   () => [colors.value, state.value.mode],
   () => {
     if (!map) return
-
-    const now = Date.now()
-    const timeSinceLastUpdate = now - lastStyleUpdate
-
-    // Clear any pending update
-    if (styleUpdateTimeout) {
-      clearTimeout(styleUpdateTimeout)
-      styleUpdateTimeout = null
-    }
-
-    // If enough time has passed, update immediately
-    if (timeSinceLastUpdate >= THROTTLE_MS) {
-      updateMapStyle()
-    } else {
-      // Otherwise, schedule an update for later
-      styleUpdateTimeout = setTimeout(updateMapStyle, THROTTLE_MS - timeSinceLastUpdate)
-    }
+    if (styleUpdateTimeout) clearTimeout(styleUpdateTimeout)
+    styleUpdateTimeout = setTimeout(updateMapStyle, RESTYLE_IDLE_MS)
   },
   { deep: true }
 )
 
+// Only spin up maplibre (heavy render loop + tile fetching) once the preview is
+// actually scrolled near — it sits below the fold during normal slider editing.
+let observer: IntersectionObserver | null = null
+
 onMounted(() => {
-  initMap()
+  if (!mapContainer.value) return
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        observer?.disconnect()
+        observer = null
+        initMap()
+      }
+    },
+    { rootMargin: '200px' }
+  )
+  observer.observe(mapContainer.value)
 })
 
 onUnmounted(() => {
-  // Clean up throttle timeout
+  observer?.disconnect()
+  observer = null
   if (styleUpdateTimeout) {
     clearTimeout(styleUpdateTimeout)
     styleUpdateTimeout = null

@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { EditorView } from '@codemirror/view'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Compartment } from '@codemirror/state'
 import { basicSetup } from 'codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
+import { useDebounceFn } from '@vueuse/core'
 
 const editorRef = ref<HTMLElement>()
 const { state, colors, options } = useTheme()
 let view: EditorView | null = null
+
+// Theme lives in a compartment so it can be swapped without rebuilding the editor
+const themeCompartment = new Compartment()
 
 // Compute opacity as reactive value
 const editorOpacity = computed(() => state.value.backgroundOpacity / 100)
@@ -192,8 +196,7 @@ onMounted(() => {
     extensions: [
       basicSetup,
       javascript({ typescript: true }),
-      createTheme(),
-      createHighlighting(),
+      themeCompartment.of([createTheme(), createHighlighting()]),
       EditorView.editable.of(true),
       EditorView.lineWrapping,
     ],
@@ -205,33 +208,15 @@ onMounted(() => {
   })
 })
 
-// Update theme when state changes
-watch(
-  state,
-  () => {
-    if (!view || !editorRef.value) return
+// Swapping the theme rebuilds CodeMirror's stylesheet and forces a DOM re-measure,
+// which is expensive — keep it off the drag path and apply once movement settles.
+const applyTheme = useDebounceFn(() => {
+  view?.dispatch({
+    effects: themeCompartment.reconfigure([createTheme(), createHighlighting()]),
+  })
+}, 90)
 
-    view.destroy()
-
-    const startState = EditorState.create({
-      doc: demoCode,
-      extensions: [
-        basicSetup,
-        javascript({ typescript: true }),
-        createTheme(),
-        createHighlighting(),
-        EditorView.editable.of(true),
-        EditorView.lineWrapping,
-      ],
-    })
-
-    view = new EditorView({
-      state: startState,
-      parent: editorRef.value,
-    })
-  },
-  { deep: true }
-)
+watch([colors, options], applyTheme)
 
 onBeforeUnmount(() => {
   view?.destroy()

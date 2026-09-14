@@ -465,142 +465,6 @@ export const useTheme = () => {
     mapBuildingSaturation: Number(params.mbs) || defaultState.mapBuildingSaturation,
   }))
 
-  // Watch state and sync to URL
-  if (import.meta.client) {
-    watch(
-      state,
-      (newState) => {
-        params.n = newState.themeName
-        params.h = String(newState.baseHue)
-        params.o = String(newState.hueOffset)
-        params.s = String(newState.saturation)
-        params.ls = String(newState.lightModeSaturation)
-        params.c = String(newState.contrast)
-        params.m = newState.monochromeMode ? '1' : '0'
-        params.mi = String(newState.monochromeIntensity)
-        params.ml = String(newState.monochromeLightness)
-        params.b = newState.boldKeywords ? '1' : '0'
-        params.i = newState.italicComments ? '1' : '0'
-        params.bf = newState.boldFunctions ? '1' : '0'
-        params.is = newState.italicStrings ? '1' : '0'
-        params.ue = newState.underlineErrors ? '1' : '0'
-        params.mode = newState.mode
-        params.cbm = newState.colorblindMode
-        params.bgop = String(newState.backgroundOpacity)
-        params.bgbl = String(newState.backgroundBlur)
-        params.wbl = String(newState.windowBlend)
-        params.pbl = String(newState.popupBlend)
-        params.eo = String(newState.errorOffset)
-        params.wo = String(newState.warningOffset)
-        params.ko = String(newState.keywordOffset)
-        params.so = String(newState.stringOffset)
-        params.no = String(newState.numberOffset)
-        params.fo = String(newState.functionOffset)
-        params.el = String(newState.errorLightness)
-        params.wl = String(newState.warningLightness)
-        params.kl = String(newState.keywordLightness)
-        params.sl = String(newState.stringLightness)
-        params.nl = String(newState.numberLightness)
-        params.fl = String(newState.functionLightness)
-        params.co = String(newState.constantOffset)
-        params.to = String(newState.typeOffset)
-        params.vo = String(newState.variableOffset)
-        params.oo = String(newState.operatorOffset)
-        params.cl = String(newState.constantLightness)
-        params.tl = String(newState.typeLightness)
-        params.vl = String(newState.variableLightness)
-        params.ol = String(newState.operatorLightness)
-        params.elink = newState.errorLinked ? '1' : '0'
-        params.wlink = newState.warningLinked ? '1' : '0'
-        params.klink = newState.keywordLinked ? '1' : '0'
-        params.slink = newState.stringLinked ? '1' : '0'
-        params.nlink = newState.numberLinked ? '1' : '0'
-        params.flink = newState.functionLinked ? '1' : '0'
-        params.clink = newState.constantLinked ? '1' : '0'
-        params.tlink = newState.typeLinked ? '1' : '0'
-        params.vlink = newState.variableLinked ? '1' : '0'
-        params.olink = newState.operatorLinked ? '1' : '0'
-        params.em = String(newState.errorMultiplier)
-        params.wm = String(newState.warningMultiplier)
-        params.km = String(newState.keywordMultiplier)
-        params.sm = String(newState.stringMultiplier)
-        params.nm = String(newState.numberMultiplier)
-        params.fm = String(newState.functionMultiplier)
-        params.cm = String(newState.constantMultiplier)
-        params.tm = String(newState.typeMultiplier)
-        params.vm = String(newState.variableMultiplier)
-        params.om = String(newState.operatorMultiplier)
-        // New granular colors
-        params.bio = String(newState.builtinOffset)
-        params.pao = String(newState.parameterOffset)
-        params.pro = String(newState.propertyOffset)
-        params.nso = String(newState.namespaceOffset)
-        params.mao = String(newState.macroOffset)
-        params.tao = String(newState.tagOffset)
-        params.puo = String(newState.punctuationOffset)
-        params.heo = String(newState.headingOffset)
-        params.cmo = String(newState.commentOffset)
-        params.bao = String(newState.baseOffset)
-        params.hio = String(newState.hintOffset)
-        params.fgo = String(newState.fgOffset)
-        params.bgo = String(newState.bgOffset)
-        params.bil = String(newState.builtinLightness)
-        params.pal = String(newState.parameterLightness)
-        params.prl = String(newState.propertyLightness)
-        params.nsl = String(newState.namespaceLightness)
-        params.mal = String(newState.macroLightness)
-        params.tal = String(newState.tagLightness)
-        params.pul = String(newState.punctuationLightness)
-        params.hel = String(newState.headingLightness)
-        params.cml = String(newState.commentLightness)
-        params.bal = String(newState.baseLightness)
-        params.hil = String(newState.hintLightness)
-        params.fgl = String(newState.fgLightness)
-        params.bgl = String(newState.bgLightness)
-        params.bilink = newState.builtinLinked ? '1' : '0'
-        params.palink = newState.parameterLinked ? '1' : '0'
-        params.prlink = newState.propertyLinked ? '1' : '0'
-        params.nslink = newState.namespaceLinked ? '1' : '0'
-        params.malink = newState.macroLinked ? '1' : '0'
-        params.talink = newState.tagLinked ? '1' : '0'
-        params.pulink = newState.punctuationLinked ? '1' : '0'
-        params.helink = newState.headingLinked ? '1' : '0'
-        params.cmlink = newState.commentLinked ? '1' : '0'
-        params.balink = newState.baseLinked ? '1' : '0'
-        params.hilink = newState.hintLinked ? '1' : '0'
-        params.fglink = newState.fgLinked ? '1' : '0'
-        params.bglink = newState.bgLinked ? '1' : '0'
-        params.bim = String(newState.builtinMultiplier)
-        params.pam = String(newState.parameterMultiplier)
-        params.prm = String(newState.propertyMultiplier)
-        params.nsm = String(newState.namespaceMultiplier)
-        params.mam = String(newState.macroMultiplier)
-        params.tam = String(newState.tagMultiplier)
-        params.pum = String(newState.punctuationMultiplier)
-        params.hem = String(newState.headingMultiplier)
-        params.cmm = String(newState.commentMultiplier)
-        params.bam = String(newState.baseMultiplier)
-        params.him = String(newState.hintMultiplier)
-        params.fgm = String(newState.fgMultiplier)
-        params.bgm = String(newState.bgMultiplier)
-        // MapLibre-specific colors
-        params.mwo = String(newState.mapWaterOffset)
-        params.mpo = String(newState.mapParkOffset)
-        params.mrmo = String(newState.mapRoadMotorwayOffset)
-        params.mrto = String(newState.mapRoadTrunkOffset)
-        params.mrpro = String(newState.mapRoadPrimaryOffset)
-        params.mrso = String(newState.mapRoadSecondaryOffset)
-        params.mbo = String(newState.mapBuildingOffset)
-        params.mpoi = String(newState.mapPoiOffset)
-        params.mws = String(newState.mapWaterSaturation)
-        params.mps = String(newState.mapParkSaturation)
-        params.mrs = String(newState.mapRoadSaturation)
-        params.mbs = String(newState.mapBuildingSaturation)
-      },
-      { deep: true }
-    )
-  }
-
   // Generate colors for a specific mode with auto-contrast
   const generateThemeVariant = (mode: 'dark' | 'light') => {
     const isDark = mode === 'dark'
@@ -857,16 +721,17 @@ export const useTheme = () => {
 
   // Current mode colors with colorblind simulation
   // If imported palette exists, use it directly instead of generating
+  // Both variants with colorblind simulation
+  const darkColors = computed(() => applyColorblindSim(generateThemeVariant('dark')))
+  const lightColors = computed(() => applyColorblindSim(generateThemeVariant('light')))
+
   const colors = computed(() => {
     if (state.value.importedPalette) {
       return applyColorblindSim(state.value.importedPalette)
     }
-    return applyColorblindSim(generateThemeVariant(state.value.mode))
+    // Reuse the already-computed variant instead of generating a third palette
+    return state.value.mode === 'dark' ? darkColors.value : lightColors.value
   })
-
-  // Both variants with colorblind simulation
-  const darkColors = computed(() => applyColorblindSim(generateThemeVariant('dark')))
-  const lightColors = computed(() => applyColorblindSim(generateThemeVariant('light')))
 
   const ghosttyTheme = computed(() => ({
     background: colors.value.bg,
