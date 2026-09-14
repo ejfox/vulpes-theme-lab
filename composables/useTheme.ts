@@ -315,15 +315,16 @@ const defaultState: ThemeState = {
   hintMultiplier: 0, // Hint - subtle UI elements
   fgMultiplier: 0, // Foreground - main text color
   bgMultiplier: 0, // Background - canvas color
-  // MapLibre-specific color offsets (relative to baseHue)
-  mapWaterOffset: 180, // Water bodies - cyan/blue
-  mapParkOffset: 120, // Parks/green spaces - green
-  mapRoadMotorwayOffset: 30, // Major highways - orange/yellow
-  mapRoadTrunkOffset: 20, // Trunk roads - yellow
-  mapRoadPrimaryOffset: 10, // Primary roads - warm
-  mapRoadSecondaryOffset: 0, // Secondary roads - neutral
-  mapBuildingOffset: -30, // Buildings - purple/blue
-  mapPoiOffset: 0, // Points of interest - base color
+  // MapLibre-specific hue shifts (±degrees from cartographic base hues)
+  // water=200°, park=120°, motorway=20°, trunk=40°, primary=50°, secondary=60°, building=280°, poi=0°
+  mapWaterOffset: 0,
+  mapParkOffset: 0,
+  mapRoadMotorwayOffset: 0,
+  mapRoadTrunkOffset: 0,
+  mapRoadPrimaryOffset: 0,
+  mapRoadSecondaryOffset: 0,
+  mapBuildingOffset: 0,
+  mapPoiOffset: 0,
   // Cartographic saturation controls (0-100)
   mapWaterSaturation: 15, // How blue the water is
   mapParkSaturation: 50, // How green the parks are
@@ -599,8 +600,21 @@ export const useTheme = () => {
       return baseSaturation[feature]
     }
 
+    // Map feature names to their offset state keys
+    const MAP_OFFSET_KEYS: Record<keyof typeof CARTOGRAPHIC_HUES, keyof ThemeState> = {
+      water: 'mapWaterOffset',
+      park: 'mapParkOffset',
+      motorway: 'mapRoadMotorwayOffset',
+      trunk: 'mapRoadTrunkOffset',
+      primary: 'mapRoadPrimaryOffset',
+      secondary: 'mapRoadSecondaryOffset',
+      building: 'mapBuildingOffset',
+      poi: 'mapPoiOffset',
+    }
+
     const mapColorAt = (feature: keyof typeof CARTOGRAPHIC_HUES) => {
-      const hue = CARTOGRAPHIC_HUES[feature]
+      const offset = (state.value[MAP_OFFSET_KEYS[feature]] as number) || 0
+      const hue = ((CARTOGRAPHIC_HUES[feature] + offset) % 360 + 360) % 360
       const lightness = getMapLightness(feature) / 100
       const saturation = getMapSaturation(feature)
       return chroma.hsl(hue, saturation, lightness).hex()

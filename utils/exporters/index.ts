@@ -13,7 +13,7 @@ export { exportTweakcc } from './tweakcc'
 export { exportNeomutt } from './neomutt'
 export { exportWezterm } from './wezterm'
 export { exportAlacritty } from './alacritty'
-export { exportMaplibre } from './maplibre'
+export { exportMaplibre, LAYER_GROUPS } from './maplibre'
 export { exportTailwind } from './tailwind'
 export { exportObsidian } from './obsidian'
 

@@ -40,15 +40,26 @@ const handlePresetChange = (event: Event) => {
       }"
     >
       <h1>theme-lab</h1>
-      <NuxtLink
-        to="/showcase"
-        class="showcase-link"
-        :style="{
-          color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
-        }"
-      >
-        showcase →
-      </NuxtLink>
+      <div class="nav-links">
+        <NuxtLink
+          to="/showcase"
+          class="showcase-link"
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+          }"
+        >
+          showcase →
+        </NuxtLink>
+        <NuxtLink
+          to="/map"
+          class="showcase-link"
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+          }"
+        >
+          basemap →
+        </NuxtLink>
+      </div>
     </div>
 
     <div

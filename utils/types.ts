@@ -132,6 +132,34 @@ export function createSemanticPalette(colors: ThemeColors, mode: 'dark' | 'light
 }
 
 /**
+ * Typography options for MapLibre style generation
+ */
+export interface MapTypographyOptions {
+  fontFamily?: string // MapTiler font name, e.g. 'Noto Sans Bold'
+  sizeScale?: number // Multiplier for all text sizes (0.5–2.0, default 1.0)
+  haloWidth?: number // Override halo width for all labels (0–4)
+  haloOpacity?: number // Halo opacity 0–1
+  labelOpacity?: number // Text opacity 0–1
+  densityOffsets?: Record<string, number> // layer-id → minzoom offset (-5 to +5)
+}
+
+/**
+ * Extended options for MapLibre style export
+ */
+export interface MapExportOptions {
+  typography?: MapTypographyOptions
+  visibility?: Record<string, boolean> // layer-group → visible
+  opacity?: Record<string, number> // layer-group → opacity 0–1
+  colorOverrides?: Record<string, string> // variable-name → hex color override
+  geometry?: {
+    buildingHeightScale?: number // multiplier on extrusion height
+    roadWidthScale?: number // multiplier on all road widths
+    waterOutlineWidth?: number // px
+    boundaryWidth?: number // px
+  }
+}
+
+/**
  * Export format types supported by the theme lab
  */
 export type ExportFormat =

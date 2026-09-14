@@ -1,94 +1,195 @@
 import chroma from 'chroma-js'
-import type { ThemePalette, ExportResult } from '../types'
+import type { ThemePalette, ExportResult, MapExportOptions } from '../types'
+
+/**
+ * Layer group → layer ID mapping for visibility/opacity controls
+ */
+export const LAYER_GROUPS: Record<string, string[]> = {
+  water: ['water', 'water-outline', 'waterway', 'waterway-tunnel'],
+  parks: ['landuse-park', 'landuse-grass', 'landuse-forest'],
+  buildings: ['building-3d'],
+  roads: [
+    'road-motorway',
+    'road-trunk',
+    'road-primary',
+    'road-secondary',
+    'road-tertiary',
+    'road-street',
+    'road-pedestrian',
+    'road-bridge-motorway',
+    'road-bridge-major',
+    'road-tunnel',
+  ],
+  railways: ['railway', 'railway-outline'],
+  boundaries: ['boundary-country', 'boundary-state'],
+  labels: ['place-city', 'place-town', 'road-label'],
+  pois: [
+    'poi-medical',
+    'poi-education',
+    'poi-transport',
+    'poi-food',
+    'poi-culture',
+    'poi-shopping',
+    'poi-park',
+    'poi-religion',
+    'poi-general',
+  ],
+  aeroway: ['aeroway-runway', 'aeroway-taxiway', 'aeroway-apron'],
+  landuse: [
+    'landuse-residential',
+    'landuse-commercial',
+    'landuse-industrial',
+    'landuse-cemetery',
+    'landuse-sports',
+  ],
+}
+
+/**
+ * Scale a numeric paint/layout value (static number or interpolation expression) by a multiplier
+ */
+function scaleNumericValue(value: any, scale: number): any {
+  if (typeof value === 'number') return Math.round(value * scale * 100) / 100
+  if (Array.isArray(value) && value[0] === 'interpolate') {
+    const scaled = [...value]
+    for (let i = 3; i < scaled.length; i += 2) {
+      if (typeof scaled[i + 1] === 'number') {
+        scaled[i + 1] = Math.round(scaled[i + 1] * scale * 100) / 100
+      }
+    }
+    return scaled
+  }
+  return value
+}
+
+/**
+ * Scale a text-size value (static number or interpolation expression) by a multiplier
+ */
+function scaleTextSize(value: any, scale: number): any {
+  if (typeof value === 'number') return Math.round(value * scale * 10) / 10
+  if (Array.isArray(value) && value[0] === 'interpolate') {
+    // ['interpolate', ['linear'], ['zoom'], stop1, val1, stop2, val2, ...]
+    const scaled = [...value]
+    for (let i = 3; i < scaled.length; i += 2) {
+      if (typeof scaled[i + 1] === 'number') {
+        scaled[i + 1] = Math.round(scaled[i + 1] * scale * 10) / 10
+      }
+    }
+    return scaled
+  }
+  return value
+}
+
+/**
+ * Find which group a layer belongs to
+ */
+function layerGroup(layerId: string): string | undefined {
+  for (const [group, ids] of Object.entries(LAYER_GROUPS)) {
+    if (ids.includes(layerId)) return group
+  }
+  return undefined
+}
 
 /**
  * Generates a MapLibre/Maptiler style JSON with cyberpunk neon aesthetic
- * Inspired by vulpes-reddishnovember theme - dark, minimalist, neon accents
  *
  * @param palette - Semantic color palette
  * @param themeName - Name of the theme
+ * @param options - Optional typography, visibility, and opacity overrides
  * @returns MapLibre style JSON
  */
-export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpes'): ExportResult {
+export function exportMaplibre(
+  palette: ThemePalette,
+  themeName: string = 'vulpes',
+  options?: MapExportOptions
+): ExportResult {
   // Create color variations for different map features
   // === SMART SEMANTIC MAPPING ===
   // Map code syntax colors to cartographic features
   // Now uses customizable maplibre-specific colors from theme controls
 
-  // ROADS - User-customizable road colors
-  const roadMotorway = palette.mapRoadMotorway
-  const roadTrunk = palette.mapRoadTrunk
-  const roadPrimary = palette.mapRoadPrimary
-  const roadSecondary = palette.mapRoadSecondary
-  const roadTertiary = palette.comment // Muted like comments
-  const roadMinor = chroma(palette.comment).darken(0.3).alpha(0.6).hex()
-  const roadPedestrian = palette.success // Green for walkable paths
+  // Color override helper: use override if provided, otherwise fall back to derived
+  const ov = options?.colorOverrides || {}
 
-  // WATER - User-customizable water color
-  const water = palette.mapWater
-  const waterOutline = chroma(palette.mapWater).darken(0.5).alpha(0.4).hex()
+  // ROADS
+  const roadMotorway = ov.roadMotorway || palette.mapRoadMotorway
+  const roadTrunk = ov.roadTrunk || palette.mapRoadTrunk
+  const roadPrimary = ov.roadPrimary || palette.mapRoadPrimary
+  const roadSecondary = ov.roadSecondary || palette.mapRoadSecondary
+  const roadTertiary = ov.roadTertiary || palette.comment
+  const roadMinor = chroma(ov.roadTertiary || palette.comment)
+    .darken(0.3)
+    .alpha(0.6)
+    .hex()
+  const roadPedestrian = ov.roadPedestrian || palette.success
 
-  // BUILDINGS - User-customizable base building color with variations
-  const buildingBase = chroma(palette.mapBuilding)
-  // Array of building colors - variations of the base building color
-  const buildingColors = [
-    buildingBase.set('hsl.h', '+10').darken(0.5).hex(),
-    buildingBase.set('hsl.h', '+20').darken(0.5).hex(),
-    buildingBase.set('hsl.h', '+30').darken(0.5).hex(),
-    buildingBase.set('hsl.h', '-10').darken(0.5).hex(),
-    buildingBase.set('hsl.h', '-20').darken(0.5).hex(),
-    buildingBase.set('hsl.h', '-30').darken(0.5).hex(),
-    buildingBase.darken(0.5).hex(),
-    buildingBase.brighten(0.2).darken(0.5).hex(),
-    buildingBase.saturate(0.5).darken(0.5).hex(),
-    buildingBase.desaturate(0.5).darken(0.5).hex(),
-  ]
-  // NATURE/PARKS - User-customizable park color
-  const parkBase = chroma(palette.mapPark)
+  // WATER
+  const water = ov.water || palette.mapWater
+  const waterOutline = chroma(ov.water || palette.mapWater)
+    .darken(0.5)
+    .alpha(0.4)
+    .hex()
+
+  // BUILDINGS
+  const buildingColor = chroma(ov.building || palette.mapBuilding)
+    .darken(0.5)
+    .hex()
+
+  // NATURE/PARKS
+  const parkBase = chroma(ov.park || palette.mapPark)
   const parkFill = parkBase.darken(0.5).alpha(0.4).hex()
   const forestFill = parkBase.darken(0.3).alpha(0.5).hex()
   const grassFill = parkBase.darken(0.7).alpha(0.3).hex()
 
   // LANDUSE - Properties and types
-  const landuseResidential = palette.bg_alt // Subtle background variation
-  const landuseCommercial = chroma(palette.property).darken(1.0).alpha(0.3).hex()
-  const landuseIndustrial = chroma(palette.builtin).darken(1.0).alpha(0.4).hex()
+  const landuseResidential = ov.landuseResidential || palette.bg_alt
+  const landuseCommercial =
+    ov.landuseCommercial || chroma(palette.property).darken(1.0).alpha(0.3).hex()
+  const landuseIndustrial =
+    ov.landuseIndustrial || chroma(palette.builtin).darken(1.0).alpha(0.4).hex()
   const landuseSports = chroma(palette.variable).darken(0.8).alpha(0.5).hex()
   const landuseCemetery = chroma(palette.comment).darken(0.5).alpha(0.3).hex()
 
-  // RAILWAYS - Info color (infrastructure, systematic)
-  const railway = palette.info
-  const railwayOutline = chroma(palette.info).darken(0.5).hex()
+  // RAILWAYS
+  const railway = ov.railway || palette.info
+  const railwayOutline = chroma(ov.railway || palette.info)
+    .darken(0.5)
+    .hex()
 
-  // BOUNDARIES - Punctuation (delimiters, separators)
-  const boundary = chroma(palette.punctuation).alpha(0.4).hex()
+  // BOUNDARIES
+  const boundary = ov.boundary || chroma(palette.punctuation).alpha(0.4).hex()
 
-  // POIs/AMENITIES - User-customizable POI color with semantic variations
-  const poiGeneral = palette.mapPoi
-  const poiMedical = palette.error // Red for hospitals
-  const poiEducation = palette.type // Type color for schools
-  const poiTransport = palette.info // Blue for transit
-  const poiFood = palette.warning // Orange for food/dining
-  const poiShopping = palette.property // Property color for retail
-  const poiCulture = palette.macro // Macro color for museums/theaters
-  const poiReligion = palette.builtin // Builtin for churches/temples
-  const poiPark = palette.success // Green for park entrances
+  // POIs/AMENITIES
+  const poiGeneral = ov.poi || palette.mapPoi
+  const poiMedical = ov.poiMedical || palette.error
+  const poiEducation = ov.poiEducation || palette.type
+  const poiTransport = ov.poiTransport || palette.info
+  const poiFood = ov.poiFood || palette.warning
+  const poiShopping = ov.poiShopping || palette.property
+  const poiCulture = ov.poiCulture || palette.macro
+  const poiReligion = ov.poiReligion || palette.builtin
+  const poiPark = palette.success
 
-  // TUNNELS/BRIDGES - Special infrastructure
-  const tunnel = chroma(palette.builtin).darken(1.0).alpha(0.6).hex()
-  const bridge = palette.macro
+  // TUNNELS/BRIDGES
+  const tunnel = ov.tunnel || chroma(palette.builtin).darken(1.0).alpha(0.6).hex()
+  const bridge = ov.bridge || palette.macro
 
-  // AEROWAY - Aviation infrastructure
-  const runway = chroma(palette.heading).darken(0.5).hex()
-  const taxiway = chroma(palette.heading).darken(1.0).alpha(0.7).hex()
+  // AEROWAY
+  const runway = ov.runway || chroma(palette.heading).darken(0.5).hex()
+  const taxiway = chroma(ov.runway || palette.heading)
+    .darken(1.0)
+    .alpha(0.7)
+    .hex()
 
-  // WATERWAYS - Flowing water (rivers, streams)
-  const waterway = chroma(palette.constant).brighten(0.2).alpha(0.8).hex()
-  const waterwayTunnel = chroma(palette.constant).darken(0.5).alpha(0.5).hex()
+  // WATERWAYS
+  const waterway = ov.waterway || chroma(palette.constant).brighten(0.2).alpha(0.8).hex()
+  const waterwayTunnel = chroma(ov.waterway || palette.constant)
+    .darken(0.5)
+    .alpha(0.5)
+    .hex()
 
-  // LABELS - Foreground with proper hierarchy
-  const labelText = palette.fg
-  const labelHalo = palette.bg
+  // LABELS
+  const labelText = ov.labelText || palette.fg
+  const labelHalo = ov.labelHalo || palette.bg
 
   const style = {
     version: 8,
@@ -225,7 +326,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'fill',
         source: 'openmaptiles',
         'source-layer': 'landuse',
-        filter: ['any', ['==', ['get', 'class'], 'stadium'], ['==', ['get', 'class'], 'pitch'], ['==', ['get', 'class'], 'track']],
+        filter: [
+          'any',
+          ['==', ['get', 'class'], 'stadium'],
+          ['==', ['get', 'class'], 'pitch'],
+          ['==', ['get', 'class'], 'track'],
+        ],
         minzoom: 13,
         paint: {
           'fill-color': landuseSports,
@@ -315,29 +421,7 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         'source-layer': 'building',
         minzoom: 13,
         paint: {
-          // Use modulo to pseudo-randomly assign colors based on feature id
-          'fill-extrusion-color': [
-            'case',
-            ['<', ['%', ['id'], 10], 1],
-            buildingColors[0],
-            ['<', ['%', ['id'], 10], 2],
-            buildingColors[1],
-            ['<', ['%', ['id'], 10], 3],
-            buildingColors[2],
-            ['<', ['%', ['id'], 10], 4],
-            buildingColors[3],
-            ['<', ['%', ['id'], 10], 5],
-            buildingColors[4],
-            ['<', ['%', ['id'], 10], 6],
-            buildingColors[5],
-            ['<', ['%', ['id'], 10], 7],
-            buildingColors[6],
-            ['<', ['%', ['id'], 10], 8],
-            buildingColors[7],
-            ['<', ['%', ['id'], 10], 9],
-            buildingColors[8],
-            buildingColors[9], // default
-          ],
+          'fill-extrusion-color': buildingColor,
           'fill-extrusion-height': [
             'interpolate',
             ['linear'],
@@ -503,7 +587,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         'source-layer': 'transportation',
         filter: [
           'all',
-          ['any', ['==', ['get', 'class'], 'trunk'], ['==', ['get', 'class'], 'primary'], ['==', ['get', 'class'], 'secondary']],
+          [
+            'any',
+            ['==', ['get', 'class'], 'trunk'],
+            ['==', ['get', 'class'], 'primary'],
+            ['==', ['get', 'class'], 'secondary'],
+          ],
           ['==', ['get', 'brunnel'], 'bridge'],
         ],
         paint: {
@@ -706,7 +795,13 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['any', ['==', ['get', 'class'], 'restaurant'], ['==', ['get', 'class'], 'cafe'], ['==', ['get', 'class'], 'bar'], ['==', ['get', 'class'], 'fast_food']],
+        filter: [
+          'any',
+          ['==', ['get', 'class'], 'restaurant'],
+          ['==', ['get', 'class'], 'cafe'],
+          ['==', ['get', 'class'], 'bar'],
+          ['==', ['get', 'class'], 'fast_food'],
+        ],
         minzoom: 15,
         layout: {
           'text-field': '{name}',
@@ -779,7 +874,12 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         type: 'symbol',
         source: 'openmaptiles',
         'source-layer': 'poi',
-        filter: ['any', ['==', ['get', 'class'], 'park'], ['==', ['get', 'class'], 'playground'], ['==', ['get', 'class'], 'garden']],
+        filter: [
+          'any',
+          ['==', ['get', 'class'], 'park'],
+          ['==', ['get', 'class'], 'playground'],
+          ['==', ['get', 'class'], 'garden'],
+        ],
         minzoom: 14,
         layout: {
           'text-field': '{name}',
@@ -841,6 +941,130 @@ export function exportMaplibre(palette: ThemePalette, themeName: string = 'vulpe
         },
       },
     ],
+  }
+
+  // === POST-PROCESSING: Apply options if provided ===
+  if (options) {
+    const typo = options.typography
+    const vis = options.visibility
+    const opac = options.opacity
+
+    // Filter out hidden layer groups
+    if (vis) {
+      style.layers = style.layers.filter((layer: any) => {
+        if (layer.type === 'background') return true
+        const group = layerGroup(layer.id)
+        if (group && vis[group] === false) return false
+        return true
+      })
+    }
+
+    // Apply typography and opacity to remaining layers
+    for (const layer of style.layers as any[]) {
+      const group = layerGroup(layer.id)
+
+      // Typography: apply to all symbol layers
+      if (layer.type === 'symbol' && typo) {
+        if (!layer.layout) layer.layout = {}
+        if (!layer.paint) layer.paint = {}
+
+        if (typo.fontFamily) {
+          layer.layout['text-font'] = [typo.fontFamily]
+        }
+        if (typo.sizeScale != null && typo.sizeScale !== 1) {
+          layer.layout['text-size'] = scaleTextSize(layer.layout['text-size'], typo.sizeScale)
+        }
+        if (typo.haloWidth != null) {
+          layer.paint['text-halo-width'] = typo.haloWidth
+        }
+        if (typo.haloOpacity != null && typo.haloOpacity < 1) {
+          layer.paint['text-halo-blur'] = (1 - typo.haloOpacity) * 2
+        }
+        if (typo.labelOpacity != null && typo.labelOpacity < 1) {
+          layer.paint['text-opacity'] = typo.labelOpacity
+        }
+        // Per-layer density: adjust minzoom
+        if (typo.densityOffsets && typo.densityOffsets[layer.id] != null) {
+          const baseMinzoom = layer.minzoom || 0
+          layer.minzoom = Math.max(0, Math.min(24, baseMinzoom + typo.densityOffsets[layer.id]))
+        }
+      }
+
+      // Per-group opacity overrides
+      if (group && opac && opac[group] != null && opac[group] < 1) {
+        if (!layer.paint) layer.paint = {}
+        const groupOpacity = opac[group]
+
+        if (layer.type === 'fill') {
+          layer.paint['fill-opacity'] = groupOpacity
+        } else if (layer.type === 'line') {
+          layer.paint['line-opacity'] = groupOpacity
+        } else if (layer.type === 'fill-extrusion') {
+          layer.paint['fill-extrusion-opacity'] = groupOpacity
+        } else if (layer.type === 'symbol') {
+          layer.paint['text-opacity'] = groupOpacity
+          layer.paint['icon-opacity'] = groupOpacity
+        }
+      }
+    }
+
+    // Geometry scaling
+    const geo = options.geometry
+    if (geo) {
+      for (const layer of style.layers as any[]) {
+        if (!layer.paint) continue
+
+        // Building height scale
+        if (
+          geo.buildingHeightScale != null &&
+          geo.buildingHeightScale !== 1 &&
+          layer.type === 'fill-extrusion'
+        ) {
+          if (layer.paint['fill-extrusion-height']) {
+            layer.paint['fill-extrusion-height'] = scaleNumericValue(
+              layer.paint['fill-extrusion-height'],
+              geo.buildingHeightScale
+            )
+          }
+          if (layer.paint['fill-extrusion-base']) {
+            layer.paint['fill-extrusion-base'] = scaleNumericValue(
+              layer.paint['fill-extrusion-base'],
+              geo.buildingHeightScale
+            )
+          }
+        }
+
+        // Road width scale
+        if (geo.roadWidthScale != null && geo.roadWidthScale !== 1 && layer.type === 'line') {
+          const group = layerGroup(layer.id)
+          if (group === 'roads' && layer.paint['line-width']) {
+            layer.paint['line-width'] = scaleNumericValue(
+              layer.paint['line-width'],
+              geo.roadWidthScale
+            )
+          }
+        }
+
+        // Water outline width
+        if (geo.waterOutlineWidth != null && layer.id === 'water-outline') {
+          layer.paint['line-width'] = scaleNumericValue(
+            layer.paint['line-width'],
+            geo.waterOutlineWidth
+          )
+        }
+
+        // Boundary width
+        if (geo.boundaryWidth != null && layer.type === 'line') {
+          const group = layerGroup(layer.id)
+          if (group === 'boundaries' && layer.paint['line-width']) {
+            layer.paint['line-width'] = scaleNumericValue(
+              layer.paint['line-width'],
+              geo.boundaryWidth
+            )
+          }
+        }
+      }
+    }
   }
 
   return {

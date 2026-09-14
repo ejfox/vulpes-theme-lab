@@ -125,6 +125,11 @@
   align-items: center;
 }
 
+.nav-links {
+  display: flex;
+  gap: 12px;
+}
+
 .showcase-link {
   font-size: 9px;
   text-decoration: none;
