@@ -1,5 +1,52 @@
 # Changelog
 
+## v0.4.0
+
+[compare changes](https://github.com/ejfox/vulpes-theme-lab/compare/v0.3.0...v0.4.0)
+
+### 🚀 Enhancements
+
+- Rebuild showcase page as Product Hunt-style landing ([7c3540d](https://github.com/ejfox/vulpes-theme-lab/commit/7c3540d))
+- Add syntax highlighting demos and semantic color examples ([572d3b1](https://github.com/ejfox/vulpes-theme-lab/commit/572d3b1))
+- Add Tailwind CSS for proper spacing on showcase page ([aa5e931](https://github.com/ejfox/vulpes-theme-lab/commit/aa5e931))
+- Sticky nav with prominent hue counter badge that shows color rotation ([6537414](https://github.com/ejfox/vulpes-theme-lab/commit/6537414))
+- Rewrite showcase copy to explain monochrome benefits and multi-format export ([4a719ea](https://github.com/ejfox/vulpes-theme-lab/commit/4a719ea))
+- Reorder sections with visual demos first, add live color demos to offset mentions, improve copy ([4168a89](https://github.com/ejfox/vulpes-theme-lab/commit/4168a89))
+- Add clickable preset rows, fix readability, and redesign sliders ([f73afb1](https://github.com/ejfox/vulpes-theme-lab/commit/f73afb1))
+- Add real SVG logos to export formats grid ([ad72198](https://github.com/ejfox/vulpes-theme-lab/commit/ad72198))
+- Make base, fg, and bg colors editable ([49e6111](https://github.com/ejfox/vulpes-theme-lab/commit/49e6111))
+- Showcase page overhaul with hero examples, presets grid, and Monaspace fonts ([904c4fe](https://github.com/ejfox/vulpes-theme-lab/commit/904c4fe))
+- Add Tailwind CSS exporter ([7cc38f8](https://github.com/ejfox/vulpes-theme-lab/commit/7cc38f8))
+- Add Obsidian theme exporter and preview component ([d117169](https://github.com/ejfox/vulpes-theme-lab/commit/d117169))
+- Flatten sidebar/preview nesting and redesign sliders ([2ef4913](https://github.com/ejfox/vulpes-theme-lab/commit/2ef4913))
+
+### 🔥 Performance
+
+- Cut per-drag work so sliders stay responsive ([39ab95b](https://github.com/ejfox/vulpes-theme-lab/commit/39ab95b))
+
+### 🩹 Fixes
+
+- Remove global overflow hidden to allow showcase page scrolling ([716cdf5](https://github.com/ejfox/vulpes-theme-lab/commit/716cdf5))
+- Remove aggressive global reset killing tailwind spacing, throttle hue animation to prevent router history spam ([110637e](https://github.com/ejfox/vulpes-theme-lab/commit/110637e))
+- Theme preview cards now show actual theme hues with color palette swatches ([1cdcd11](https://github.com/ejfox/vulpes-theme-lab/commit/1cdcd11))
+- MapLibre filter syntax for proper tile rendering ([c4f041c](https://github.com/ejfox/vulpes-theme-lab/commit/c4f041c))
+- Proper grid layouts for color swatches and presets ([328b48b](https://github.com/ejfox/vulpes-theme-lab/commit/328b48b))
+- ObsidianPreview undefined colors.value.property ([c119f6b](https://github.com/ejfox/vulpes-theme-lab/commit/c119f6b))
+- Remove problematic colors.value refs in Obsidian preview ([e737487](https://github.com/ejfox/vulpes-theme-lab/commit/e737487))
+- Pin nuxt to 4.1.3 to resolve vue-router RouterView crash ([3c3e254](https://github.com/ejfox/vulpes-theme-lab/commit/3c3e254))
+
+### 💅 Refactors
+
+- Fix DOM manipulation, add design tokens, implement VueUse composables ([55131e6](https://github.com/ejfox/vulpes-theme-lab/commit/55131e6))
+
+### 🎨 Styles
+
+- Format MapLibre filter expressions for readability ([35de8c6](https://github.com/ejfox/vulpes-theme-lab/commit/35de8c6))
+
+### ❤️ Contributors
+
+- EJ Fox ([@ejfox](https://github.com/ejfox))
+
 ## v0.3.0
 
 [compare changes](https://github.com/ejfox/vulpes-theme-lab/compare/v0.2.0...v0.3.0)
