@@ -7,6 +7,7 @@ interface Props {
   max?: number
   step?: number
   label?: string
+  description?: string
   tooltip?: string
   variant?: 'primary' | 'standard' | 'compact'
   gradient?: string
@@ -69,6 +70,20 @@ const progress = computed(() => {
   return ((props.modelValue - props.min) / (props.max - props.min)) * 100
 })
 
+// Bipolar sliders (range crosses zero, e.g. hue offset -180..180) origin their
+// fill from the zero mark so the bar reads as signed deviation, not just amount.
+const isBipolar = computed(() => props.min < 0 && props.max > 0)
+
+const zeroPercent = computed(() => ((0 - props.min) / (props.max - props.min)) * 100)
+
+const fillLeft = computed(() =>
+  isBipolar.value ? Math.min(zeroPercent.value, progress.value) : 0
+)
+
+const fillWidth = computed(() =>
+  isBipolar.value ? Math.abs(progress.value - zeroPercent.value) : progress.value
+)
+
 // Dynamic colors based on theme mode
 const textColor = computed(() => {
   return state.value.mode === 'dark' ? '#fff' : '#000'
@@ -84,11 +99,7 @@ const trackBg = computed(() => {
     : 'rgba(0, 0, 0, 0.15)'
 })
 
-const valueBg = computed(() => {
-  return state.value.mode === 'dark'
-    ? 'rgba(255, 255, 255, 0.1)'
-    : 'rgba(0, 0, 0, 0.08)'
-})
+const valueBg = computed(() => 'transparent')
 </script>
 
 <template>
@@ -108,9 +119,17 @@ const valueBg = computed(() => {
     </label>
 
     <div class="slider-track-wrapper">
-      <div class="slider-track" :style="{ ...trackStyle, background: trackBg }">
-        <div class="slider-progress" :style="{ width: `${progress}%` }" />
+      <div class="slider-track" :style="{ background: trackBg, ...trackStyle }">
+        <div
+          v-if="!gradient"
+          class="slider-fill"
+          :style="{ left: `${fillLeft}%`, width: `${fillWidth}%` }"
+        />
       </div>
+
+      <div v-if="isBipolar && !gradient" class="slider-zero" :style="{ left: `${zeroPercent}%` }" />
+
+      <div class="slider-thumb" :style="{ left: `${progress}%` }" />
 
       <input
         ref="sliderRef"
@@ -125,6 +144,10 @@ const valueBg = computed(() => {
         @input="handleInput"
       />
     </div>
+
+    <p v-if="description" class="slider-desc" :style="{ color: mutedTextColor }">
+      {{ description }}
+    </p>
   </div>
 </template>
 
@@ -133,14 +156,14 @@ const valueBg = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 6px 0;
-  transition: none;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 3px;
+  transition: background 0.15s ease;
 }
 
 .base-slider:hover {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 8px 6px;
-  margin: -2px -6px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .slider-label {
@@ -151,6 +174,14 @@ const valueBg = computed(() => {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   user-select: none;
+}
+
+.slider-desc {
+  margin: 2px 0 0;
+  font-size: 8px;
+  line-height: 1.35;
+  letter-spacing: 0.2px;
+  opacity: 0.75;
 }
 
 .slider-label-text {
@@ -164,9 +195,8 @@ const valueBg = computed(() => {
   font-weight: 700;
   min-width: 38px;
   text-align: right;
-  padding: 3px 8px;
+  padding: 3px 0;
   font-size: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Track Wrapper */
@@ -181,21 +211,65 @@ const valueBg = computed(() => {
 .slider-track {
   position: absolute;
   width: 100%;
-  height: 4px;
-  border-radius: 0;
+  height: 3px;
+  border-radius: 999px;
   overflow: visible;
   transition: none;
 }
 
-.slider-progress {
+.slider-fill {
   position: absolute;
-  left: 0;
   top: 0;
   height: 100%;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 0;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
   pointer-events: none;
-  transition: width 0.05s linear;
+}
+
+/* Signed-zero reference tick for bipolar sliders */
+.slider-zero {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 9px;
+  background: rgba(255, 255, 255, 0.28);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Visible thumb knob (the native input on top is transparent, handles interaction) */
+.slider-thumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 2px 7px rgba(0, 0, 0, 0.32);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease;
+}
+
+.base-slider:hover .slider-thumb {
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.26),
+    0 3px 11px rgba(0, 0, 0, 0.42);
+}
+
+.slider--dragging .slider-thumb {
+  transform: translate(-50%, -50%) scale(1.2);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 5px 16px rgba(0, 0, 0, 0.5);
 }
 
 .slider-input {
@@ -217,50 +291,73 @@ const valueBg = computed(() => {
 .slider-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   background: #fff;
   cursor: grab;
   border-radius: 0;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  transition: none;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
   position: relative;
   z-index: 3;
 }
 
 .slider-input::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   background: #fff;
   cursor: grab;
   border-radius: 0;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  transition: none;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 /* Hover States */
 .slider-input::-webkit-slider-thumb:hover {
-  cursor: grabbing;
+  cursor: grab;
+  transform: scale(1.18);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .slider-input::-moz-range-thumb:hover {
-  cursor: grabbing;
+  cursor: grab;
+  transform: scale(1.18);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 /* Active/Dragging States */
 .slider-input::-webkit-slider-thumb:active,
 .slider--dragging .slider-input::-webkit-slider-thumb {
   cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .slider-input::-moz-range-thumb:active,
 .slider--dragging .slider-input::-moz-range-thumb {
   cursor: grabbing;
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* PRIMARY VARIANT - Hero slider (like base hue) */
 .slider--primary .slider-track {
-  height: 8px;
+  height: 5px;
+}
+
+.slider--primary .slider-thumb {
+  width: 17px;
+  height: 17px;
 }
 
 .slider--primary .slider-input::-webkit-slider-thumb {
@@ -286,13 +383,17 @@ const valueBg = computed(() => {
 .slider--compact .slider-value {
   min-width: 36px;
   font-size: 9px;
-  padding: 3px 8px;
-  border-radius: 0;
+  padding: 3px 0;
 }
 
 .slider--compact .slider-track {
   height: 3px;
-  border-radius: 0;
+  border-radius: 999px;
+}
+
+.slider--compact .slider-thumb {
+  width: 11px;
+  height: 11px;
 }
 
 .slider--compact .slider-input::-webkit-slider-thumb {

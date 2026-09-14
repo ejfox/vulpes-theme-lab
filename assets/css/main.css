@@ -152,9 +152,8 @@ h1 {
 
 .preset-select {
   width: 100%;
-  background: transparent;
-  border: 1px solid currentColor;
-  border-opacity: 0.3;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
   color: inherit;
   padding: 6px;
   font-family: inherit;
@@ -162,13 +161,11 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s;
 }
 
 .preset-select:hover {
-  background: currentColor;
-  background-opacity: 0.05;
-  border-opacity: 0.5;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .preset-select option {
@@ -219,14 +216,14 @@ h1 {
 }
 
 .btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
   color: #fff;
   padding: 8px 12px;
   font-family: inherit;
   font-size: 8px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: normal;
@@ -234,26 +231,18 @@ h1 {
 }
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: translateY(0);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .btn-primary {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.14);
   font-weight: bold;
   font-size: 9px;
   padding: 10px 12px;
 }
 
 .btn-primary:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .btn-secondary {
@@ -262,16 +251,14 @@ h1 {
 }
 
 .btn-reset {
-  background: transparent;
-  border-color: rgba(255, 100, 100, 0.4);
+  background: rgba(255, 100, 100, 0.1);
   color: rgba(255, 150, 150, 0.9);
   font-size: 8px;
   padding: 8px 12px;
 }
 
 .btn-reset:hover {
-  background: rgba(255, 100, 100, 0.1);
-  border-color: rgba(255, 100, 100, 0.6);
+  background: rgba(255, 100, 100, 0.18);
   color: rgba(255, 150, 150, 1);
 }
 
@@ -283,8 +270,7 @@ h1 {
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  padding: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 8px 0;
   max-height: 45vh;
   overflow-y: auto;
 }
@@ -375,9 +361,6 @@ h1 {
   align-items: center;
   gap: 4px;
   margin-bottom: 6px;
-  padding: 3px;
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 3px;
 }
 
 .color-picker {
@@ -407,9 +390,7 @@ h1 {
   display: flex;
   gap: 3px;
   align-items: center;
-  padding: 3px 5px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
+  padding: 2px 0;
   font-size: 8px;
   margin-bottom: 6px;
   cursor: help;
@@ -440,9 +421,9 @@ h1 {
 
 .lock-btn {
   background: rgba(255, 255, 255, 0.15);
-  border: 1px solid currentColor;
+  border: none;
   color: inherit;
-  padding: 4px 4px;
+  padding: 5px 4px;
   font-size: 8px;
   font-weight: bold;
   cursor: pointer;
@@ -472,9 +453,9 @@ h1 {
 
 .tool-btn {
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   color: inherit;
-  padding: 3px 2px;
+  padding: 4px 2px;
   font-size: 8px;
   cursor: pointer;
   transition: all 0.15s;
@@ -488,15 +469,15 @@ h1 {
 }
 
 .tool-btn.active {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
+  font-weight: bold;
 }
 
 .tool-select {
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   color: inherit;
-  padding: 3px 2px;
+  padding: 4px 2px;
   font-size: 8px;
   cursor: pointer;
   border-radius: 2px;
@@ -517,27 +498,77 @@ h1 {
   margin-bottom: 3px;
 }
 
-.offset-slider {
+.offset-slider,
+.lightness-slider {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   -webkit-appearance: none;
   appearance: none;
-  height: 6px;
-  border-radius: 3px;
+  height: 4px;
+  border-radius: 999px;
   outline: none;
   margin: 3px 0;
+  cursor: pointer;
 }
 
-.offset-slider::-webkit-slider-thumb {
+.offset-slider::-webkit-slider-thumb,
+.lightness-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  background: currentColor;
-  cursor: pointer;
-  border: 2px solid rgba(0, 0, 0, 0.2);
+  background: #fff;
+  cursor: grab;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 7px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease;
+}
+
+.offset-slider::-moz-range-thumb,
+.lightness-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: grab;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 7px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.16s ease;
+}
+
+.offset-slider::-webkit-slider-thumb:hover,
+.lightness-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 3px 11px rgba(0, 0, 0, 0.5);
+}
+
+.offset-slider::-moz-range-thumb:hover,
+.lightness-slider::-moz-range-thumb:hover {
+  transform: scale(1.12);
+}
+
+.offset-slider::-webkit-slider-thumb:active,
+.lightness-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+.offset-slider::-moz-range-thumb:active,
+.lightness-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.2);
 }
 
 .offset-slider.add-mode {
@@ -546,29 +577,6 @@ h1 {
 
 .offset-slider.linked {
   margin-bottom: 0;
-}
-
-.lightness-slider {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 3px;
-  outline: none;
-  margin: 3px 0;
-}
-
-.lightness-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: currentColor;
-  cursor: pointer;
-  border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Previews and configs */

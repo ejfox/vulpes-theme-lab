@@ -56,8 +56,7 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
         class="preset-button"
         :class="{ 'is-current-month': preset.month === currentMonth }"
         :style="{
-          borderColor: preset.month === currentMonth ? colors.base : colors.comment + '40',
-          background: colors.bg,
+          background: preset.month === currentMonth ? colors.base + '22' : 'transparent',
         }"
         @click="loadPreset(preset)"
       >
@@ -101,14 +100,13 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
 <style scoped>
 .preset-selector {
   width: 100%;
-  border: 1px solid;
   display: flex;
   flex-direction: column;
 }
 
 .preset-header {
   display: flex;
-  padding: 6px 8px;
+  padding: 6px 0;
   align-items: center;
   flex-wrap: wrap;
   gap: 4px;
@@ -118,7 +116,7 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 4px;
-  padding: 6px;
+  padding: 6px 0;
 }
 
 .preset-button {
@@ -127,22 +125,17 @@ const getPreviewColor = (hue: number, sat: number, light: number): string => {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 4px 2px;
-  border: 1px solid;
+  padding: 6px 2px;
+  border: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: filter 0.2s;
   background: none;
   position: relative;
   min-width: 0;
 }
 
 .preset-button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.2);
-}
-
-.preset-button.is-current-month {
-  border-width: 2px;
+  filter: brightness(1.3);
 }
 
 .preset-button.is-current-month::after {

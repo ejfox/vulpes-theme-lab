@@ -11,28 +11,99 @@ const sliders = [
   {
     key: 'baseHue',
     label: 'base hue',
+    desc: 'Anchor color for the whole theme — where it sits on the color wheel (0–360°).',
     min: 0,
     max: 360,
     step: 1,
     variant: 'primary' as const,
     gradient: baseHueGradient,
   },
-  { key: 'hueOffset', label: 'offset ±', min: 1, max: 45, step: 1 },
-  { key: 'saturation', label: 'dark sat', min: 0, max: 100, step: 1 },
-  { key: 'lightModeSaturation', label: 'light sat', min: 0, max: 100, step: 1 },
-  { key: 'contrast', label: 'contrast', min: 1, max: 100, step: 1 },
+  {
+    key: 'hueOffset',
+    label: 'hue spread',
+    desc: 'How far the syntax colors fan out from the base hue. Low = tight/monochrome, high = rainbow.',
+    min: 1,
+    max: 45,
+    step: 1,
+  },
+  {
+    key: 'saturation',
+    label: 'dark sat',
+    desc: 'Color intensity when the theme is in dark mode.',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'lightModeSaturation',
+    label: 'light sat',
+    desc: 'Color intensity when the theme is in light mode.',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'contrast',
+    label: 'contrast',
+    desc: 'Separation between text and background — higher is easier to read.',
+    min: 1,
+    max: 100,
+    step: 1,
+  },
 ]
 
 const monochromeSliders = [
-  { key: 'monochromeIntensity', label: 'mono sat', min: 0, max: 100, step: 1 },
-  { key: 'monochromeLightness', label: 'mono light', min: 0, max: 100, step: 1 },
+  {
+    key: 'monochromeIntensity',
+    label: 'mono sat',
+    desc: 'How much of the base color tints the gray body text.',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'monochromeLightness',
+    label: 'mono light',
+    desc: 'Brightness of the tinted body text.',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
 ]
 
 const visualEffectsSliders = [
-  { key: 'backgroundOpacity', label: 'bg opacity', min: 0, max: 100, step: 1 },
-  { key: 'backgroundBlur', label: 'bg blur (mac)', min: 0, max: 100, step: 1 },
-  { key: 'windowBlend', label: 'nvim blend', min: 0, max: 100, step: 1 },
-  { key: 'popupBlend', label: 'popup blend', min: 0, max: 100, step: 1 },
+  {
+    key: 'backgroundOpacity',
+    label: 'bg opacity',
+    desc: 'Terminal background transparency (see-through window).',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'backgroundBlur',
+    label: 'bg blur',
+    desc: 'Frosted-glass blur behind the terminal (macOS only).',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'windowBlend',
+    label: 'nvim blend',
+    desc: 'Transparency of Neovim floating windows (pmenu / popups).',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
+  {
+    key: 'popupBlend',
+    label: 'popup blend',
+    desc: 'Transparency of completion and popup menus.',
+    min: 0,
+    max: 100,
+    step: 1,
+  },
 ]
 
 // Map color intensity controls - how vivid each map feature is
@@ -328,6 +399,7 @@ const fixAllContrast = async () => {
       :key="slider.key"
       v-model="state[slider.key as keyof typeof state]"
       :label="slider.label"
+      :description="slider.desc"
       :min="slider.min"
       :max="slider.max"
       :step="slider.step"
@@ -342,6 +414,7 @@ const fixAllContrast = async () => {
         :key="slider.key"
         v-model="state[slider.key as keyof typeof state]"
         :label="slider.label"
+        :description="slider.desc"
         :min="slider.min"
         :max="slider.max"
         :step="slider.step"
@@ -351,11 +424,15 @@ const fixAllContrast = async () => {
     <!-- Visual effects controls -->
     <div class="visual-effects-section" :style="{ borderTopColor: borderColor }">
       <div class="section-header" :style="{ color: mutedColor }">VISUAL EFFECTS</div>
+      <p class="section-note" :style="{ color: mutedColor }">
+        Window transparency &amp; blur — affects how configs look, not the palette itself.
+      </p>
       <BaseSlider
         v-for="slider in visualEffectsSliders"
         :key="slider.key"
         v-model="state[slider.key as keyof typeof state]"
         :label="slider.label"
+        :description="slider.desc"
         :min="slider.min"
         :max="slider.max"
         :step="slider.step"
@@ -365,6 +442,9 @@ const fixAllContrast = async () => {
     <!-- MapLibre color controls -->
     <div class="maplibre-section" :style="{ borderTopColor: borderColor }">
       <div class="section-header" :style="{ color: mutedColor }">MAP COLORS</div>
+      <p class="section-note" :style="{ color: mutedColor }">
+        Controls the MapLibre map preview — how vivid each map feature is.
+      </p>
 
       <!-- Main map color intensity controls -->
       <BaseSlider
@@ -372,6 +452,7 @@ const fixAllContrast = async () => {
         :key="slider.key"
         v-model="state[slider.key as keyof typeof state]"
         :label="slider.label"
+        :description="slider.tooltip"
         :min="slider.min"
         :max="slider.max"
         :step="slider.step"
@@ -400,6 +481,9 @@ const fixAllContrast = async () => {
     <!-- Individual color offset controls -->
     <div class="color-offsets-section" :style="{ borderTopColor: borderColor }">
       <div class="section-header" :style="{ color: mutedColor }">INDIVIDUAL COLORS</div>
+      <p class="section-note" :style="{ color: mutedColor }">
+        Fine-tune one syntax color at a time — drag to shift its hue left or right from center (0 = follow the global spread).
+      </p>
       <BaseSlider
         v-for="slider in offsetSliders"
         :key="slider.key"
@@ -447,9 +531,9 @@ const fixAllContrast = async () => {
 
 .mode-toggle-btn {
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
   color: rgba(255, 255, 255, 0.4);
-  padding: 4px 8px;
+  padding: 5px 8px;
   font-family: inherit;
   font-size: 7px;
   cursor: pointer;
@@ -465,7 +549,6 @@ const fixAllContrast = async () => {
 
 .mode-toggle-btn.active {
   font-weight: bold;
-  border: 1px solid;
 }
 
 .colorblind-section {
@@ -486,11 +569,10 @@ const fixAllContrast = async () => {
 .colorblind-select {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid;
-  border-radius: 4px;
+  border: none;
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: opacity 0.2s;
 }
 
 .colorblind-select:hover {
@@ -513,29 +595,17 @@ const fixAllContrast = async () => {
 .fix-contrast-btn {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid;
-  border-radius: 6px;
+  border: none;
   font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: all 0.2s;
-}
-
-.fix-contrast-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.fix-contrast-btn:active:not(:disabled) {
-  transform: translateY(0);
+  transition: opacity 0.2s;
 }
 
 .contrast-summary {
   margin-top: 8px;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  padding: 4px 0;
   max-height: 200px;
   overflow-y: auto;
 }
@@ -667,18 +737,22 @@ const fixAllContrast = async () => {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  margin-bottom: 8px;
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  padding: 2px 0 2px 8px;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  transition: color 0.2s ease;
+}
+
+.section-note {
+  margin: 0 0 10px;
+  padding-left: 8px;
+  font-size: 8px;
+  line-height: 1.4;
+  opacity: 0.7;
 }
 
 .section-header:hover {
-  background: rgba(255, 255, 255, 0.08);
   border-left-color: rgba(255, 255, 255, 0.5);
-  padding-left: 12px;
 }
 
 .advanced-section {
@@ -777,11 +851,9 @@ label {
   width: 36px;
   display: inline-block;
   text-align: right;
-  padding: 2px 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
+  padding: 2px 0;
   font-size: 9px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 /* Note: Slider styles now in BaseSlider.vue component */

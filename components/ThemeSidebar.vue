@@ -29,8 +29,6 @@ const handlePresetChange = (event: Event) => {
     :style="{
       background: state.mode === 'dark' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
       borderColor: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)',
-      boxShadow:
-        state.mode === 'dark' ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 8px 32px rgba(0, 0, 0, 0.1)',
       color: state.mode === 'dark' ? '#fff' : '#000',
     }"
   >
