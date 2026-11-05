@@ -59,6 +59,15 @@ const handlePresetChange = (event: Event) => {
         >
           basemap →
         </NuxtLink>
+        <NuxtLink
+          to="/downloads"
+          class="showcase-link"
+          :style="{
+            color: state.mode === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+          }"
+        >
+          downloads →
+        </NuxtLink>
       </div>
     </div>
 

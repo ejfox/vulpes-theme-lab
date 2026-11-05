@@ -380,7 +380,10 @@ const handleModalExport = (formats: string[], mode: 'both' | 'dark' | 'light') =
 // Load preset from Vulpes monthly themes
 const loadPreset = (preset: any) => {
   state.value.baseHue = preset.baseHue
-  state.value.baseSaturation = preset.baseSaturation
+  // ThemeState has no baseSaturation; the preset's value drives both modes
+  // (same mapping as presetToThemeState, so the UI matches the download packs)
+  state.value.saturation = preset.baseSaturation
+  state.value.lightModeSaturation = preset.baseSaturation
   state.value.baseLightness = preset.baseLightness
   state.value.themeName = preset.id
 

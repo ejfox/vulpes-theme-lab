@@ -24,14 +24,28 @@ describe('Yazi Exporter', () => {
     const result = exportYazi(palette)
     const content = result.content
 
-    expect(content).toContain('[manager]')
+    expect(content).toContain('[mgr]')
+    expect(content).toContain('[indicator]')
+    expect(content).toContain('[mode]')
     expect(content).toContain('[status]')
+    expect(content).toContain('[tabs]')
     expect(content).toContain('[input]')
-    expect(content).toContain('[select]')
+    expect(content).toContain('[pick]')
     expect(content).toContain('[tasks]')
     expect(content).toContain('[which]')
     expect(content).toContain('[help]')
     expect(content).toContain('[filetype]')
+  })
+
+  // yazi 26.x silently ignores keys it doesn't know, so stale names fail quietly
+  it('should not emit keys removed or renamed in yazi 26', () => {
+    const content = exportYazi(palette).content
+
+    expect(content).not.toContain('[manager]')
+    expect(content).not.toContain('[select]')
+    expect(content).not.toMatch(/^preview_hovered/m)
+    expect(content).not.toMatch(/^(on|run|exec|footer)\s*=/m)
+    expect(content).not.toMatch(/\{ name = /)
   })
 
   it('should use valid hex colors', () => {
@@ -66,19 +80,19 @@ describe('Yazi Exporter', () => {
     const result = exportYazi(palette)
     const content = result.content
 
-    expect(content).toContain('mode_normal')
-    expect(content).toContain('mode_select')
-    expect(content).toContain('mode_unset')
+    expect(content).toContain('normal_main')
+    expect(content).toContain('select_main')
+    expect(content).toContain('unset_main')
   })
 
   it('should include permissions styling', () => {
     const result = exportYazi(palette)
     const content = result.content
 
-    expect(content).toContain('permissions_t')
-    expect(content).toContain('permissions_r')
-    expect(content).toContain('permissions_w')
-    expect(content).toContain('permissions_x')
+    expect(content).toContain('perm_type')
+    expect(content).toContain('perm_read')
+    expect(content).toContain('perm_write')
+    expect(content).toContain('perm_exec')
   })
 
   it('should map theme colors correctly', () => {

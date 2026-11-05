@@ -25,16 +25,28 @@ gui:
       - '${palette.info}'
     selectedLineBgColor:
       - '${palette.bg_alt}'
-    selectedRangeBgColor:
+    inactiveViewSelectedLineBgColor:
       - '${palette.bg_alt}'
     cherryPickedCommitBgColor:
       - '${palette.info}'
     cherryPickedCommitFgColor:
       - '${palette.bg}'
+    markedBaseCommitBgColor:
+      - '${palette.info}'
+    markedBaseCommitFgColor:
+      - '${palette.bg}'
     unstagedChangesColor:
       - '${palette.error}'
     defaultFgColor:
       - '${palette.fg}'
+    # lazygit 0.66 moved these inside gui.theme; at gui level they're ignored
+    authorColors:
+      "*": '${palette.base}'
+    branchColorPatterns:
+      "^(main|master)$": '${palette.success}'
+      "^develop$": '${palette.info}'
+      "^feature/": '${palette.warning}'
+      "^fix/": '${palette.error}'
 
   commitLength:
     show: true
@@ -45,16 +57,6 @@ gui:
   showBranchCommitHash: false
   showBottomLine: true
   showCommandLog: true
-
-  authorColors:
-    "*": '${palette.base}'
-
-  branchColors:
-    "main": '${palette.success}'
-    "master": '${palette.success}'
-    "develop": '${palette.info}'
-    "feature/*": '${palette.warning}'
-    "fix/*": '${palette.error}'
 `
 
   return {

@@ -182,7 +182,7 @@ describe('tweakcc Exporter', () => {
     expect(result.metadata).toBeDefined()
     expect(result.metadata?.instructions).toBeDefined()
     expect(result.metadata?.schemaVersion).toBe('1.0')
-    expect(result.metadata?.colorCount).toBe(56)
+    expect(result.metadata?.colorCount).toBe(63)
     expect(result.metadata?.generatedAt).toBeDefined()
   })
 

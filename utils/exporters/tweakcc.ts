@@ -210,7 +210,7 @@ https://github.com/yourusername/vulpes-theme-lab
     metadata: {
       instructions,
       schemaVersion: '1.0',
-      colorCount: 56,
+      colorCount: 63,
       generatedAt: new Date().toISOString(),
     },
   }

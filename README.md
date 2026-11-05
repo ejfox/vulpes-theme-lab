@@ -108,6 +108,36 @@ all formats now export in a single download:
 
 see **[THEME_EXPORT_FORMATS.md](./THEME_EXPORT_FORMATS.md)** for implementation details.
 
+## install a vulpes theme
+
+Two ways to get every Vulpes monthly preset (12 presets × dark/light × 14
+apps) onto your machine, both built from the exact same exporter code:
+
+**from the browser:** open `/downloads` in the app (linked from the sidebar)
+and download a per-preset zip, a single app file, or everything in one zip.
+Generated client-side.
+
+**from the CLI:**
+
+```bash
+npm run export:all          # writes dist-themes/<preset-id>/<mode>/<app>/...
+cd dist-themes
+./install.sh vulpes-reddishnovember --all      # install everything for one preset
+./install.sh vulpes-reddishnovember ghostty    # install just one app
+./install.sh vulpes-reddishnovember --dry-run --all   # preview, change nothing
+```
+
+Each preset's `install.sh` is non-destructive: it only writes into each
+tool's own theme/include directory (never your shell rc, ghostty config,
+lazygit `config.yml`, yazi `theme.toml`, alacritty.toml, or tmux.conf), backs
+up anything it would overwrite to `<file>.bak-<timestamp>`, never deletes,
+and running it twice changes nothing the second time. It prints the one line
+you add to your own config yourself. tweakcc, iTerm2, and Obsidian have no
+safe system-wide install path, so those are print-only instructions.
+
+See `dist-themes/<preset-id>/<app>/README.md` (after running `export:all`)
+for per-app install steps.
+
 ## stack
 
 - nuxt 4

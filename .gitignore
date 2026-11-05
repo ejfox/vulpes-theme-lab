@@ -9,6 +9,9 @@ dist
 # Node dependencies
 node_modules
 
+# Batch theme export output (regenerate with `npm run export:all`)
+dist-themes
+
 # Logs
 logs
 *.log

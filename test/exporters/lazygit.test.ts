@@ -38,7 +38,8 @@ describe('Lazygit Exporter', () => {
       'searchingActiveBorderColor',
       'optionsTextColor',
       'selectedLineBgColor',
-      'selectedRangeBgColor',
+      'inactiveViewSelectedLineBgColor',
+      'markedBaseCommitBgColor',
       'defaultFgColor',
     ]
 
@@ -69,10 +70,13 @@ describe('Lazygit Exporter', () => {
     const result = exportLazygit(palette)
     const content = result.content
 
-    expect(content).toContain('branchColors:')
-    expect(content).toContain('"main"')
-    expect(content).toContain('"master"')
-    expect(content).toContain('"develop"')
+    // lazygit 0.66: branch/author colors live under gui.theme, and branchColors is gone
+    expect(content).toMatch(/^ {4}branchColorPatterns:/m)
+    expect(content).toMatch(/^ {4}authorColors:/m)
+    expect(content).not.toContain('branchColors:')
+    expect(content).not.toContain('selectedRangeBgColor')
+    expect(content).toContain('main|master')
+    expect(content).toContain('^develop$')
   })
 
   it('should include installation instructions', () => {
