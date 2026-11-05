@@ -4,7 +4,7 @@ import type { ThemePalette } from '../utils/types'
 
 const props = defineProps<{
   show: boolean
-  palette: ThemePalette
+  palettes: { mode: 'dark' | 'light'; palette: ThemePalette }[]
   themeName: string
   issues: any[]
   onAutoFix: () => void
@@ -17,9 +17,24 @@ const props = defineProps<{
 // colors, so its own chrome never uses theme colors: fixed black-and-white,
 // with theme colors only in the before/after swatches (they're the data).
 
-const fixPreview = computed(() => {
-  return applyContrastFixes(props.palette)
+// One preview per exported palette (Export both = dark and light), matching
+// what handleAutoFix actually changes.
+const fixPreviews = computed(() => {
+  return props.palettes.map(({ mode, palette }) => ({
+    mode,
+    changes: applyContrastFixes(palette).changes,
+  }))
 })
+
+const totalFixes = computed(() => {
+  return fixPreviews.value.reduce((n, p) => n + p.changes.length, 0)
+})
+
+// Only label rows with dark/light when both are being exported
+function modeLabel(mode: string | undefined): string {
+  if (!mode || props.palettes.length < 2) return ''
+  return mode
+}
 
 const showPreview = ref(false)
 
@@ -52,9 +67,14 @@ function previewLabel(): string {
 
       <div class="modal-body">
         <ul class="issues-list">
-          <li v-for="issue in issues" :key="issue.pair" class="issue-item">
+          <li v-for="issue in issues" :key="`${issue.mode}-${issue.pair}`" class="issue-item">
             <div class="issue-header">
-              <span class="issue-name">{{ issue.pair }}</span>
+              <span class="issue-name"
+                >{{ issue.pair }}
+                <span v-if="modeLabel(issue.mode)" class="mode-tag">{{
+                  modeLabel(issue.mode)
+                }}</span></span
+              >
               <span class="badge" :class="`badge-${severityLabel(issue.severity)}`">
                 {{ severityLabel(issue.severity) }}
               </span>
@@ -66,25 +86,36 @@ function previewLabel(): string {
           </li>
         </ul>
 
-        <p v-if="showPreview && fixPreview.changes.length === 0" class="meta fix-preview">
-          No automatic fixes to preview for this palette.
+        <p v-if="showPreview && totalFixes === 0" class="meta fix-preview">
+          No automatic fixes to preview.
         </p>
-        <div v-if="showPreview && fixPreview.changes.length > 0" class="fix-preview">
+        <div v-if="showPreview && totalFixes > 0" class="fix-preview">
           <h3>Auto-fix would change</h3>
-          <div v-for="change in fixPreview.changes" :key="change.color" class="change-item">
-            <span class="issue-name">{{ change.color }}</span>
-            <div class="color-comparison">
-              <div class="color-cell">
-                <div class="swatch" :style="{ background: change.old }"></div>
-                <span class="meta">{{ change.oldRatio.toFixed(2) }}:1</span>
-              </div>
-              <span class="meta" aria-hidden="true">→</span>
-              <div class="color-cell">
-                <div class="swatch" :style="{ background: change.new }"></div>
-                <span>{{ change.newRatio.toFixed(2) }}:1</span>
+          <template v-for="preview in fixPreviews" :key="preview.mode">
+            <div
+              v-for="change in preview.changes"
+              :key="`${preview.mode}-${change.color}`"
+              class="change-item"
+            >
+              <span class="issue-name"
+                >{{ change.color }}
+                <span v-if="modeLabel(preview.mode)" class="mode-tag">{{
+                  modeLabel(preview.mode)
+                }}</span></span
+              >
+              <div class="color-comparison">
+                <div class="color-cell">
+                  <div class="swatch" :style="{ background: change.old }"></div>
+                  <span class="meta">{{ change.oldRatio.toFixed(2) }}:1</span>
+                </div>
+                <span class="meta" aria-hidden="true">→</span>
+                <div class="color-cell">
+                  <div class="swatch" :style="{ background: change.new }"></div>
+                  <span>{{ change.newRatio.toFixed(2) }}:1</span>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
 
@@ -178,6 +209,13 @@ function previewLabel(): string {
 
 .issue-name {
   font-weight: 700;
+}
+
+.mode-tag {
+  margin-left: 6px;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--cw-muted);
 }
 
 .badge {

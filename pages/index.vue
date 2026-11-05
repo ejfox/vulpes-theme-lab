@@ -60,7 +60,8 @@ const droppedFile = ref<File | undefined>(undefined)
 const showContrastWarning = ref(false)
 const contrastIssues = ref<any[]>([])
 const pendingExport = ref<{
-  palette: any
+  // every palette being exported, so the warning can preview fixes for each
+  palettes: { mode: 'dark' | 'light'; palette: any }[]
   themeName: string
   formats: string[]
   mode: 'both' | 'dark' | 'light'
@@ -190,23 +191,23 @@ const validateAndExport = (mode: 'both' | 'dark' | 'light') => {
     return
   }
 
-  // Check dark theme contrast
+  // Validate each palette being exported; tag issues with their mode so the
+  // warning can say which theme a failing color belongs to
   const darkPalette = createSemanticPalette(darkColors.value, 'dark')
-  const darkIssues = validateThemeContrast(darkPalette)
-
-  // Check light theme contrast if exporting both or light only
   const lightPalette = createSemanticPalette(lightColors.value, 'light')
-  const lightIssues = mode !== 'dark' ? validateThemeContrast(lightPalette) : []
+  const exported: { mode: 'dark' | 'light'; palette: any }[] = []
+  if (mode !== 'light') exported.push({ mode: 'dark', palette: darkPalette })
+  if (mode !== 'dark') exported.push({ mode: 'light', palette: lightPalette })
 
-  // Combine issues
-  const allIssues =
-    mode === 'both' ? [...darkIssues, ...lightIssues] : mode === 'dark' ? darkIssues : lightIssues
+  const allIssues = exported.flatMap(({ mode: m, palette }) =>
+    validateThemeContrast(palette).map((issue) => ({ ...issue, mode: m }))
+  )
 
   if (allIssues.length > 0) {
     // Show contrast warning modal
     contrastIssues.value = allIssues
     pendingExport.value = {
-      palette: mode === 'dark' ? darkPalette : lightPalette,
+      palettes: exported,
       themeName: state.value.themeName || 'vulpes',
       formats: exportFormats.value,
       mode,
@@ -1070,7 +1071,7 @@ const handlePick = ({ name, color }: { name: string; color: string }) => {
     <!-- Contrast Warning Modal -->
     <ContrastWarningModal
       :show="showContrastWarning"
-      :palette="pendingExport?.palette"
+      :palettes="pendingExport?.palettes || []"
       :themeName="pendingExport?.themeName || ''"
       :issues="contrastIssues"
       :onAutoFix="handleAutoFix"

@@ -71,6 +71,43 @@ export function ensureContrast(bg: string, preferredFg: string): string {
 }
 
 /**
+ * Fix contrast without throwing away the color: keep the OKLCH hue and
+ * chroma and move only lightness (up on dark backgrounds, down on light
+ * ones) to the smallest change that clears the target. Falls back to
+ * black/white only when no lightness gets there.
+ * @param bg - Background color
+ * @param fg - Failing foreground color
+ * @param target - Contrast ratio to reach (a hair over 4.5 so rounding can't fail it)
+ */
+export function nudgeToContrast(bg: string, fg: string, target = 4.6): string {
+  try {
+    if (getContrastRatio(fg, bg) >= target) return fg
+    const [l0, c, h] = chroma(fg).oklch()
+    const hue = Number.isNaN(h) ? 0 : h
+    const goLighter = chroma(bg).luminance() < 0.5
+    const at = (l: number) => chroma.oklch(l, c, hue).hex()
+
+    let lo = l0
+    let hi = 0
+    if (goLighter) hi = 1
+    if (getContrastRatio(at(hi), bg) < target) return ensureContrast(bg, fg)
+
+    // Binary search for the lightness closest to the original that passes
+    for (let i = 0; i < 24; i++) {
+      const mid = (lo + hi) / 2
+      if (getContrastRatio(at(mid), bg) >= target) {
+        hi = mid
+      } else {
+        lo = mid
+      }
+    }
+    return at(hi)
+  } catch {
+    return ensureContrast(bg, fg)
+  }
+}
+
+/**
  * Validate all critical contrast ratios in a theme
  * @param palette - Theme palette
  * @returns Array of contrast issues
@@ -179,7 +216,7 @@ export function applyContrastFixes(palette: ThemePalette): {
     const oldRatio = getContrastRatio(original, palette.bg)
 
     if (!meetsWCAG(oldRatio, 'AA')) {
-      const fixedColor = ensureContrast(palette.bg, original)
+      const fixedColor = nudgeToContrast(palette.bg, original)
       const newRatio = getContrastRatio(fixedColor, palette.bg)
 
       fixed[colorKey] = fixedColor as any
