@@ -13,236 +13,101 @@ const props = defineProps<{
   onCancel: () => void
 }>()
 
-const { colors } = useTheme()
+// This dialog appears precisely when the theme being edited has unreadable
+// colors, so its own chrome never uses theme colors: fixed black-and-white,
+// with theme colors only in the before/after swatches (they're the data).
 
 const fixPreview = computed(() => {
   return applyContrastFixes(props.palette)
 })
 
 const showPreview = ref(false)
+
+function plural(n: number): string {
+  if (n === 1) return ''
+  return 's'
+}
+
+function severityLabel(severity: string): string {
+  if (severity === 'critical') return 'critical'
+  return 'warning'
+}
+
+function previewLabel(): string {
+  if (showPreview.value) return 'Hide fixes'
+  return 'Preview fixes'
+}
 </script>
 
 <template>
   <div v-if="show" class="modal-overlay" @click="onCancel">
-    <div class="modal" :style="{ background: colors.bg, color: colors.fg }" @click.stop>
-      <!-- Header -->
-      <div class="modal-header" :style="{ borderBottom: `1px solid ${colors.error}` }">
-        <span :style="{ color: colors.error, fontSize: '11px' }"
-          >╔══[ <span class="blink">!</span> WCAG VALIDATION FAILED
-          ]══════════════════════════════════╗</span
-        >
+    <div class="modal" role="alertdialog" aria-labelledby="cw-title" @click.stop>
+      <div class="modal-header">
+        <h2 id="cw-title">WCAG AA check failed</h2>
+        <p class="meta">
+          {{ issues.length }} color{{ plural(issues.length) }} below 4.5:1 contrast against the
+          background. Low-vision readers will struggle with these.
+        </p>
       </div>
 
-      <!-- Issue Summary -->
       <div class="modal-body">
-        <div
-          class="summary"
-          :style="{
-            background: colors.error + '10',
-            borderLeft: `3px solid ${colors.error}`,
-            padding: '12px',
-          }"
-        >
-          <div :style="{ fontWeight: 'bold', marginBottom: '8px', color: colors.error }">
-            ║ ERROR: {{ issues.length }} color{{ issues.length > 1 ? 's' : '' }} fail WCAG AA
-            (4.5:1)
-          </div>
-          <div :style="{ fontSize: '9px', color: colors.comment }">
-            ║ Insufficient contrast detected. Low vision accessibility compromised.
-          </div>
-        </div>
-
-        <!-- Issue List -->
-        <div class="issues-list">
-          <div
-            v-for="issue in issues"
-            :key="issue.pair"
-            class="issue-item"
-            :style="{
-              background: colors.bg_alt,
-              borderLeft: `3px solid ${issue.severity === 'critical' ? colors.error : colors.warning}`,
-            }"
-          >
+        <ul class="issues-list">
+          <li v-for="issue in issues" :key="issue.pair" class="issue-item">
             <div class="issue-header">
-              <span :style="{ fontWeight: 'bold' }">{{ issue.pair }}</span>
-              <span
-                class="badge"
-                :style="{
-                  background: issue.severity === 'critical' ? colors.error : colors.warning,
-                  color: colors.bg,
-                  fontSize: '7px',
-                  padding: '2px 6px',
-                  borderRadius: '2px',
-                }"
-              >
-                {{ issue.severity === 'critical' ? 'CRITICAL' : 'WARNING' }}
+              <span class="issue-name">{{ issue.pair }}</span>
+              <span class="badge" :class="`badge-${severityLabel(issue.severity)}`">
+                {{ severityLabel(issue.severity) }}
               </span>
             </div>
-            <div class="issue-details" :style="{ fontSize: '8px', color: colors.comment }">
-              <div>Contrast: {{ issue.ratio.toFixed(2) }}:1 (need 4.5:1)</div>
-              <div>Gap: {{ (4.5 - issue.ratio).toFixed(2) }}:1 below minimum</div>
+            <div class="meta">
+              {{ issue.ratio.toFixed(2) }}:1, needs 4.5:1 ({{ (4.5 - issue.ratio).toFixed(2) }}
+              short)
             </div>
-          </div>
-        </div>
+          </li>
+        </ul>
 
-        <!-- Fix Preview -->
+        <p v-if="showPreview && fixPreview.changes.length === 0" class="meta fix-preview">
+          No automatic fixes to preview for this palette.
+        </p>
         <div v-if="showPreview && fixPreview.changes.length > 0" class="fix-preview">
-          <div
-            class="preview-header"
-            :style="{ color: colors.success, fontWeight: 'bold', marginBottom: '8px' }"
-          >
-            Auto-Fix Preview
-          </div>
-          <div
-            v-for="change in fixPreview.changes"
-            :key="change.color"
-            class="change-item"
-            :style="{ background: colors.bg_alt, padding: '8px', marginBottom: '4px' }"
-          >
-            <div :style="{ fontWeight: 'bold', fontSize: '9px' }">{{ change.color }}</div>
+          <h3>Auto-fix would change</h3>
+          <div v-for="change in fixPreview.changes" :key="change.color" class="change-item">
+            <span class="issue-name">{{ change.color }}</span>
             <div class="color-comparison">
-              <div class="color-before">
-                <div
-                  class="swatch"
-                  :style="{ background: change.old, width: '40px', height: '20px' }"
-                ></div>
-                <span :style="{ fontSize: '8px', color: colors.error }"
-                  >{{ change.oldRatio.toFixed(2) }}:1</span
-                >
+              <div class="color-cell">
+                <div class="swatch" :style="{ background: change.old }"></div>
+                <span class="meta">{{ change.oldRatio.toFixed(2) }}:1</span>
               </div>
-              <span :style="{ color: colors.comment }">→</span>
-              <div class="color-after">
-                <div
-                  class="swatch"
-                  :style="{ background: change.new, width: '40px', height: '20px' }"
-                ></div>
-                <span :style="{ fontSize: '8px', color: colors.success }"
-                  >{{ change.newRatio.toFixed(2) }}:1 ✓</span
-                >
+              <span class="meta" aria-hidden="true">→</span>
+              <div class="color-cell">
+                <div class="swatch" :style="{ background: change.new }"></div>
+                <span>{{ change.newRatio.toFixed(2) }}:1</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Actions -->
       <div class="modal-actions">
-        <button
-          @click="showPreview = !showPreview"
-          class="btn btn-secondary"
-          :style="{
-            background: 'transparent',
-            border: `1px solid ${colors.comment}`,
-            color: colors.comment,
-          }"
-        >
-          {{ showPreview ? 'Hide' : 'Preview' }} Changes
-        </button>
-
-        <button
-          @click="onCancel"
-          class="btn btn-secondary"
-          :style="{
-            background: 'transparent',
-            border: `1px solid ${colors.comment}`,
-            color: colors.comment,
-          }"
-        >
-          Cancel
-        </button>
-
-        <button
-          @click="onExportWithReport"
-          class="btn btn-secondary"
-          :style="{
-            background: colors.warning + '20',
-            border: `1px solid ${colors.warning}`,
-            color: colors.warning,
-          }"
-        >
-          Export + Report
-        </button>
-
-        <button
-          @click="onExportAnyway"
-          class="btn btn-secondary"
-          :style="{
-            background: 'transparent',
-            border: `1px solid ${colors.error}40`,
-            color: colors.error,
-            opacity: 0.6,
-          }"
-        >
-          Export Anyway
-        </button>
-
-        <button
-          @click="onAutoFix"
-          class="btn btn-primary"
-          :style="{
-            background: colors.success,
-            color: colors.bg,
-            fontWeight: 'bold',
-            border: 'none',
-          }"
-        >
-          ✓ Auto-Fix & Export
-        </button>
+        <button class="cw-btn" @click="showPreview = !showPreview">{{ previewLabel() }}</button>
+        <button class="cw-btn" @click="onCancel">Cancel</button>
+        <button class="cw-btn" @click="onExportWithReport">Export + report</button>
+        <button class="cw-btn cw-btn-quiet" @click="onExportAnyway">Export anyway</button>
+        <button class="cw-btn cw-btn-primary" @click="onAutoFix">Auto-fix &amp; export</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-4px);
-  }
-  75% {
-    transform: translateX(4px);
-  }
-}
-
 .modal-overlay {
+  --cw-bg: #000;
+  --cw-fg: #f2f2f2;
+  --cw-muted: #a3a3a3;
+  --cw-rule: #333;
+
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(4px);
   display: flex;
@@ -250,129 +115,106 @@ const showPreview = ref(false)
   justify-content: center;
   z-index: 9999;
   padding: 20px;
-  animation: fadeIn 0.2s ease-out;
 }
 
 .modal {
   max-width: 600px;
   width: 100%;
   max-height: 80vh;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--cw-bg);
+  color: var(--cw-fg);
+  border: 1px solid var(--cw-rule);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   font-family: 'Monaspace Krypton', monospace;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
+  font-size: 13px;
+  line-height: 1.5;
   overflow: hidden;
 }
 
-.modal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.02) 0px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-.modal > * {
-  position: relative;
-  z-index: 2;
-}
-
 .modal-header {
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 11px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--cw-rule);
+}
+
+.modal-header h2 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.modal-header span:first-child {
-  animation: pulse 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px currentColor);
+.meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--cw-muted);
 }
 
 .modal-body {
   flex: 1;
-  padding: 16px;
+  padding: 8px 20px 16px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  font-size: 9px;
 }
 
 .issues-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .issue-item {
-  padding: 10px;
-  border-radius: 2px;
-  animation: slideUp 0.3s ease-out backwards;
-}
-
-.issue-item:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.issue-item:nth-child(2) {
-  animation-delay: 0.1s;
-}
-.issue-item:nth-child(3) {
-  animation-delay: 0.15s;
-}
-.issue-item:nth-child(4) {
-  animation-delay: 0.2s;
-}
-.issue-item:nth-child(5) {
-  animation-delay: 0.25s;
-}
-.issue-item:nth-child(6) {
-  animation-delay: 0.3s;
-}
-.issue-item:nth-child(7) {
-  animation-delay: 0.35s;
-}
-.issue-item:nth-child(8) {
-  animation-delay: 0.4s;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--cw-rule);
 }
 
 .issue-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
-  font-size: 9px;
+  margin-bottom: 2px;
 }
 
-.issue-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.issue-name {
+  font-weight: 700;
+}
+
+.badge {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+/* Severity reads without color: inverted = critical, outlined = warning */
+.badge-critical {
+  background: var(--cw-fg);
+  color: var(--cw-bg);
+  font-weight: 700;
+}
+
+.badge-warning {
+  border: 1px solid var(--cw-muted);
+  color: var(--cw-fg);
 }
 
 .fix-preview {
-  border-radius: 2px;
-  animation: slideUp 0.3s ease-out;
+  margin-top: 16px;
 }
 
-.summary {
-  position: relative;
+.fix-preview h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--cw-muted);
+}
+
+.change-item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cw-rule);
 }
 
 .color-comparison {
@@ -382,73 +224,60 @@ const showPreview = ref(false)
   margin-top: 6px;
 }
 
-.color-before,
-.color-after {
+.color-cell {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
   align-items: center;
+  gap: 8px;
 }
 
 .swatch {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 20px;
+  border: 1px solid var(--cw-rule);
   border-radius: 2px;
 }
 
-.change-item {
-  /* No hover effects */
-}
-
 .modal-actions {
-  padding: 16px;
+  padding: 16px 20px;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   flex-wrap: wrap;
+  border-top: 1px solid var(--cw-rule);
 }
 
-.btn {
-  padding: 8px 16px;
-  font-size: 9px;
+/* Own class: the global .btn in main.css forces width 100% and 8px type */
+.cw-btn {
+  padding: 8px 14px;
+  font-size: 12px;
   font-family: inherit;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
   border-radius: 2px;
-  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
-  font-weight: 600;
-  position: relative;
-  overflow: hidden;
+  background: transparent;
+  color: var(--cw-fg);
+  border: 1px solid var(--cw-muted);
 }
 
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
+.cw-btn:hover {
+  border-color: var(--cw-fg);
 }
 
-.btn:active::before {
-  width: 300px;
-  height: 300px;
+.cw-btn:focus-visible {
+  outline: 2px solid var(--cw-fg);
+  outline-offset: 2px;
 }
 
-.btn:active {
-  transform: translateY(0);
-  transition: all 0.05s;
+.cw-btn-quiet {
+  color: var(--cw-muted);
+  border-color: var(--cw-rule);
 }
 
-.btn-primary {
-  padding: 10px 20px;
-  animation: pulse 2s ease-in-out infinite;
+.cw-btn-primary {
+  background: var(--cw-fg);
+  color: var(--cw-bg);
+  border-color: var(--cw-fg);
+  font-weight: 700;
 }
 </style>
