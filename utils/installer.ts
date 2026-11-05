@@ -159,7 +159,7 @@ export function renderAppReadme(app: AppId, presetId: string): string {
       return (
         header +
         `1. Copy \`dark/${dark}\` to e.g. \`~/.config/lazygit/${presetId}-theme.yml\` (lazygit only applies one theme at a time -- pick dark or light).\n` +
-        '2. Point lazygit at both files: `export LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml:' +
+        '2. Point lazygit at both files (comma-separated): `export LG_CONFIG_FILE="$XDG_CONFIG_HOME/lazygit/config.yml,' +
         `$XDG_CONFIG_HOME/lazygit/${presetId}-theme.yml` +
         '"` (macOS without `~/.config/lazygit`: use `~/Library/Application Support/lazygit/config.yml` instead).\n' +
         '3. Put the `export LG_CONFIG_FILE=...` line in your shell rc yourself -- the installer never edits it for you.\n'
@@ -273,6 +273,12 @@ install_file() {
     say "  ! missing $src (skipping)"
     return 0
   fi
+  # A symlink or directory here could be the user's real config (cp follows
+  # links and copies into dirs), so leave it alone.
+  if [ -L "$dest" ] || [ -d "$dest" ]; then
+    say "  ! $dest is a symlink or directory; skipping (move it aside to install)"
+    return 0
+  fi
   if [ -f "$dest" ] && cmp -s "$src" "$dest"; then
     say "  = unchanged: $dest"
     return 0
@@ -284,6 +290,11 @@ install_file() {
   mkdir -p "$(dirname "$dest")"
   if [ -f "$dest" ]; then
     local bak="$dest.bak-$(date +%Y%m%d%H%M%S)"
+    local n=1
+    while [ -e "$bak" ]; do
+      bak="$dest.bak-$(date +%Y%m%d%H%M%S)-$n"
+      n=$((n + 1))
+    done
     cp "$dest" "$bak"
     say "  backed up $dest -> $bak"
   fi
@@ -293,7 +304,9 @@ install_file() {
 }
 
 lazygit_config_dir() {
-  if [ -d "$CONFIG_HOME/lazygit" ]; then
+  # lazygit's default is ~/Library/Application Support on macOS only;
+  # everywhere else (and on a Mac that already uses it) it's the XDG dir.
+  if [ -d "$CONFIG_HOME/lazygit" ] || [ "$(uname -s)" != "Darwin" ]; then
     printf '%s' "$CONFIG_HOME/lazygit"
   else
     printf '%s' "$HOME/Library/Application Support/lazygit"
@@ -359,12 +372,15 @@ for app in "\${APPS[@]}"; do
       lg_dir="$(lazygit_config_dir)"
       install_file "$HERE/dark/lazygit/lazygit-config.yml" "$lg_dir/${presetId}-dark-theme.yml"
       install_file "$HERE/light/lazygit/lazygit-config.yml" "$lg_dir/${presetId}-light-theme.yml"
-      say "  export LG_CONFIG_FILE=\\"$lg_dir/config.yml:$lg_dir/${presetId}-dark-theme.yml\\""
+      say "  export LG_CONFIG_FILE=\\"$lg_dir/config.yml,$lg_dir/${presetId}-dark-theme.yml\\"  (comma-separated)"
       say "  (lazygit only applies one theme at a time -- swap -dark-theme.yml for -light-theme.yml to switch)"
       ;;
     yazi)
       install_file "$HERE/dark/yazi/theme.toml" "$CONFIG_HOME/yazi/flavors/${presetId}-dark.yazi/flavor.toml"
       install_file "$HERE/light/yazi/theme.toml" "$CONFIG_HOME/yazi/flavors/${presetId}-light.yazi/flavor.toml"
+      # yazi 26 takes preview highlighting from the flavor's tmtheme.xml
+      install_file "$HERE/dark/bat/${presetId}-dark.tmTheme" "$CONFIG_HOME/yazi/flavors/${presetId}-dark.yazi/tmtheme.xml"
+      install_file "$HERE/light/bat/${presetId}-light.tmTheme" "$CONFIG_HOME/yazi/flavors/${presetId}-light.yazi/tmtheme.xml"
       say "  In $CONFIG_HOME/yazi/theme.toml:"
       say "    [flavor]"
       say "    dark = \\"${presetId}-dark\\""

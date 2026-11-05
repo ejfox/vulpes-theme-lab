@@ -58,6 +58,11 @@ const EXPORTERS: Record<string, (palette: ThemePalette, name: string) => ExportR
 // the dist-themes/<preset-id>/... tree that `npm run export:all` writes on
 // the server side. Same exporter functions, same installer templates --
 // the web download and the CLI export can never drift apart.
+// install.sh must unzip executable: mark it as a Unix (os 3) file, mode 0755.
+function executable(bytes: Uint8Array): Zippable[string] {
+  return [bytes, { os: 3, attrs: (0o100755 << 16) >>> 0 }]
+}
+
 function buildPresetFiles(preset: ThemePreset): Zippable {
   const files: Zippable = {}
   const enc = (s: string) => new TextEncoder().encode(s)
@@ -86,7 +91,7 @@ function buildPresetFiles(preset: ThemePreset): Zippable {
     files[`light/${appId}/README.md`] = readme
   }
 
-  files['install.sh'] = enc(renderInstallScript(preset.id))
+  files['install.sh'] = executable(enc(renderInstallScript(preset.id)))
 
   return files
 }
@@ -127,10 +132,10 @@ async function downloadAllZip(): Promise<void> {
     for (const preset of VULPES_MONTHLY_PRESETS) {
       const presetFiles = buildPresetFiles(preset)
       for (const [path, data] of Object.entries(presetFiles)) {
-        files[`${preset.id}/${path}`] = data as Uint8Array
+        files[`${preset.id}/${path}`] = data
       }
     }
-    files['install.sh'] = enc(renderTopLevelInstallScript())
+    files['install.sh'] = executable(enc(renderTopLevelInstallScript()))
     const zipped = zipSync(files, { level: 6 })
     triggerDownload(zipped, 'vulpes-all-themes.zip')
   } finally {
